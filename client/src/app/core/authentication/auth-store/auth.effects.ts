@@ -32,7 +32,7 @@ export class AuthEffects {
         ofType('[Login] Login Success'),
         tap(() => {
           this.router.navigate(['/dashboard']);
-          this.notificationService.emitNotification('You have logged succesfully', 'success');
+          this.notificationService.emitNotification('Tus credenciales fueron correctas. Ingresaste exitosamente.', 'success', 2000);
         })
       ),
     { dispatch: false }
