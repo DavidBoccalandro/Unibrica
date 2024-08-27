@@ -14,6 +14,7 @@ import { BreaksModule } from './breaks/breaks.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { BanksModule } from './banks/banks.module';
 import { DebtorsModule } from './debtors/debtors.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -34,6 +35,8 @@ import { DebtorsModule } from './debtors/debtors.module';
     RequestsModule,
     AttendanceModule,
     BreaksModule,
+    PaymentModule,
   ],
+  providers: [],
 })
 export class AppModule {}
