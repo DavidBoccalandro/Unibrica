@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { logout } from 'src/app/core/authentication/auth-store/auth.actions';
 import { selectUser } from 'src/app/core/authentication/auth-store/auth.selectors';
 import { User } from 'src/app/core/authentication/auth.interfaces';
 
@@ -91,6 +92,6 @@ export class HeaderComponent implements OnInit {
   }
 
   onLogout() {
-    console.log('User logged out');
+    this.store.dispatch(logout());
   }
 }

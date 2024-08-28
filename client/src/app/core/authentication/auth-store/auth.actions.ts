@@ -5,12 +5,12 @@ export const login = createAction(
     '[Login] Login Attempt',
     props<{ username: string, password: string }>()
   );
-  
+
   export const loginSuccess = createAction(
     '[Login] Login Success',
     props<{ user:User }>()
   );
-  
+
   export const loginFailure = createAction(
     '[Login] Login Failure',
     props<{ error: string }>()
@@ -18,4 +18,8 @@ export const login = createAction(
 
   export const clearAuth = createAction(
     '[Auth] Clear Auth'
+  )
+
+  export const logout = createAction(
+    '[Auth] Logout'
   )

@@ -54,7 +54,19 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType('[Auth] Clear Auth'),
         tap(() => {
-          this.notificationService.emitNotification('Session expired', 'error');
+          this.notificationService.emitNotification('Tu sesión expiró', 'error');
+          this.router.navigate(['/login']);
+        })
+      ),
+    { dispatch: false }
+  );
+
+  logout$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType('[Auth] Logout'),
+        tap(() => {
+          this.notificationService.emitNotification('Cerraste Sesión con Éxito', 'success');
           this.router.navigate(['/login']);
         })
       ),
