@@ -47,12 +47,12 @@
 -->
 <div class="avatar-container">
 
-  <button mat-button [matMenuTriggerFor]="menu">
-    {{ userName }}
+  <button mat-button [matMenuTriggerFor]="menu" *ngIf="user$ | async as user">
+    {{ user.name }}
     <mat-icon>arrow_drop_down</mat-icon>
   </button>
 
-  <mat-menu #menu="matMenu">
+  <mat-menu #menu="matMenu" xPosition="before">
     <button mat-menu-item (click)="onLogout()">Cerrar Sesión</button>
   </mat-menu>
 </div>
