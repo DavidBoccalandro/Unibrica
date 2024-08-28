@@ -56,6 +56,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    margin-left: auto;
 
     .user-avatar {
       border-radius: 50%;
@@ -68,6 +69,16 @@
         filter: brightness(1.2);
       }
     }
-  }
 
+    button[mat-button] {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+
+      .mat-icon {
+        font-size: 20px;
+      }
+    }
+  }
 }
