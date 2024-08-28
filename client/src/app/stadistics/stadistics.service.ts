@@ -7,6 +7,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/enviroments/enviroment';
 import { Debtor } from './components/debtors/debtors.interface';
 import { Client } from './components/clients/clients.interfaces';
+import { Payment } from './components/payments/payments/payments.component';
 
 interface StatisticsParams {
   limit: number;
@@ -21,6 +22,7 @@ export class StadisticsService {
   private DebtsUrl = `${environment.envVar.API_URL}/debts`;
   private DebtorsUrl = `${environment.envVar.API_URL}/debtors`;
   private ClientsUrl = `${environment.envVar.API_URL}/clients`;
+  private PaymentsUrl = `${environment.envVar.API_URL}/payment`;
 
   params$!: Observable<Params>;
 
@@ -44,6 +46,10 @@ export class StadisticsService {
 
   getAllClients(): Observable<Client[]> {
     return this.http.get<any>(`${this.ClientsUrl}/all`, { withCredentials: true });
+  }
+
+  getAllPayments(): Observable<Payment[]> {
+    return this.http.get<any>(`${this.PaymentsUrl}`, { withCredentials: true });
   }
 
   navigateWithQueryParams(pageInfo: PageEvent, filters: FilterValues, route: string): void {

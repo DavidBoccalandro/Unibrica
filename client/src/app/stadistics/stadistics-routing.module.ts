@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { StadisticsComponent } from './stadistics.component';
 import { DebtsComponent } from './components/debts/debts.component';
 import { DebtorsComponent } from './components/debtors/debtors.component';
-import { ClientsComponent } from './components/clients/clients.component';
+import { PaymentsComponent } from './components/payments/payments/payments.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'deudas', pathMatch: 'full' },
@@ -22,9 +22,9 @@ const routes: Routes = [
         component: DebtorsComponent,
       },
       {
-        path: 'clientes',
-        title: 'Unibrica - Estadísticas | Clientes',
-        component: ClientsComponent,
+        path: 'pagos',
+        title: 'Unibrica - Estadísticas | Pagos',
+        component: PaymentsComponent,
       }
     ],
   },

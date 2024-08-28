@@ -10,12 +10,17 @@
         (click)="elementClick({column, value: element[column]})"
         class="cell-center"
       >
-        <ng-container *ngIf="column === 'createdAt' || column === 'updatedAt' || column === 'dueDate'; else defaultColumn">
-          {{ element[column] | date: 'dd/MM/yyyy' }}
+      <ng-container *ngIf="column === 'createdAt' || column === 'updatedAt' || column === 'dueDate'; else otherColumns">
+        {{ element[column] | date: 'dd/MM/yyyy' }}
+      </ng-container>
+      <ng-template #otherColumns>
+        <ng-container *ngIf="column === 'bank'; else defaultColumn">
+          {{ element[column].bankId }}
         </ng-container>
-        <ng-template #defaultColumn>
-          {{ element[column] }}
-        </ng-template>
+      </ng-template>
+      <ng-template #defaultColumn>
+        {{ element[column] }}
+      </ng-template>
       </td>
     </ng-container>
     <tr mat-header-row *matHeaderRowDef="columns; sticky: true"></tr>

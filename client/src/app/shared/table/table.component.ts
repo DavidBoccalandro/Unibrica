@@ -6,6 +6,7 @@ import { CdkColumnDef } from '@angular/cdk/table';
 import { Debt } from 'src/app/stadistics/components/debts/debts.interface';
 import { Debtor } from 'src/app/stadistics/components/debtors/debtors.interface';
 import { Client } from 'src/app/stadistics/components/clients/clients.interfaces';
+import { Payment } from 'src/app/stadistics/components/payments/payments/payments.component';
 
 const MaterialModules = [
   MatTableModule,
@@ -16,7 +17,7 @@ interface TableClickEvent {
   value: any
 }
 
-export type MatTableDataSourceInput = Debt | Debtor | Client;
+export type MatTableDataSourceInput = Debt | Debtor | Client | Payment;
 @Component({
   selector: 'app-table',
   standalone: true,
@@ -45,7 +46,21 @@ export class TableComponent {
     lastNames: 'Apellido',
     dni: 'DNI',
     name: 'Nombre',
-    clientId: 'ID Cliente'
+    clientId: 'ID Cliente',
+    recordType: 'Tipo de registro',
+    agreementNumber: 'N° de convenio',
+    creditCompany: 'Empresa crédito',
+    companyAccountNumber: 'N° de abonado',
+    debitDate: 'Fecha débito',
+    subscriberID: 'N° de abonado',
+    bank: 'Banco',
+    customerAccountType: "Tipo de cuenta",
+    branchCode: 'Sucursal',
+    bankAccountNumber: 'N° de cuenta',
+    debitSequence: 'Secuencial débito',
+    installmentNumber: 'N° cuota',
+    debitStatus: 'Estado de débito',
+    chargedAmount: 'Monto cobrado'
   };
 
   ngOnInit() {}

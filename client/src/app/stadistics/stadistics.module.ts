@@ -22,6 +22,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { StadisticsService } from './stadistics.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { PaymentsComponent } from './components/payments/payments/payments.component';
 
 const MaterialModules = [
   MatTabsModule,
@@ -41,6 +42,7 @@ const MaterialModules = [
     DebtorsComponent,
     ClientsComponent,
     FilterComponent,
+    PaymentsComponent,
   ],
   imports: [
     TableComponent,
