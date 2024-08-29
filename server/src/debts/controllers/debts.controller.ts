@@ -33,13 +33,12 @@ export class DebtsController {
   public async uploadDebtSheet(
     @UploadedFile() file: Express.Multer.File,
     @Body('userId') userId: string,
-    @Body('clientId') clientId: string,
     @Body('bankId') bankId: string
   ): Promise<string> {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
-    return await this.debtsService.uploadDebtSheet(file, userId, clientId, bankId);
+    return await this.debtsService.uploadDebtSheet(file, userId, bankId);
   }
 
   @Get('all')
