@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
 import { PaymentRecord } from '../entities/payment.entity';
 import { BankEntity } from 'src/banks/entities/banks.entity';
+import { FindAllPaymentsDto } from '../dto/findAllPayments.dto';
+import { PaginationQueryDto } from 'src/debts/controllers/debts.controller';
 
 @Injectable()
 export class PaymentService {
@@ -42,7 +44,7 @@ export class PaymentService {
         const day = parseInt(debitDateStr.substring(6, 8), 10);
         const debitDate = new Date(year, month, day);
 
-        const subscriberID = parseInt(line.substring(49, 60).trim(), 10);
+        const subscriberID = line.substring(49, 60).trim();
         const bankCode = line.substring(60, 63).trim();
         const customerAccountType = parseInt(line.substring(63, 64).trim(), 10);
         const branchCode = parseInt(line.substring(64, 67).trim(), 10);
@@ -56,7 +58,6 @@ export class PaymentService {
           isNaN(recordType) ||
           isNaN(agreementNumber) ||
           isNaN(creditCompany) ||
-          isNaN(subscriberID) ||
           isNaN(customerAccountType) ||
           isNaN(branchCode) ||
           isNaN(debitSequence) ||
@@ -114,8 +115,58 @@ export class PaymentService {
     return processedData;
   }
 
-  async findAll(): Promise<PaymentRecord[]> {
-    return this.paymentRecordRepository.find({ relations: ['bank'] });
+  async findAll(
+    paginationQuery: PaginationQueryDto
+  ): Promise<{ payments: PaymentRecord[]; totalItems: number }> {
+    const { limit, offset, sortBy, sortOrder, filterBy, filterValue, date, startDate, endDate } =
+      paginationQuery;
+    let queryBuilder = this.paymentRecordRepository
+      .createQueryBuilder('payment_records')
+      .leftJoinAndSelect('payment_records.bank', 'bank');
+
+    if (
+      filterBy &&
+      ['companyAccountNumber', 'subscriberID', 'bankAccountNumber'].includes(filterBy)
+    ) {
+      const lowerFilterValue = filterValue.toLowerCase();
+      queryBuilder = queryBuilder.where(`LOWER(payment_records.${filterBy}) LIKE :filterValue`, {
+        filterValue: `%${lowerFilterValue}%`,
+      });
+      // if (filterBy === 'subscriberID' && !isNaN(filterValue)) {
+      //   queryBuilder = queryBuilder.where(`payment_records.${filterBy} = :filterValue`, {
+      //     filterValue,
+      //   });
+      // } else {
+      // }
+    }
+
+    // if (startDate && endDate) {
+    //   if (date && ['createdAt', 'updatedAt', 'dueDate'].includes(date)) {
+    //     queryBuilder = queryBuilder.andWhere(
+    //       `debtor.${date} >= :startDate AND debtor.${date} <= :endDate`,
+    //       { startDate, endDate }
+    //     );
+    //   } else {
+    //     throw new BadRequestException('Invalid date field specified for filtering');
+    //   }
+    // }
+
+    // Ejecuta la consulta para obtener el total de elementos
+    const totalItems = await queryBuilder.getCount();
+
+    if (sortBy && sortOrder) {
+      const order = {};
+      order[`payment_records.${sortBy}`] = sortOrder.toUpperCase();
+      queryBuilder = queryBuilder.orderBy(order);
+    }
+
+    if (limit) {
+      queryBuilder = queryBuilder.limit(limit).offset(offset ?? 0);
+    }
+
+    const payments = await queryBuilder.getMany();
+
+    return { payments, totalItems };
   }
 
   async findOne(id: number): Promise<PaymentRecord> {

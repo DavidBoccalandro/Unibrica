@@ -8,10 +8,12 @@ import {
   Delete,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
 import { PaymentRecord } from '../entities/payment.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PaymentService } from '../services/payment.service';
+import { PaginationQueryDto } from 'src/debts/controllers/debts.controller';
 
 @Controller('payment')
 export class PaymentController {
@@ -24,8 +26,8 @@ export class PaymentController {
   }
 
   @Get()
-  async findAll(): Promise<PaymentRecord[]> {
-    return this.paymentService.findAll();
+  findAll(@Query() findAllPaymentsDto: PaginationQueryDto) {
+    return this.paymentService.findAll(findAllPaymentsDto);
   }
 
   @Get(':id')

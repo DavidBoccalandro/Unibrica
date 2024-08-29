@@ -4,22 +4,33 @@ import { FilterService } from 'src/app/core/services/filter.service';
 @Component({
   selector: 'app-filter',
   templateUrl: './filter.component.html',
-  styleUrls: ['./filter.component.scss']
+  styleUrls: ['./filter.component.scss'],
 })
 export class FilterComponent {
   @Input() currentRoute!: string;
-  range = new FormGroup ({
+  range = new FormGroup({
     start: new FormControl<Date | null>(null),
     end: new FormControl<Date | null>(null),
-  })
+  });
 
-  selectOptions: {[key: string]: {value: string, label: string}[]} = {
-    'deudas': [{value: 'idDebt', label:'ID Deuda'}],
-    'deudores': [{value: 'firstNames', label:'Nombre'}, {value: 'dni', label:'DNI'}],
-    'clientes': [{value: 'name', label:'Nombre'}, {value: 'idClient', label:'ID Cliente'}]
-  }
+  selectOptions: { [key: string]: { value: string; label: string }[] } = {
+    deudas: [{ value: 'idDebt', label: 'ID Deuda' }],
+    deudores: [
+      { value: 'firstNames', label: 'Nombre' },
+      { value: 'dni', label: 'DNI' },
+    ],
+    clientes: [
+      { value: 'name', label: 'Nombre' },
+      { value: 'idClient', label: 'ID Cliente' },
+    ],
+    pagos: [
+      { value: 'companyAccountNumber', label: 'N de abonado' },
+      { value: 'subscriberID', label: 'N de abonado banco' },
+      { value: 'bankAccountNumber', label: 'N° cuenta bancaria' },
+    ],
+  };
 
-  constructor(private filterService: FilterService) { }
+  constructor(private filterService: FilterService) {}
 
   ngOnInit(): void {}
 
@@ -40,7 +51,7 @@ export class FilterComponent {
   }
 
   clearSearchValue(): void {
-    this.filterService.updateSearchValue('')
+    this.filterService.updateSearchValue('');
   }
 
   searchButtonClick(): void {

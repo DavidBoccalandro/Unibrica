@@ -40,7 +40,7 @@ export class StadisticsService {
   }
 
   getAllDebtors(params: StatisticsParams): Observable<{totalItems: number, debtors: Debtor[]}> {
-    const url =`${this.DebtorsUrl}?limit=${params.limit}&offset=${params.offset}&filterBy=${params.filterBy ?? 'firstNames'}&filterValue=${params.filterValue}`
+    const url =`${this.PaymentsUrl}?limit=${params.limit}&offset=${params.offset}&filterBy=${params.filterBy ?? 'firstNames'}&filterValue=${params.filterValue}`
     return this.http.get<any>(url, { withCredentials: true });
   }
 
@@ -48,8 +48,9 @@ export class StadisticsService {
     return this.http.get<any>(`${this.ClientsUrl}/all`, { withCredentials: true });
   }
 
-  getAllPayments(): Observable<Payment[]> {
-    return this.http.get<any>(`${this.PaymentsUrl}`, { withCredentials: true });
+  getAllPayments(params: StatisticsParams): Observable<{totalItems: number, payments: Payment[]}> {
+    const url =`${this.PaymentsUrl}?limit=${params.limit}&offset=${params.offset}&filterBy=${params.filterBy ?? 'firstNames'}&filterValue=${params.filterValue}`
+    return this.http.get<any>(`${url}`, { withCredentials: true });
   }
 
   navigateWithQueryParams(pageInfo: PageEvent, filters: FilterValues, route: string): void {
