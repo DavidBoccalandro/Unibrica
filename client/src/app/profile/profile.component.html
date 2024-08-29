@@ -1,6 +1,6 @@
 <h2>Perfil de usuario</h2>
 <div class="user-image">
-  <!-- If we add user images, we should exchange the false for the user url. 
+  <!-- If we add user images, we should exchange the false for the user url.
       For now the template will do -->
   <img *ngIf="false; else user_letter" [src]="" id="user-image" />
   <ng-template #user_letter
@@ -10,11 +10,11 @@
 
 <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
   <div class="field">
-    <h3>Username:</h3>
+    <h3>Usuario:</h3>
     <mat-form-field>
       <input matInput formControlName="username" />
       <mat-error *ngIf="profileForm.get('name')?.hasError('required')"
-        >Username is required</mat-error
+        >Usuario es requerido</mat-error
       >
     </mat-form-field>
   </div>
@@ -24,7 +24,7 @@
     <mat-form-field>
       <input matInput formControlName="email" />
       <mat-error *ngIf="profileForm.get('email')?.hasError('required')"
-        >Email is required</mat-error
+        >Email es requerido</mat-error
       >
       <mat-error *ngIf="profileForm.get('email')?.hasError('email')">Invalid email</mat-error>
     </mat-form-field>
@@ -34,7 +34,7 @@
     <h3>Nombre:</h3>
     <mat-form-field>
       <input matInput formControlName="name" />
-      <mat-error *ngIf="profileForm.get('name')?.hasError('required')">Name is required</mat-error>
+      <mat-error *ngIf="profileForm.get('name')?.hasError('required')">Nombre es requerido</mat-error>
     </mat-form-field>
   </div>
 
@@ -50,7 +50,7 @@
 
   <div class="button-container">
     <button mat-raised-button color="primary" type="submit" [disabled]="!profileForm.valid">
-      Save
+      Guardar
     </button>
     <button
       mat-raised-button

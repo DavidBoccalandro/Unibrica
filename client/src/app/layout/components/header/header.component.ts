@@ -1,11 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { logout } from 'src/app/core/authentication/auth-store/auth.actions';
+import { selectUser } from 'src/app/core/authentication/auth-store/auth.selectors';
+import { User } from 'src/app/core/authentication/auth.interfaces';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
   fingerprintColor = 'primary';
   selfImprovementDisabled = true;
   isChronometerRunning = false;
@@ -13,6 +18,13 @@ export class HeaderComponent {
   signInTime: string = '';
   signOutTime: string = '';
   totalElapsedMilliseconds = 0;
+  user$!: Observable<User | null>;
+
+  constructor(private store: Store) { }
+
+  ngOnInit(): void {
+    this.user$ = this.store.select(selectUser);
+  }
 
   onFingerprintClick() {
     this.fingerprintColor = 'warn';
@@ -38,11 +50,11 @@ export class HeaderComponent {
   private startChronometer() {
     let currentElapsedTime = 0;
     const currentStartTime = Date.now();
-    if(this.totalElapsedMilliseconds) {
+    if (this.totalElapsedMilliseconds) {
       currentElapsedTime = this.totalElapsedMilliseconds;
     }
     this.isChronometerRunning = true;
-    
+
 
     const updateChronometer = () => {
       const currentTime = Date.now();
@@ -77,5 +89,9 @@ export class HeaderComponent {
     const minutes = now.getMinutes().toString().padStart(2, '0');
     const seconds = now.getSeconds().toString().padStart(2, '0');
     return `${hours}:${minutes}:${seconds}`;
+  }
+
+  onLogout() {
+    this.store.dispatch(logout());
   }
 }

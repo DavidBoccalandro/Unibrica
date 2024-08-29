@@ -7,8 +7,8 @@
 @include mat.core();
 
 
-$client-primary: mat.define-palette(mat.$indigo-palette);
-$client-accent: mat.define-palette(mat.$indigo-palette, A200, A100, A400);
+$client-primary: mat.define-palette(mat.$indigo-palette, 900, 600);
+$client-accent: mat.define-palette(mat.$blue-palette, 400, 300);
 $client-warn: mat.define-palette(mat.$red-palette);
 
 $client-theme: mat.define-light-theme((

@@ -1,4 +1,4 @@
-@use 'colors' as c; 
+@use 'colors' as c;
 :host{
     width: 100%;
     display: flex;
@@ -16,41 +16,44 @@
     p{
         color: c.$grey;
     }
+
+    h2 {
+      font-weight: 300;
+    }
 }
 
 
 
 .unibrica-word{
     display: flex;
-    h2{
+    h1{
         margin-bottom: 0.5em;
-        font-weight: 300;
         opacity: 0;
-        animation: fadeInOut 3s forwards;
+        animation: fadeInOut 2s forwards;
     }
 
-    h2:nth-child(1) {
-        animation-delay: 0.4s;      
+    h1:nth-child(1) {
+        animation-delay: 0.4s;
     }
-    h2:nth-child(2) {
+    h1:nth-child(2) {
         animation-delay: 0.8s;
     }
-    h2:nth-child(3) {
+    h1:nth-child(3) {
         animation-delay: 1.2s;
     }
-    h2:nth-child(4) {
+    h1:nth-child(4) {
         animation-delay: 1.4s;
     }
-    h2:nth-child(5) {
+    h1:nth-child(5) {
         animation-delay: 2s;
     }
-    h2:nth-child(6) {
+    h1:nth-child(6) {
         animation-delay: 2.4s;
     }
-    h2:nth-child(7) {
+    h1:nth-child(7) {
         animation-delay: 2.8s;
     }
-    h2:nth-child(8) {
+    h1:nth-child(8) {
         animation-delay: 3.2s;
     }
 }

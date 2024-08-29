@@ -32,7 +32,7 @@ export class AuthEffects {
         ofType('[Login] Login Success'),
         tap(() => {
           this.router.navigate(['/dashboard']);
-          this.notificationService.emitNotification('You have logged succesfully', 'success');
+          this.notificationService.emitNotification('Tus credenciales fueron correctas. Ingresaste exitosamente.', 'success', 2000);
         })
       ),
     { dispatch: false }
@@ -54,7 +54,19 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType('[Auth] Clear Auth'),
         tap(() => {
-          this.notificationService.emitNotification('Session expired', 'error');
+          this.notificationService.emitNotification('Tu sesión expiró', 'error');
+          this.router.navigate(['/login']);
+        })
+      ),
+    { dispatch: false }
+  );
+
+  logout$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType('[Auth] Logout'),
+        tap(() => {
+          this.notificationService.emitNotification('Cerraste Sesión con Éxito', 'success');
           this.router.navigate(['/login']);
         })
       ),

@@ -1,4 +1,4 @@
-<div class="fingerprint-container">
+<!-- <div class="fingerprint-container">
   <div class="title">
     <h3>HORARIOS</h3>
   </div>
@@ -41,13 +41,18 @@
     <div id="chronometer">{{ chronometerTime }}</div>
   </div>
 </div>
+<button mat-icon-button aria-label="Notification bell">
+  <mat-icon>notifications</mat-icon>
+</button>
+-->
 <div class="avatar-container">
-  <button mat-icon-button aria-label="Notification bell">
-    <mat-icon>notifications</mat-icon>
+
+  <button mat-button [matMenuTriggerFor]="menu" *ngIf="user$ | async as user">
+    {{ user.name }}
+    <mat-icon>arrow_drop_down</mat-icon>
   </button>
-  <img
-    alt="User Avatar"
-    class="user-avatar"
-    src="https://material.angular.io/assets/img/examples/shiba1.jpg"
-  />
+
+  <mat-menu #menu="matMenu" xPosition="before">
+    <button mat-menu-item (click)="onLogout()">Cerrar Sesión</button>
+  </mat-menu>
 </div>

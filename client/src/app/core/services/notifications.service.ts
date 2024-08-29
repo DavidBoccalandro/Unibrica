@@ -14,10 +14,10 @@ export class NotificationsService {
     private zone: NgZone
   ) { }
 
-  emitNotification (message:string, type:notificationType) {
+  emitNotification (message:string, type:notificationType, duration?: number) {
     this.zone.run(() => {
       this.snackBar.open( message, 'Close', {
-        duration: this.duration,
+        duration: duration || this.duration,
         panelClass: [`${type}-notification`],
         verticalPosition: 'bottom',
         horizontalPosition: 'center'
