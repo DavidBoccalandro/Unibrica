@@ -106,9 +106,11 @@ export class PaymentsComponent {
     );
   }
   resetParams() {
-    const currentPageSize = this.paginator.pageSize;
-    this.params.next({ ...this.params.getValue(), offset: 0, limit: currentPageSize });
-    this.paginator.pageIndex = 0;
+    if(this.paginator) {
+      const currentPageSize = this.paginator?.pageSize ?? 10;
+      this.params.next({ ...this.params.getValue(), offset: 0, limit: currentPageSize });
+      this.paginator.pageIndex = 0;
+    }
   }
 
   fetchPayments(): void {
@@ -116,8 +118,6 @@ export class PaymentsComponent {
       .getAllPayments(this.params.getValue())
       .pipe(take(1))
       .subscribe((data) => {
-        console.log('DATA: ', data);
-        // this.payments = this.processPaymentData(data.payments);
         this.payments = data.payments;
         this.totalItems = data.totalItems;
         this.tableData = new MatTableDataSource<MatTableDataSourceInput>(this.payments);
