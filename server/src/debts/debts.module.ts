@@ -3,7 +3,6 @@ import { DebtsController } from './controllers/debts.controller';
 import { DebtsService } from './services/debts.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountEntity } from './entities/accounts.entity';
-import { BankEntity } from '../banks/entities/banks.entity';
 import { DebtorEntity } from './entities/debtors.entity';
 import { DebtEntity } from './entities/debts.entity';
 import { DebtSheetsEntity } from './entities/debtSheets.entity';

@@ -143,11 +143,11 @@ export class DebtsService {
   async getAllDebts(paginationQuery: PaginationQueryDto) {
     const { limit, offset, sortBy, sortOrder, filterBy, filterValue, date, startDate, endDate } =
       paginationQuery;
-    let queryBuilder = this.debtRepository.createQueryBuilder('debt');
+    let queryBuilder = this.debtRepository.createQueryBuilder('debts');
 
     if (filterBy && ['idDebt'].includes(filterBy)) {
       const lowerFilterValue = filterValue.toLowerCase();
-      queryBuilder = queryBuilder.where(`LOWER(debt.${filterBy}) LIKE :filterValue`, {
+      queryBuilder = queryBuilder.where(`LOWER(debts.${filterBy}) LIKE :filterValue`, {
         filterValue: `%${lowerFilterValue}%`,
       });
     }
@@ -155,7 +155,7 @@ export class DebtsService {
     if (startDate && endDate) {
       if (date && ['createdAt', 'updatedAt', 'dueDate'].includes(date)) {
         queryBuilder = queryBuilder.andWhere(
-          `debt.${date} >= :startDate AND debt.${date} <= :endDate`,
+          `debts.${date} >= :startDate AND debt.${date} <= :endDate`,
           { startDate, endDate }
         );
       } else {
@@ -167,7 +167,7 @@ export class DebtsService {
 
     if (sortBy && sortOrder) {
       const order = {};
-      order[`debt.${sortBy}`] = sortOrder.toUpperCase();
+      order[`debts.${sortBy}`] = sortOrder.toUpperCase();
       queryBuilder = queryBuilder.orderBy(order);
     }
 

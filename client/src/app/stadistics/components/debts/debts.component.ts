@@ -42,6 +42,7 @@ export class DebtsComponent implements OnDestroy {
       const newParams = { ...this.params.getValue(), filterBy: value };
       this.params.next(newParams);
       this.fetchDebts()
+      this.resetParams()
     }))
 
     this.subscriptions.push(
