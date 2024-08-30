@@ -30,7 +30,6 @@ export class DebtsService {
   public async uploadDebtSheet(
     file: Express.Multer.File,
     userId: string,
-    clientId: string,
     bankId: string
   ): Promise<string> {
     try {
