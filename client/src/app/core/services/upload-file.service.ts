@@ -26,7 +26,7 @@ export class UploadFileService {
 
     const formData: FormData = new FormData();
 
-    console.log('FILE: ', files)
+    console.log('FILE: ', files, fileType)
     for (let i = 0; i < files.length; i++) {
       formData.append('file', files[i], files[i].name);
     }

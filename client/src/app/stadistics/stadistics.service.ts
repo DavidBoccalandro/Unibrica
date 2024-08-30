@@ -16,12 +16,11 @@ export interface StatisticsParams {
   filterValue?: string;
   date?: string;
   startDate?: string;
-  endDate?: string
+  endDate?: string;
 }
 
 @Injectable()
 export class StadisticsService {
-
   private DebtsUrl = `${environment.envVar.API_URL}/debts`;
   private DebtorsUrl = `${environment.envVar.API_URL}/debtors`;
   private ClientsUrl = `${environment.envVar.API_URL}/clients`;
@@ -29,21 +28,49 @@ export class StadisticsService {
 
   params$!: Observable<Params>;
 
-  constructor(private router: Router, private activatedRoute: ActivatedRoute, private http: HttpClient) {
+  constructor(
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private http: HttpClient
+  ) {
     this.params$ = this.activatedRoute.queryParams;
   }
 
-  getParams():Observable<Params> {
-    return this.params$
+  getParams(): Observable<Params> {
+    return this.params$;
   }
 
   getAllDebts(params: StatisticsParams): Observable<any> {
-    const url =`${this.DebtsUrl}/all?limit=${params.limit}&offset=${params.offset}&filterBy=${params.filterBy ?? 'idDebt'}&filterValue=${params.filterValue}`
-    return this.http.get<any>(url, { withCredentials: true });
+    let httpParams = new HttpParams()
+      .set('limit', params.limit.toString())
+      .set('offset', params.offset.toString())
+      .set('filterBy', params.filterBy ?? 'debt_ID')
+      .set('filterValue', params.filterValue ?? '');
+
+    if (params.startDate) {
+      httpParams = httpParams.set('startDate', params.startDate);
+    }
+
+    if (params.endDate) {
+      const adjustedEndDate = new Date(params.endDate);
+      adjustedEndDate.setHours(23, 59, 59, 999);
+      httpParams = httpParams.set('endDate', adjustedEndDate.toISOString());
+    }
+
+    if (params.date) {
+      httpParams = httpParams.set('date', params.date);
+    }
+
+    return this.http.get<any>(this.DebtsUrl + '/all', {
+      params: httpParams,
+      withCredentials: true,
+    });
   }
 
-  getAllDebtors(params: StatisticsParams): Observable<{totalItems: number, debtors: Debtor[]}> {
-    const url =`${this.DebtorsUrl}?limit=${params.limit}&offset=${params.offset}&filterBy=${params.filterBy ?? 'firstNames'}&filterValue=${params.filterValue}`
+  getAllDebtors(params: StatisticsParams): Observable<{ totalItems: number; debtors: Debtor[] }> {
+    const url = `${this.DebtorsUrl}?limit=${params.limit}&offset=${params.offset}&filterBy=${
+      params.filterBy ?? 'firstNames'
+    }&filterValue=${params.filterValue}`;
     return this.http.get<any>(url, { withCredentials: true });
   }
 
@@ -51,7 +78,9 @@ export class StadisticsService {
     return this.http.get<any>(`${this.ClientsUrl}/all`, { withCredentials: true });
   }
 
-  getAllPayments(params: StatisticsParams): Observable<{ totalItems: number, payments: Payment[] }> {
+  getAllPayments(
+    params: StatisticsParams
+  ): Observable<{ totalItems: number; payments: Payment[] }> {
     let httpParams = new HttpParams()
       .set('limit', params.limit.toString())
       .set('offset', params.offset.toString())
@@ -65,7 +94,6 @@ export class StadisticsService {
     if (params.endDate) {
       const adjustedEndDate = new Date(params.endDate);
       adjustedEndDate.setHours(23, 59, 59, 999);
-      console.log('adjusted endDate: ', adjustedEndDate)
       httpParams = httpParams.set('endDate', adjustedEndDate.toISOString());
     }
 
@@ -73,7 +101,7 @@ export class StadisticsService {
       httpParams = httpParams.set('date', params.date);
     }
 
-    return this.http.get<{ totalItems: number, payments: Payment[] }>(this.PaymentsUrl, {
+    return this.http.get<{ totalItems: number; payments: Payment[] }>(this.PaymentsUrl, {
       params: httpParams,
       withCredentials: true,
     });
@@ -93,11 +121,11 @@ export class StadisticsService {
     }
 
     if (filters.rangeStart) {
-      queryParams.rangeStart = filters.rangeStart.setHours(0,0,0,0);
+      queryParams.rangeStart = filters.rangeStart.setHours(0, 0, 0, 0);
     }
 
     if (filters.rangeEnd) {
-      queryParams.rangeEnd = filters.rangeEnd.setHours(0,0,0,0);
+      queryParams.rangeEnd = filters.rangeEnd.setHours(0, 0, 0, 0);
     }
     const navigationExtras: NavigationExtras = {
       queryParams,

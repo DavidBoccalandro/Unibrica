@@ -112,7 +112,15 @@ export class DebtsService {
         const debt = new DebtEntity();
         debt.amount = parseFloat(row['Importe']) / 100;
         debt.idDebt = row['Id_adherente'];
-        debt.dueDate = new Date(row['Fecha_vto']);
+
+        // Format date
+        const dateString = row['Fecha_vto'];
+        const year = parseInt(dateString.slice(0, 4), 10);
+        const month = parseInt(dateString.slice(4, 6), 10) - 1;
+        const day = parseInt(dateString.slice(6, 8), 10);
+        const dueDate = new Date(year, month, day);
+        debt.dueDate = dueDate;
+
         debt.account = account;
         debt.debtor = debtor;
         debt.isPaid = false;

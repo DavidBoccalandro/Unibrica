@@ -96,7 +96,6 @@ export class UploadFileModalComponent implements OnInit {
   }
 
   onUploadFiles(): void {
-    console.log('FORM: ', this.form.value)
     this.uploadFileService.postUploadDebtSheet(
       this.files!,
       'e1cac08c-145b-469b-ae9d-c1c76d3ff001',

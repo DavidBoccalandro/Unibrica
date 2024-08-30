@@ -2,7 +2,7 @@ import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { DEBT_TABLE_DATA_MOCK, Debt } from './debts.interface';
 import { BehaviorSubject, Subscription, take, debounceTime } from 'rxjs';
 import { Params } from '@angular/router';
-import { StadisticsService } from '../../stadistics.service';
+import { StadisticsService, StatisticsParams } from '../../stadistics.service';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Debtor } from '../debtors/debtors.interface';
@@ -20,7 +20,7 @@ export class DebtsComponent implements OnDestroy {
   clickableColumns = new Set<string>();
   subscriptions: Subscription[] = [];
   debts: Debt[] = [];
-  params = new BehaviorSubject<{ limit: number; offset: number; filterBy?: string; filterValue?: string }>({
+  params = new BehaviorSubject<StatisticsParams>({
     limit: 10,
     offset: 0,
   });
@@ -43,6 +43,30 @@ export class DebtsComponent implements OnDestroy {
       this.params.next(newParams);
       this.fetchDebts()
     }))
+
+    this.subscriptions.push(
+      this.filterService.rangeStart$.subscribe((startDate) => {
+        const newParams = {
+          ...this.params.getValue(),
+          date: 'createdAt',
+          startDate: startDate ? startDate.toISOString() : undefined,
+        };
+        this.params.next(newParams);
+        this.resetParams();
+      })
+    );
+
+    this.subscriptions.push(
+      this.filterService.rangeEnd$.subscribe((endDate) => {
+        const newParams = {
+          ...this.params.getValue(),
+          date: 'createdAt',
+          endDate: endDate ? endDate.toISOString() : undefined
+        };
+        this.params.next(newParams);
+        this.resetParams();
+      })
+    );
 
     if (this.paginator && this.debts.length === 0) {
       this.fetchDebts();
@@ -71,5 +95,13 @@ export class DebtsComponent implements OnDestroy {
         this.tableData = new MatTableDataSource<MatTableDataSourceInput>(this.debts);
         this.clickableColumns = new Set<string>([this.tableColumns[0]]);
       });
+  }
+
+  resetParams() {
+    if(this.paginator) {
+      const currentPageSize = this.paginator?.pageSize ?? 10;
+      this.params.next({ ...this.params.getValue(), offset: 0, limit: currentPageSize });
+      this.paginator.pageIndex = 0;
+    }
   }
 }
