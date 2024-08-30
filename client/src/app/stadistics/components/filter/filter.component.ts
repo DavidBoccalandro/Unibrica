@@ -32,7 +32,17 @@ export class FilterComponent {
 
   constructor(private filterService: FilterService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.range.get('start')?.valueChanges.subscribe((start) => {
+      this.filterService.updateDateField('updatedAt')
+      this.filterService.updateRangeStart(start);
+    });
+
+    this.range.get('end')?.valueChanges.subscribe((end) => {
+      this.filterService.updateDateField('updatedAt')
+      this.filterService.updateRangeEnd(end);
+    });
+  }
 
   changeSearchValue(search: string): void {
     this.filterService.updateSearchValue(search);

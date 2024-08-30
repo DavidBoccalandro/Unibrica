@@ -3,17 +3,20 @@ import { PageEvent } from '@angular/material/paginator';
 import { FilterValues } from './components/filter/filter.interfaces';
 import { NavigationExtras, Router, ActivatedRoute, Params } from '@angular/router';
 import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from 'src/enviroments/enviroment';
 import { Debtor } from './components/debtors/debtors.interface';
 import { Client } from './components/clients/clients.interfaces';
 import { Payment } from './components/payments/payments/payments.component';
 
-interface StatisticsParams {
+export interface StatisticsParams {
   limit: number;
   offset: number;
   filterBy?: string;
   filterValue?: string;
+  date?: string;
+  startDate?: string;
+  endDate?: string
 }
 
 @Injectable()
@@ -40,7 +43,7 @@ export class StadisticsService {
   }
 
   getAllDebtors(params: StatisticsParams): Observable<{totalItems: number, debtors: Debtor[]}> {
-    const url =`${this.PaymentsUrl}?limit=${params.limit}&offset=${params.offset}&filterBy=${params.filterBy ?? 'firstNames'}&filterValue=${params.filterValue}`
+    const url =`${this.DebtorsUrl}?limit=${params.limit}&offset=${params.offset}&filterBy=${params.filterBy ?? 'firstNames'}&filterValue=${params.filterValue}`
     return this.http.get<any>(url, { withCredentials: true });
   }
 
@@ -48,11 +51,33 @@ export class StadisticsService {
     return this.http.get<any>(`${this.ClientsUrl}/all`, { withCredentials: true });
   }
 
-  getAllPayments(params: StatisticsParams): Observable<{totalItems: number, payments: Payment[]}> {
-    const url =`${this.PaymentsUrl}?limit=${params.limit}&offset=${params.offset}&filterBy=${params.filterBy ?? 'firstNames'}&filterValue=${params.filterValue}`
-    return this.http.get<any>(`${url}`, { withCredentials: true });
-  }
+  getAllPayments(params: StatisticsParams): Observable<{ totalItems: number, payments: Payment[] }> {
+    let httpParams = new HttpParams()
+      .set('limit', params.limit.toString())
+      .set('offset', params.offset.toString())
+      .set('filterBy', params.filterBy ?? 'firstNames')
+      .set('filterValue', params.filterValue ?? '');
 
+    if (params.startDate) {
+      httpParams = httpParams.set('startDate', params.startDate);
+    }
+
+    if (params.endDate) {
+      const adjustedEndDate = new Date(params.endDate);
+      adjustedEndDate.setHours(23, 59, 59, 999);
+      console.log('adjusted endDate: ', adjustedEndDate)
+      httpParams = httpParams.set('endDate', adjustedEndDate.toISOString());
+    }
+
+    if (params.date) {
+      httpParams = httpParams.set('date', params.date);
+    }
+
+    return this.http.get<{ totalItems: number, payments: Payment[] }>(this.PaymentsUrl, {
+      params: httpParams,
+      withCredentials: true,
+    });
+  }
   navigateWithQueryParams(pageInfo: PageEvent, filters: FilterValues, route: string): void {
     const queryParams: any = {
       pageIndex: pageInfo.pageIndex || 1,

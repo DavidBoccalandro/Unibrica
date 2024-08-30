@@ -132,24 +132,18 @@ export class PaymentService {
       queryBuilder = queryBuilder.where(`LOWER(payment_records.${filterBy}) LIKE :filterValue`, {
         filterValue: `%${lowerFilterValue}%`,
       });
-      // if (filterBy === 'subscriberID' && !isNaN(filterValue)) {
-      //   queryBuilder = queryBuilder.where(`payment_records.${filterBy} = :filterValue`, {
-      //     filterValue,
-      //   });
-      // } else {
-      // }
     }
 
-    // if (startDate && endDate) {
-    //   if (date && ['createdAt', 'updatedAt', 'dueDate'].includes(date)) {
-    //     queryBuilder = queryBuilder.andWhere(
-    //       `debtor.${date} >= :startDate AND debtor.${date} <= :endDate`,
-    //       { startDate, endDate }
-    //     );
-    //   } else {
-    //     throw new BadRequestException('Invalid date field specified for filtering');
-    //   }
-    // }
+    if (startDate && endDate) {
+      if (date && ['createdAt', 'updatedAt', 'dueDate'].includes(date)) {
+        queryBuilder = queryBuilder.andWhere(
+          `payment_records.${date} >= :startDate AND payment_records.${date} <= :endDate`,
+          { startDate, endDate }
+        );
+      } else {
+        throw new BadRequestException('Invalid date field specified for filtering');
+      }
+    }
 
     // Ejecuta la consulta para obtener el total de elementos
     const totalItems = await queryBuilder.getCount();

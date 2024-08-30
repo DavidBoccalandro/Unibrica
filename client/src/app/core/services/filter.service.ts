@@ -17,6 +17,9 @@ export class FilterService {
   private rangeEndSubject = new BehaviorSubject<Date | null>(null);
   rangeEnd$: Observable<Date | null> = this.rangeEndSubject.asObservable();
 
+  private dateFieldSubject = new BehaviorSubject<String>('');
+  dateFieldSubject$: Observable<String> = this.dateFieldSubject.asObservable();
+
   constructor() { }
 
   updateSearchValue(search: string): void {
@@ -33,5 +36,9 @@ export class FilterService {
 
   updateRangeEnd(end: Date | null): void {
     this.rangeEndSubject.next(end);
+  }
+
+  updateDateField(field: string): void {
+    this.dateFieldSubject.next(field);
   }
 }

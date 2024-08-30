@@ -1,5 +1,5 @@
 import { BankEntity } from 'src/banks/entities/banks.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from 'typeorm';
 
 @Entity('payment_records')
 export class PaymentRecord {
@@ -47,4 +47,7 @@ export class PaymentRecord {
 
   @Column({ type: 'float' })
   chargedAmount: number;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
 }
