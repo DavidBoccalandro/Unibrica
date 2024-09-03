@@ -112,7 +112,15 @@ export class DebtsService {
         const debt = new DebtEntity();
         debt.amount = parseFloat(row['Importe']) / 100;
         debt.idDebt = row['Id_adherente'];
-        debt.dueDate = new Date(row['Fecha_vto']);
+
+        // Format date
+        const dateString = row['Fecha_vto'];
+        const year = parseInt(dateString.slice(0, 4), 10);
+        const month = parseInt(dateString.slice(4, 6), 10) - 1;
+        const day = parseInt(dateString.slice(6, 8), 10);
+        const dueDate = new Date(year, month, day);
+        debt.dueDate = dueDate;
+
         debt.account = account;
         debt.debtor = debtor;
         debt.isPaid = false;
@@ -135,11 +143,11 @@ export class DebtsService {
   async getAllDebts(paginationQuery: PaginationQueryDto) {
     const { limit, offset, sortBy, sortOrder, filterBy, filterValue, date, startDate, endDate } =
       paginationQuery;
-    let queryBuilder = this.debtRepository.createQueryBuilder('debt');
+    let queryBuilder = this.debtRepository.createQueryBuilder('debts');
 
     if (filterBy && ['idDebt'].includes(filterBy)) {
       const lowerFilterValue = filterValue.toLowerCase();
-      queryBuilder = queryBuilder.where(`LOWER(debt.${filterBy}) LIKE :filterValue`, {
+      queryBuilder = queryBuilder.where(`LOWER(debts.${filterBy}) LIKE :filterValue`, {
         filterValue: `%${lowerFilterValue}%`,
       });
     }
@@ -147,7 +155,7 @@ export class DebtsService {
     if (startDate && endDate) {
       if (date && ['createdAt', 'updatedAt', 'dueDate'].includes(date)) {
         queryBuilder = queryBuilder.andWhere(
-          `debt.${date} >= :startDate AND debt.${date} <= :endDate`,
+          `debts.${date} >= :startDate AND debt.${date} <= :endDate`,
           { startDate, endDate }
         );
       } else {
@@ -159,7 +167,7 @@ export class DebtsService {
 
     if (sortBy && sortOrder) {
       const order = {};
-      order[`debt.${sortBy}`] = sortOrder.toUpperCase();
+      order[`debts.${sortBy}`] = sortOrder.toUpperCase();
       queryBuilder = queryBuilder.orderBy(order);
     }
 
