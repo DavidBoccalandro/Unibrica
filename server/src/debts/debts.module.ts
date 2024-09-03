@@ -12,17 +12,12 @@ import { UsersModule } from 'src/users/users.module';
 import { ClientsModule } from 'src/clients/clients.module';
 import { BanksModule } from 'src/banks/banks.module';
 import { RepeatedDebtEntity } from './entities/repeatedDebts.entity';
+import { BankEntity } from 'src/banks/entities/banks.entity';
 
 @Module({
   imports: [
     MulterModule.register(multerConfig),
-    TypeOrmModule.forFeature([
-      AccountEntity,
-      DebtorEntity,
-      DebtEntity,
-      DebtSheetsEntity,
-      RepeatedDebtEntity,
-    ]),
+    TypeOrmModule.forFeature([DebtEntity, DebtSheetsEntity, RepeatedDebtEntity, BankEntity]),
     UsersModule,
     ClientsModule,
     BanksModule,

@@ -23,9 +23,9 @@ export class DebtSheetsEntity extends BaseEntity implements IDebtSheet {
   @ManyToOne(() => UserEntity, (user) => user.debtSheets)
   user: UserEntity;
 
-  @ManyToOne(()=> ClientEntity, (client) => client.debtSheets)
+  @ManyToOne(() => ClientEntity, (client) => client.debtSheets)
   client: ClientEntity;
 
-  @ManyToOne(()=> BankEntity, (bank) => bank.debtSheets)
+  @ManyToOne(() => BankEntity, (bank) => bank.debtSheets)
   bank: BankEntity;
 }

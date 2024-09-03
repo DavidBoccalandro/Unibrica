@@ -1,17 +1,32 @@
 import { BaseEntity } from 'src/config/base.entity';
 import { IDebt } from 'src/interfaces/debt.interface';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { DebtSheetsEntity } from './debtSheets.entity';
-import { AccountEntity } from './accounts.entity';
-import { DebtorEntity } from '../entities/debtors.entity';
+import { BankEntity } from 'src/banks/entities/banks.entity';
+import { PaymentRecord } from 'src/payment/entities/payment.entity';
 
 @Entity({ name: 'debts' })
 export class DebtEntity extends BaseEntity implements IDebt {
-  @Column()
+  @ManyToOne(() => BankEntity, (bank) => bank.debts)
+  bank: BankEntity;
+
+  @Column({ type: 'int' })
+  branch: number;
+
+  @Column({ type: 'int' })
+  accountType: number;
+
+  @Column({ type: 'varchar', length: 50 })
+  account: string;
+
+  @Column({ type: 'varchar', length: 50 })
   idDebt: string;
 
-  @Column()
+  @Column({ type: 'date' })
   dueDate: Date;
+
+  @Column({ type: 'varchar', length: 3 })
+  currency: string;
 
   @Column({ type: 'float' })
   amount: number;
@@ -19,12 +34,6 @@ export class DebtEntity extends BaseEntity implements IDebt {
   @ManyToOne(() => DebtSheetsEntity, (debtSheet) => debtSheet.debts)
   debtSheet: DebtSheetsEntity;
 
-  @ManyToOne(() => AccountEntity, (account) => account.debts)
-  account: AccountEntity;
-
-  @ManyToOne(() => DebtorEntity, (debtor) => debtor.debts)
-  debtor: DebtorEntity;
-
-  @Column()
-  isPaid: boolean;
+  @OneToMany(() => PaymentRecord, (payment) => payment.debt)
+  payments: PaymentRecord;
 }
