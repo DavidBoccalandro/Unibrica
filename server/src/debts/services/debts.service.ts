@@ -1,5 +1,4 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { DebtSheetsEntity } from '../entities/debtSheets.entity';
 import * as XLSX from 'xlsx';
 import { Repository } from 'typeorm';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -11,12 +10,13 @@ import { BankEntity } from '../../banks/entities/banks.entity';
 import { DebtEntity } from '../entities/debts.entity';
 import { PaginationQueryDto } from '../controllers/debts.controller';
 import { RepeatedDebtEntity } from '../entities/repeatedDebts.entity';
+import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
 
 @Injectable()
 export class DebtsService {
   constructor(
-    @InjectRepository(DebtSheetsEntity)
-    private readonly debtSheetRepository: Repository<DebtSheetsEntity>,
+    @InjectRepository(SheetsEntity)
+    private readonly sheetRepository: Repository<SheetsEntity>,
     @InjectRepository(DebtorEntity) private readonly debtorRepository: Repository<DebtorEntity>,
     @InjectRepository(DebtEntity) private readonly debtRepository: Repository<DebtEntity>,
     @InjectRepository(AccountEntity) private readonly accountRepository: Repository<AccountEntity>,
@@ -72,7 +72,6 @@ export class DebtsService {
         repeatedDebt.dueDate = existingDebt.dueDate;
         repeatedDebt.amount = existingDebt.amount;
         repeatedDebt.account = existingDebt.account;
-        repeatedDebt.debtSheet = existingDebt.debtSheet;
         repeatedDebts.push(repeatedDebt);
         continue;
       } else {

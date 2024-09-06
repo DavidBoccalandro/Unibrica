@@ -5,13 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountEntity } from './entities/accounts.entity';
 import { DebtorEntity } from './entities/debtors.entity';
 import { DebtEntity } from './entities/debts.entity';
-import { DebtSheetsEntity } from './entities/debtSheets.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { multerConfig } from 'src/config/multer.config';
 import { UsersModule } from 'src/users/users.module';
 import { ClientsModule } from 'src/clients/clients.module';
 import { BanksModule } from 'src/banks/banks.module';
 import { RepeatedDebtEntity } from './entities/repeatedDebts.entity';
+import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import { RepeatedDebtEntity } from './entities/repeatedDebts.entity';
       AccountEntity,
       DebtorEntity,
       DebtEntity,
-      DebtSheetsEntity,
+      SheetsEntity,
       RepeatedDebtEntity,
     ]),
     UsersModule,

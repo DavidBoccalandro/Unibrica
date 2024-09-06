@@ -1,9 +1,9 @@
 import { BaseEntity } from 'src/config/base.entity';
 import { IDebt } from 'src/interfaces/debt.interface';
 import { Column, Entity, ManyToOne } from 'typeorm';
-import { DebtSheetsEntity } from './debtSheets.entity';
 import { AccountEntity } from './accounts.entity';
 import { DebtorEntity } from '../entities/debtors.entity';
+import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
 
 @Entity({ name: 'debts' })
 export class DebtEntity extends BaseEntity implements IDebt {
@@ -16,8 +16,8 @@ export class DebtEntity extends BaseEntity implements IDebt {
   @Column({ type: 'float' })
   amount: number;
 
-  @ManyToOne(() => DebtSheetsEntity, (debtSheet) => debtSheet.debts)
-  debtSheet: DebtSheetsEntity;
+  @ManyToOne(() => SheetsEntity, (debtSheet) => debtSheet.debts)
+  debtSheet: SheetsEntity;
 
   @ManyToOne(() => AccountEntity, (account) => account.debts)
   account: AccountEntity;
