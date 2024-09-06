@@ -19,7 +19,7 @@ export class SheetsEntity extends BaseEntity {
   @OneToMany(() => DebtEntity, (debt) => debt.debtSheet, { nullable: true })
   payments: PaymentRecord[];
 
-  @OneToMany(() => DebtEntity, (debt) => debt.debtSheet, { nullable: true })
+  @OneToMany(() => ReversalRecord, (debt) => debt.sheet, { nullable: true })
   reversals: ReversalRecord[];
 
   @ManyToOne(() => ClientEntity, (client) => client.debtSheets)

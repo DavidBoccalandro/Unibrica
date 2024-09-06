@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { BankEntity } from 'src/banks/entities/banks.entity';
 import { ReversalRecord } from '../entities/reversal.entity';
 import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
+import * as XLSX from 'xlsx';
 
 @Injectable()
 export class ReversalService {
@@ -38,6 +39,7 @@ export class ReversalService {
       // sheet.client = // TODO
       const regex = /_(\d{6})_/;
       const match = originalFileName.match(regex);
+      let date;
 
       if (match) {
         const dateString = match[1];
@@ -45,17 +47,21 @@ export class ReversalService {
         const month = parseInt(dateString.slice(2, 4));
         const year = parseInt('20' + dateString.slice(4, 6));
 
-        sheet.date = new Date(year, month, day);
-        console.log('Date: ', sheet.date);
+        date = new Date(year, month, day);
+        console.log('Date: ', date);
       }
 
-      const sheetRecord = this.sheetRepository.create(sheet);
-      await this.sheetRepository.save(sheetRecord);
+      sheet = this.sheetRepository.create({
+        fileName: originalFileName,
+        date: date,
+      });
+      await this.sheetRepository.save(sheet);
     }
 
     const processedData: ReversalRecord[] = [];
 
     for (const line of lines) {
+      console.log('Se ejecuta una linea');
       try {
         // const recordType = parseInt(line.substring(0, 1).trim(), 10); // Filler
         const agreementNumber = parseInt(line.substring(1, 6).trim(), 10); // Nro de convenio
@@ -81,7 +87,12 @@ export class ReversalService {
         const debitAmount = parseFloat(line.substring(98, 111).trim()) / 100; // Importe a debitar
 
         // Validaciones adicionales si es necesario
-        if (isNaN(agreementNumber) || isNaN(branchCode) || isNaN(debitAmount)) {
+        if (
+          isNaN(agreementNumber) ||
+          isNaN(branchCode) ||
+          isNaN(debitAmount) ||
+          parseInt(accountNumber, 10) === 0
+        ) {
           console.log(`Error parsing line: ${line}`);
           continue;
         }
@@ -111,21 +122,22 @@ export class ReversalService {
           sheet,
         });
 
-        // console.log('Reversal: ', {
-        //   agreementNumber,
-        //   serviceNumber,
-        //   companyNumber,
-        //   bank,
-        //   branchCode,
-        //   accountType,
-        //   accountNumber,
-        //   currentID,
-        //   debitID,
-        //   movementFunction,
-        //   rejectionCode,
-        //   dueDate,
-        //   debitAmount,
-        // });
+        console.log('Reversal: ', {
+          agreementNumber,
+          serviceNumber,
+          companyNumber,
+          bank,
+          branchCode,
+          accountType,
+          accountNumber,
+          currentID,
+          debitID,
+          movementFunction,
+          rejectionCode,
+          dueDate,
+          debitAmount,
+          sheet,
+        });
         await this.reversalRecordRepository.save(reversalRecord);
         processedData.push(reversalRecord);
       } catch (error) {
@@ -134,7 +146,83 @@ export class ReversalService {
       }
     }
 
+    const filePath = await this.createExcelFile(processedData, originalFileName);
+    console.log('El archivo fue creado en: ', filePath);
+
     // Opcionalmente, puedes generar un archivo Excel o hacer otra acción
     return processedData;
+  }
+
+  // Función para crear el archivo Excel
+  async createExcelFile(
+    reversalRecords: ReversalRecord[],
+    originalFileName: string
+  ): Promise<string> {
+    // Definir los encabezados en español
+    const headers = [
+      'N° convenio', // agreementNumber
+      'N° servicio', // serviceNumber
+      'N° empresa', // companyNumber
+      'Banco', // bank
+      'Sucursal', // branchCode
+      'Tipo de cuenta', // accountType
+      'N° cuenta', // accountNumber
+      'Id usuario', // currentID
+      'Id del débito', // debitID
+      'C° mov', // movementFunction
+      'C° rechazo', // rejectionCode
+      'Vencimiento', // dueDate
+      'Importe a debitar', // debitAmount
+    ];
+
+    // Mapear los registros a un formato adecuado para el archivo Excel
+    const data = reversalRecords.map((record) => ({
+      'N° convenio': record.agreementNumber,
+      'N° servicio': record.serviceNumber,
+      'N° empresa': record.companyNumber,
+      'Banco': record.bank?.bankId || 'Desconocido', // Manejo del banco si está relacionado
+      'Sucursal': record.branchCode,
+      'Tipo de cuenta': record.accountType,
+      'N° cuenta': record.accountNumber,
+      'Id usuario': record.currentID,
+      'Id del débito': record.debitID,
+      'C° mov': record.movementFunction,
+      'C° rechazo': record.rejectionCode,
+      'Vencimiento': record.dueDate.toISOString().split('T')[0], // Formato YYYY-MM-DD
+      'Importe a debitar': record.debitAmount.toFixed(2),
+    }));
+
+    // Crear una hoja de trabajo
+    const worksheet = XLSX.utils.json_to_sheet(data, { header: headers });
+    // Crear un libro de trabajo
+    const workbook = XLSX.utils.book_new();
+    // Añadir la hoja de trabajo al libro
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Registros de Pago');
+
+    // Eliminar la extensión .lis del nombre del archivo original
+    const fileNameWithoutExtension = originalFileName.replace('.lis', '') + '.xlsx';
+    // Ruta para guardar el archivo Excel
+    const filePath = path.join(__dirname, '..', '..', '..', 'uploads', fileNameWithoutExtension);
+
+    const wscols = [
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 15 },
+      { wch: 23 },
+      { wch: 25 },
+      { wch: 9 },
+      { wch: 9 },
+      { wch: 12 },
+    ];
+    worksheet['!cols'] = wscols;
+
+    // Escribir el archivo en el sistema
+    fs.writeFileSync(filePath, XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' }));
+
+    return filePath;
   }
 }
