@@ -68,7 +68,7 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-stroked-button color="warn" (click)="onCloseClick()">Cerrar</button>
-  <button mat-fab (click)="downloadExcel()">
+  <button mat-mini-fab (click)="downloadExcel()" [disabled]="!(uploadSuccess$ | async)">
     <mat-icon>download</mat-icon>
   </button>
   <button

@@ -14,6 +14,9 @@ export class UploadFileService {
   private uploadingSubject = new BehaviorSubject<boolean>(false);
   public uploading$ = this.uploadingSubject.asObservable();
 
+  private uploadSuccessSubject = new BehaviorSubject<boolean>(false);  // Nuevo BehaviorSubject para rastrear éxito
+  public uploadSuccess$ = this.uploadSuccessSubject.asObservable();   // Observable para el éxito de la carga
+
   constructor(private http: HttpClient) {}
 
   postUploadDebtSheet(
@@ -26,11 +29,9 @@ export class UploadFileService {
     this.uploadingSubject.next(true);
 
     const formData: FormData = new FormData();
-
     for (let i = 0; i < files.length; i++) {
       formData.append('file', files[i], files[i].name);
     }
-
     formData.append('userId', userId);
     formData.append('clientId', clientId);
     formData.append('bankId', bankId);
@@ -40,9 +41,11 @@ export class UploadFileService {
     postUpload.subscribe(
       (response) => {
         console.log('Respuesta del servidor:', response);
+        this.uploadSuccessSubject.next(true);  // Señalamos que la carga fue exitosa
         this.uploadingSubject.next(false);
       },
       () => {
+        this.uploadSuccessSubject.next(false);  // Señalamos que la carga falló
         this.uploadingSubject.next(false);
       }
     );
