@@ -46,7 +46,7 @@
     <mat-select formControlName="fileType">
       <mat-option value="deudas" default>Liquidaciones (Deudas por cobrar)</mat-option>
       <mat-option value="cobros">PAGBA (Cobros realizados)</mat-option>
-      <mat-option value="rebajas">Bajas y reversas</mat-option>
+      <mat-option value="reversas">Bajas y reversas</mat-option>
     </mat-select>
   </mat-form-field>
 
@@ -68,7 +68,17 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-stroked-button color="warn" (click)="onCloseClick()">Cerrar</button>
-  <button mat-flat-button color="primary" type="button" form="inputForm" (click)="onUploadFiles()" [disabled]="!files || !form.valid">
+  <button mat-fab (click)="downloadExcel()">
+    <mat-icon>download</mat-icon>
+  </button>
+  <button
+    mat-flat-button
+    color="primary"
+    type="button"
+    form="inputForm"
+    (click)="onUploadFiles()"
+    [disabled]="!files || !form.valid"
+  >
     Enviar
   </button>
 </mat-dialog-actions>

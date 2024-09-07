@@ -62,19 +62,24 @@ export class ReversalService {
   }
 
   private async parseLine(line: string, sheet: SheetsEntity): Promise<ReversalRecord | null> {
-    const agreementNumber = parseInt(line.substring(1, 6).trim(), 10);
-    const serviceNumber = line.substring(6, 16).trim();
-    const companyNumber = line.substring(16, 21).trim();
-    const bankCode = line.substring(21, 24).trim();
-    const branchCode = parseInt(line.substring(24, 28).trim(), 10);
-    const accountType = parseInt(line.substring(28, 29).trim(), 10);
-    const accountNumber = line.substring(29, 44).trim();
-    const currentID = line.substring(44, 66).trim();
-    const debitID = line.substring(66, 81).trim();
-    const movementFunction = line.substring(81, 83).trim();
-    const rejectionCode = line.substring(83, 87).trim();
+    // const recordType = parseInt(line.substring(0, 1).trim(), 10); // Filler
+    const agreementNumber = parseInt(line.substring(1, 6).trim(), 10); // Nro de convenio
+    const serviceNumber = line.substring(6, 16).trim(); // Nro de servicio
+    const companyNumber = line.substring(16, 21).trim(); // Nro de empresa de sueldos
+    const bankCode = line.substring(21, 24).trim(); // Codigo de banco del adherente
+    const branchCode = parseInt(line.substring(24, 28).trim(), 10); // Codigo de sucursal de la cuenta
+    const accountType = parseInt(line.substring(28, 29).trim(), 10); // Tipo de cuenta
+    const accountNumber = line.substring(29, 44).trim(); // Cuenta bancaria del adherente
+    const currentID = line.substring(44, 66).trim(); // Identificación actual del adherente
+    const debitID = line.substring(66, 81).trim(); // Identificación del débito
+
+    const movementFunction = line.substring(81, 83).trim(); // Función o uso del movimiento
+    const rejectionCode = line.substring(83, 87).trim(); // Código de motivo o rechazo
+
+    // Convertir la fecha de vencimiento a un objeto Date
     const dueDate = parseDate(line.substring(87, 95).trim());
-    const debitAmount = parseFloat(line.substring(98, 111).trim()) / 100;
+
+    const debitAmount = parseFloat(line.substring(98, 111).trim()) / 100; // Importe a debitar
 
     if (
       isNaN(agreementNumber) ||

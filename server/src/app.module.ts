@@ -16,6 +16,7 @@ import { BanksModule } from './banks/banks.module';
 import { DebtorsModule } from './debtors/debtors.module';
 import { PaymentModule } from './payment/payment.module';
 import { ReversalModule } from './reversal/reversal.module';
+import { SheetsModule } from './sheets/sheets.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { ReversalModule } from './reversal/reversal.module';
     BreaksModule,
     PaymentModule,
     ReversalModule,
+    SheetsModule,
   ],
   providers: [],
 })
