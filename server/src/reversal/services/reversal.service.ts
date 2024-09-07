@@ -11,6 +11,7 @@ import {
   findOrCreateSheet,
   parseDate,
 } from '../utils/reversal.util';
+import { UpdateReversalDto } from '../dto/updateReversalDto';
 
 @Injectable()
 export class ReversalService {
@@ -103,5 +104,30 @@ export class ReversalService {
       debitAmount,
       sheet,
     });
+  }
+
+  // Obtener todos los registros de reversión
+  async findAll(): Promise<ReversalRecord[]> {
+    return this.reversalRecordRepository.find({ relations: ['sheet'] });
+  }
+
+  // Obtener un registro de reversión por ID
+  async findOne(id: number): Promise<ReversalRecord> {
+    return this.reversalRecordRepository.findOne({ where: { id } });
+  }
+
+  // Actualizar un registro de reversión
+  async update(id: number, updateReversalDto: UpdateReversalDto): Promise<ReversalRecord> {
+    await this.reversalRecordRepository.update(id, updateReversalDto);
+    return this.findOne(id);
+  }
+
+  // Eliminar un registro de reversión
+  async remove(id: number): Promise<void> {
+    await this.reversalRecordRepository.delete(id);
+  }
+
+  async findBySheet(id: string): Promise<ReversalRecord[]> {
+    return this.reversalRecordRepository.find({ where: { sheet: { id } } });
   }
 }
