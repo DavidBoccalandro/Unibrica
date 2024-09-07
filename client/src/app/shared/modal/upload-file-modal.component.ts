@@ -42,7 +42,7 @@ export class UploadFileModalComponent implements OnInit {
   fileSelected: string = '';
 
   uploading$ = this.uploadFileService.uploading$;
-  uploadSuccess$ = this.uploadFileService.uploadSuccess$; // Nueva suscripción para monitorear éxito
+  uploadSuccess$ = this.uploadFileService.uploadSuccess$;
 
   constructor(
     public dialogRef: MatDialogRef<UploadFileModalComponent>,

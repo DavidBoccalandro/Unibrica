@@ -23,14 +23,14 @@ export class PaymentService {
       throw new Error('No file provided');
     }
 
-    //! Al trabajar con Angular, de-comentar las lineas 24-25 y comentar la 26
-    // const filePath = path.join(__dirname, '..', 'uploads', file.filename);
-    // const fileContent = fs.readFileSync(filePath, 'utf-8');
     const fileContent = file.buffer.toString('utf-8');
     const lines = fileContent.split('\n');
     const originalFileName = path.basename(file.originalname);
 
     const processedData: PaymentRecord[] = [];
+
+    const allBanks = await this.bankRepository.find();
+    const bankMap = new Map(allBanks.map((bank) => [bank.bankId, bank]));
 
     for (const line of lines) {
       try {
@@ -45,7 +45,6 @@ export class PaymentService {
         const month = parseInt(debitDateStr.substring(4, 6), 10) - 1;
         const day = parseInt(debitDateStr.substring(6, 8), 10);
         const debitDate = new Date(year, month, day);
-
         const subscriberID = line.substring(49, 60).trim();
         const bankCode = line.substring(60, 63).trim();
         const customerAccountType = parseInt(line.substring(63, 64).trim(), 10);
@@ -55,6 +54,14 @@ export class PaymentService {
         const installmentNumber = parseInt(line.substring(85, 87).trim(), 10);
         const debitStatus = line.substring(87, 88).trim();
         const chargedAmount = parseFloat(line.substring(108, 119).trim()) / 100;
+
+        let bank = bankMap.get(bankCode);
+
+        if (!bank) {
+          bank = this.bankRepository.create({ bankId: bankCode, name: 'Unknown Bank' });
+          await this.bankRepository.save(bank);
+          bankMap.set(bankCode, bank);
+        }
 
         if (
           isNaN(recordType) ||
@@ -81,13 +88,6 @@ export class PaymentService {
           continue;
         }
 
-        // Buscar o crear el banco
-        let bank = await this.bankRepository.findOne({ where: { bankId: bankCode } });
-        if (!bank) {
-          bank = this.bankRepository.create({ bankId: bankCode, name: 'Unknown Bank' });
-          await this.bankRepository.save(bank);
-        }
-
         // Crear y guardar el registro de pago
         const paymentRecord = this.paymentRecordRepository.create({
           recordType,
@@ -106,7 +106,6 @@ export class PaymentService {
           chargedAmount,
         });
 
-        await this.paymentRecordRepository.save(paymentRecord);
         processedData.push(paymentRecord);
       } catch (error) {
         console.error(`Error processing line: ${line}. Error: ${error.message}`);
@@ -118,6 +117,7 @@ export class PaymentService {
     const filePath = await this.createExcelFile(processedData, originalFileName);
     console.log(`Excel file created at: ${filePath}`);
 
+    await this.paymentRecordRepository.save(processedData);
     return processedData;
   }
 
@@ -208,7 +208,7 @@ export class PaymentService {
     const headers = [
       'Registro',
       'Convenio',
-      'Compañía de Crédito',
+      'Empresa',
       'N° de abonado',
       'Fecha de Débito',
       'ID del Suscriptor',
@@ -217,16 +217,16 @@ export class PaymentService {
       'Sucursal',
       'N° Cuenta Banco',
       'Secuencia de Débito',
-      'Número de Cuota',
+      'N° Cuota',
       'Estado de Débito',
-      'Monto Cargado',
+      'Monto cobrado',
     ];
 
     // Mapear los registros a un formato adecuado para el archivo Excel
     const data = paymentRecords.map((record) => ({
       'Registro': record.recordType,
       'Convenio': record.agreementNumber,
-      'Compañía de Crédito': record.creditCompany,
+      'Empresa': record.creditCompany,
       'N° de abonado': record.companyAccountNumber,
       'Fecha de Débito': record.debitDate.toISOString().split('T')[0], // Formato YYYY-MM-DD
       'ID del Suscriptor': record.subscriberID,
@@ -235,7 +235,7 @@ export class PaymentService {
       'Sucursal': record.branchCode,
       'N° Cuenta Banco': record.bankAccountNumber,
       'Secuencia de Débito': record.debitSequence,
-      'Número de Cuota': record.installmentNumber,
+      'N° Cuota': record.installmentNumber,
       'Estado de Débito': record.debitStatus,
       'Monto cobrado': record.chargedAmount.toFixed(2),
     }));

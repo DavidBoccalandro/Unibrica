@@ -14,8 +14,8 @@ export class UploadFileService {
   private uploadingSubject = new BehaviorSubject<boolean>(false);
   public uploading$ = this.uploadingSubject.asObservable();
 
-  private uploadSuccessSubject = new BehaviorSubject<boolean>(false);  // Nuevo BehaviorSubject para rastrear éxito
-  public uploadSuccess$ = this.uploadSuccessSubject.asObservable();   // Observable para el éxito de la carga
+  private uploadSuccessSubject = new BehaviorSubject<boolean>(false);
+  public uploadSuccess$ = this.uploadSuccessSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
@@ -41,11 +41,11 @@ export class UploadFileService {
     postUpload.subscribe(
       (response) => {
         console.log('Respuesta del servidor:', response);
-        this.uploadSuccessSubject.next(true);  // Señalamos que la carga fue exitosa
+        this.uploadSuccessSubject.next(true);
         this.uploadingSubject.next(false);
       },
       () => {
-        this.uploadSuccessSubject.next(false);  // Señalamos que la carga falló
+        this.uploadSuccessSubject.next(false);
         this.uploadingSubject.next(false);
       }
     );
