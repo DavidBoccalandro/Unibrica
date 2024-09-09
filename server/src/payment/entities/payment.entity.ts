@@ -1,6 +1,6 @@
 import { BankEntity } from 'src/banks/entities/banks.entity';
 import { DebtEntity } from 'src/debts/entities/debts.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, CreateDateColumn } from 'typeorm';
 
 @Entity('payment_records')
 export class PaymentRecord {

@@ -50,14 +50,14 @@ export class UploadFileModalComponent implements OnInit {
     private snackBar: NotificationsService
   ) {
     this.form = this.fb.group({
-      client: [null, [Validators.required]],
+      // client: [null, [Validators.required]],
       bank: [null, [Validators.required]],
       fileType: [null, [Validators.required]],
     });
   }
 
   ngOnInit(): void {
-    this.getClients();
+    // this.getClients();
     this.getBanks();
 
     this.uploading$.subscribe((uploading) => {
@@ -84,7 +84,7 @@ export class UploadFileModalComponent implements OnInit {
 
   get filesLabel(): string {
     if (!this.files?.length) {
-      return 'No file selected';
+      return 'No hay archivo seleccionado';
     }
     const filesSelected = this.files?.length;
     switch (filesSelected) {
