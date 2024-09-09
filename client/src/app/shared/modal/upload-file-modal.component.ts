@@ -26,6 +26,7 @@ const MaterialModules = [
   selector: 'app-upload-file-modal',
   standalone: true,
   imports: [CommonModule, ...MaterialModules, ReactiveFormsModule],
+  providers: [ExcelService],
   templateUrl: './upload-file-modal.component.html',
   styleUrls: ['./upload-file-modal.component.scss'],
 })
