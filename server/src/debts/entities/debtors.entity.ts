@@ -10,14 +10,17 @@ export class DebtorEntity extends BaseEntity implements IDebtor {
   dni: string;
 
   @Column()
-  firstNames: string;
+  idDebtor: string;
 
-  @Column()
-  lastNames: string;
+  // @Column()
+  // firstNames: string;
+
+  // @Column()
+  // lastNames: string;
 
   @OneToMany(() => AccountEntity, (account) => account.debtor)
   accounts: AccountEntity[];
 
-  @OneToMany(() => DebtEntity, (account) => account.debtor)
-  debts: DebtEntity[];
+  // @OneToMany(() => DebtEntity, (account) => account.debtor)
+  // debts: DebtEntity[];
 }

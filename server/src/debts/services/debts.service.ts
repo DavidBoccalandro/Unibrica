@@ -2,10 +2,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as XLSX from 'xlsx';
 import { Repository } from 'typeorm';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { DebtorEntity } from '../entities/debtors.entity';
-import { AccountEntity } from '../entities/accounts.entity';
-import { UserEntity } from 'src/users/entities/users.entity';
-import { ClientEntity } from 'src/clients/entities/clients.entity';
 import { BankEntity } from '../../banks/entities/banks.entity';
 import { DebtEntity } from '../entities/debts.entity';
 import { PaginationQueryDto } from '../controllers/debts.controller';
@@ -17,12 +13,10 @@ export class DebtsService {
   constructor(
     @InjectRepository(SheetsEntity)
     private readonly sheetRepository: Repository<SheetsEntity>,
-    @InjectRepository(DebtorEntity) private readonly debtorRepository: Repository<DebtorEntity>,
+    @InjectRepository(SheetsEntity)
+    private readonly debtSheetRepository: Repository<SheetsEntity>,
     @InjectRepository(DebtEntity) private readonly debtRepository: Repository<DebtEntity>,
-    @InjectRepository(AccountEntity) private readonly accountRepository: Repository<AccountEntity>,
-    @InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
-    @InjectRepository(ClientEntity) private readonly clientEntity: Repository<ClientEntity>,
-    @InjectRepository(BankEntity) private readonly bankEntity: Repository<BankEntity>,
+    @InjectRepository(BankEntity) private readonly bankRepository: Repository<BankEntity>,
     @InjectRepository(RepeatedDebtEntity)
     private readonly repeatedDebtRepository: Repository<RepeatedDebtEntity>
   ) {}
@@ -54,63 +48,44 @@ export class DebtsService {
    * Function to process de file
    */
   public async processDebtSheet(excelData: any) {
-    const debtors: DebtorEntity[] = [];
-    const accounts: AccountEntity[] = [];
     const debts: DebtEntity[] = [];
     const repeatedDebts: RepeatedDebtEntity[] = [];
+    const banks: BankEntity[] = [];
 
     for (const row of excelData) {
       // Check if debt exists
       const existingDebt = await this.debtRepository.findOne({
         where: { idDebt: row['Id_adherente'] },
+        relations: ['payments'],
       });
 
       if (existingDebt) {
-        // If debt exist, it stores it
+        // If debt exists, store it as a repeated debt
         const repeatedDebt = new RepeatedDebtEntity();
         repeatedDebt.idDebt = existingDebt.idDebt;
         repeatedDebt.dueDate = existingDebt.dueDate;
         repeatedDebt.amount = existingDebt.amount;
-        repeatedDebt.account = existingDebt.account;
         repeatedDebts.push(repeatedDebt);
         continue;
       } else {
-        // Check if debtor exits
-        let debtor = await this.debtorRepository.findOne({
-          where: { dni: row['DNI'] },
-          relations: ['debts'],
+        // Check if bank exists
+        let bank = await this.bankRepository.findOne({
+          where: { bankId: row['Tipo_Banco'] },
         });
 
-        // If debtor doesn't exist, creates it
-        if (!debtor) {
-          debtor = new DebtorEntity();
-          debtor.dni = row['DNI'];
-          debtor.firstNames = row['NOMBRES'].toUpperCase();
-          debtor.lastNames = row['APELLIDOS'].toUpperCase();
-          debtor.debts = []; // Inicializar la lista de deudas
-          debtors.push(debtor);
-        }
-
-        // Check if account exists
-        let account = await this.accountRepository.findOne({
-          where: { acctNumber: row['Cuenta'] },
-        });
-
-        // If account doesn't exists, it creates it
-        if (!account) {
-          account = new AccountEntity();
-          account.acctNumber = row['Cuenta'];
-          account.branch = row['Sucursal'];
-          account.exchangeType = row['Moneda'];
-          account.type = row['Tipo_cuenta'];
-          account.debtor = debtor;
-          accounts.push(account);
+        // If bank doesn't exist, create it
+        if (!bank) {
+          bank = new BankEntity();
+          bank.bankId = row['Tipo_Banco'];
+          bank.name = `Bank ${row['Tipo_Banco']}`; // TODO: CRUD para modificar bancos
+          banks.push(bank);
         }
 
         // Create a new debt
         const debt = new DebtEntity();
         debt.amount = parseFloat(row['Importe']) / 100;
         debt.idDebt = row['Id_adherente'];
+        debt.bank = bank;
 
         // Format date
         const dateString = row['Fecha_vto'];
@@ -120,20 +95,20 @@ export class DebtsService {
         const dueDate = new Date(year, month, day);
         debt.dueDate = dueDate;
 
-        debt.account = account;
-        debt.debtor = debtor;
-        debt.isPaid = false;
-        debts.push(debt);
+        // Set additional properties
+        debt.branch = row['Sucursal'];
+        debt.accountType = row['Tipo_cuenta'];
+        debt.account = row['Cuenta'];
+        debt.currency = row['Moneda'];
+        debt.idDebt = row['Id_debito'];
 
-        // Add debt to debtor
-        debtor.debts.push(debt);
+        debts.push(debt);
       }
     }
 
     // Save all entities in DB
     await Promise.all([
-      this.debtorRepository.save(debtors),
-      this.accountRepository.save(accounts),
+      this.bankRepository.save(banks),
       this.debtRepository.save(debts),
       this.repeatedDebtRepository.save(repeatedDebts),
     ]);
@@ -175,6 +150,7 @@ export class DebtsService {
     }
 
     const debts = await queryBuilder.getMany();
+    console.log('DEBTS AND DEBTORS: ', debts);
 
     // It return debts and total amount of item
     return { debts, totalItems };
