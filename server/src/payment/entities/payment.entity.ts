@@ -1,5 +1,6 @@
 import { BankEntity } from 'src/banks/entities/banks.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from 'typeorm';
+import { DebtEntity } from 'src/debts/entities/debts.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, CreateDateColumn } from 'typeorm';
 
 @Entity('payment_records')
 export class PaymentRecord {
@@ -47,6 +48,9 @@ export class PaymentRecord {
 
   @Column({ type: 'float' })
   chargedAmount: number;
+
+  @ManyToOne(() => DebtEntity, (debt) => debt.payments, { nullable: true })
+  debt: DebtEntity;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

@@ -7,6 +7,7 @@ import { PaymentRecord } from '../entities/payment.entity';
 import { BankEntity } from 'src/banks/entities/banks.entity';
 import { FindAllPaymentsDto } from '../dto/findAllPayments.dto';
 import { PaginationQueryDto } from 'src/debts/controllers/debts.controller';
+import { DebtEntity } from 'src/debts/entities/debts.entity';
 
 @Injectable()
 export class PaymentService {
@@ -15,7 +16,10 @@ export class PaymentService {
     private paymentRecordRepository: Repository<PaymentRecord>,
 
     @InjectRepository(BankEntity)
-    private bankRepository: Repository<BankEntity>
+    private bankRepository: Repository<BankEntity>,
+
+    @InjectRepository(DebtEntity)
+    private debtRepository: Repository<DebtEntity>
   ) {}
 
   async uploadPaymentSheet(file: Express.Multer.File): Promise<PaymentRecord[]> {
@@ -86,6 +90,19 @@ export class PaymentService {
           await this.bankRepository.save(bank);
         }
 
+        // Buscar la deuda relacionada en función del account y bankAccountNumber
+        const debt = await this.debtRepository.findOne({
+          where: {
+            account: bankAccountNumber,
+          },
+          relations: ['bank'],
+        });
+
+        if (!debt) {
+          console.log(`No se encontró una deuda relacionada para la cuenta: ${bankAccountNumber}`);
+          console.log('DEBT: ', debt);
+        }
+
         // Crear y guardar el registro de pago
         const paymentRecord = this.paymentRecordRepository.create({
           recordType,
@@ -102,6 +119,7 @@ export class PaymentService {
           installmentNumber,
           debitStatus,
           chargedAmount,
+          debt,
         });
 
         await this.paymentRecordRepository.save(paymentRecord);
