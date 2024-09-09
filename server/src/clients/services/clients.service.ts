@@ -4,6 +4,7 @@ import { ClientDTO } from 'src/clients/dto/client.dto';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
 import { ErrorManager } from 'src/utils/error.manager';
 import { Repository } from 'typeorm';
+import { UpdateClientDto } from '../dto/updateClient.dto';
 
 @Injectable()
 export class ClientsService {
@@ -37,6 +38,30 @@ export class ClientsService {
       }
 
       return clients;
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
+  }
+
+  public async updateClient(
+    oldClientId: number,
+    updateClientDto: UpdateClientDto
+  ): Promise<ClientEntity> {
+    console.log('Update Client: ', oldClientId, updateClientDto);
+    try {
+      const client = await this.clientRepository.findOne({ where: { clientId: oldClientId } });
+      console.log('Cliente encontrado: ', client);
+
+      if (!client) {
+        throw new ErrorManager({ type: 'BAD_REQUEST', message: 'Could Not Find Client' });
+      }
+
+      // Actualiza los campos del cliente con los nuevos datos
+      Object.assign(client, updateClientDto);
+      console.log('Cliente modificado: ', client);
+
+      // Guarda los cambios
+      return await this.clientRepository.save(client);
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }

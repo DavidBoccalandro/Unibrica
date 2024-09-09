@@ -60,7 +60,7 @@ export class UploadFileModalComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getBanks();
+    this.getClients();
     this.uploading$.subscribe((uploading) => {
       if (uploading) {
         this.snackBar.emitNotification(
@@ -106,9 +106,9 @@ export class UploadFileModalComponent implements OnInit {
     this.form.reset();
   }
 
-  getBanks() {
-    this.banksService.getBanks().subscribe((banks) => {
-      this.banks = banks;
+  getClients() {
+    this.clientService.getClients().subscribe((clients) => {
+      this.clients = clients;
     });
   }
 

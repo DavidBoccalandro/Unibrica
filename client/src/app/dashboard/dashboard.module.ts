@@ -7,6 +7,7 @@ import { DashboardComponent } from './dashboard.component';
 import { DashboardService } from './dashboard.service';
 import { CalendarModule } from '../calendar/calendar.module';
 import { MatButtonModule } from '@angular/material/button';
+import { ClientModalComponent } from '../shared/modal/clients/client-modal/client-modal.component';
 
 @NgModule({
   declarations: [DashboardComponent],
@@ -14,6 +15,7 @@ import { MatButtonModule } from '@angular/material/button';
     CommonModule,
     DashboardRoutingModule,
     UploadFileModalComponent,
+    ClientModalComponent,
     ChartsModule,
     CalendarModule,
     MatButtonModule,

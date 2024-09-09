@@ -1,7 +1,10 @@
 <div class="dashboard-container">
   <div class="dashboard-header">
     <h2>Dashboard</h2>
-    <button mat-raised-button color="primary" (click)="openDialog()">Subir Archivo</button>
+    <div class="buttons">
+      <button mat-raised-button color="primary" (click)="openClientModal()">Clientes</button>
+      <button mat-raised-button color="primary" (click)="openDialog()">Subir Archivo</button>
+    </div>
   </div>
   <div class="charts-container">
     <div class="chart-wrapper">

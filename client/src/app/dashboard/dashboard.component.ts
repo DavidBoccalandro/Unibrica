@@ -10,6 +10,7 @@ import {
 import { UploadFileModalComponent } from '../shared/modal/upload-file-modal.component';
 import { DashboardService } from './dashboard.service';
 import { CalendarEvent } from 'angular-calendar';
+import { ClientModalComponent } from '../shared/modal/clients/client-modal/client-modal.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -54,6 +55,25 @@ export class DashboardComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       console.log(`Dialog result: ${result}`);
+    });
+  }
+
+  openClientModal(client = null): void {
+    const dialogRef = this.dialog.open(ClientModalComponent, {
+      width: '400px',
+      data: { client }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        if (client) {
+          // Lógica para editar el cliente existente
+          console.log('Cliente actualizado', result);
+        } else {
+          // Lógica para crear un nuevo cliente
+          console.log('Nuevo cliente creado', result);
+        }
+      }
     });
   }
 

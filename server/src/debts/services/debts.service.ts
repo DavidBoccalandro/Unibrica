@@ -82,11 +82,11 @@ export class DebtsService {
         });
 
         // If debtor doesn't exist, creates it
-        if (!debtor) {
+        if (!debtor && row['DNI']) {
           debtor = new DebtorEntity();
           debtor.dni = row['DNI'];
-          debtor.firstNames = row['NOMBRES'].toUpperCase();
-          debtor.lastNames = row['APELLIDOS'].toUpperCase();
+          debtor.firstNames = row['NOMBRES'] ? row['NOMBRES'].toUpperCase() : '';
+          debtor.lastNames = row['APELLIDOS'] ? row['APELLIDOS'].toUpperCase() : '';
           debtor.debts = []; // Inicializar la lista de deudas
           debtors.push(debtor);
         }
