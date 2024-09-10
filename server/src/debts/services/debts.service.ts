@@ -52,6 +52,9 @@ export class DebtsService {
     const repeatedDebts: RepeatedDebtEntity[] = [];
     const banks: BankEntity[] = [];
 
+    const allBanks = await this.bankRepository.find();
+    const bankMap = new Map(allBanks.map((bank) => [bank.bankId, bank]));
+
     for (const row of excelData) {
       // Check if debt exists
       const existingDebt = await this.debtRepository.findOne({
@@ -68,18 +71,39 @@ export class DebtsService {
         repeatedDebts.push(repeatedDebt);
         continue;
       } else {
-        // Check if bank exists
-        let bank = await this.bankRepository.findOne({
-          where: { bankId: row['Tipo_Banco'] },
-        });
+        let bank = bankMap.get(row['bank']);
 
-        // If bank doesn't exist, create it
         if (!bank) {
-          bank = new BankEntity();
-          bank.bankId = row['Tipo_Banco'];
-          bank.name = `Bank ${row['Tipo_Banco']}`; // TODO: CRUD para modificar bancos
-          banks.push(bank);
+          bank = this.bankRepository.create({ bankId: row['bank'], name: 'Unknown Bank' });
+          await this.bankRepository.save(bank);
+          bankMap.set(row['BANK'], bank);
         }
+
+        // If debtor doesn't exist, creates it
+        // if (!debtor && row['DNI']) {
+        //   debtor = new DebtorEntity();
+        //   debtor.dni = row['DNI'];
+        //   debtor.firstNames = row['NOMBRES'] ? row['NOMBRES'].toUpperCase() : '';
+        //   debtor.lastNames = row['APELLIDOS'] ? row['APELLIDOS'].toUpperCase() : '';
+        //   debtor.debts = []; // Inicializar la lista de deudas
+        //   debtors.push(debtor);
+        // }
+
+        // Check if account exists
+        // let account = await this.accountRepository.findOne({
+        //   where: { acctNumber: row['Cuenta'] },
+        // });
+
+        // If account doesn't exists, it creates it
+        // if (!account) {
+        //   account = new AccountEntity();
+        //   account.acctNumber = row['Cuenta'];
+        //   account.branch = row['Sucursal'];
+        //   account.exchangeType = row['Moneda'];
+        //   account.type = row['Tipo_cuenta'];
+        //   account.debtor = debtor;
+        //   accounts.push(account);
+        // }
 
         // Create a new debt
         const debt = new DebtEntity();

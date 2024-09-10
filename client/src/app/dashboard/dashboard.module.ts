@@ -6,7 +6,6 @@ import { DashboardComponent } from './dashboard.component';
 import { DashboardService } from './dashboard.service';
 import { CalendarModule } from '../calendar/calendar.module';
 import { MatButtonModule } from '@angular/material/button';
-import { ExcelService } from '../core/services/excel.service';
 
 @NgModule({
   declarations: [DashboardComponent],
@@ -17,6 +16,6 @@ import { ExcelService } from '../core/services/excel.service';
     CalendarModule,
     MatButtonModule,
   ],
-  providers: [DashboardService, ExcelService],
+  providers: [DashboardService],
 })
 export class DashboardModule {}

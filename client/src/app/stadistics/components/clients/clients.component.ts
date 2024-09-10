@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { CLIENT_TABLE_COLUMNS_MOCK, Client } from './clients.interfaces';
+import { Client } from './clients.interfaces';
 import { StadisticsService } from '../../stadistics.service';
 import { Subscription } from 'rxjs';
 import { Params } from '@angular/router';

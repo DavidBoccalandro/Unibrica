@@ -11,6 +11,6 @@ export class ClientEntity extends BaseEntity implements IClient {
   @Column()
   name: string;
 
-  @OneToMany(() => SheetsEntity, (debtSheet) => debtSheet.client)
-  debtSheets: SheetsEntity[];
+  @OneToMany(() => SheetsEntity, (debtSheet) => debtSheet.client, { nullable: true })
+  sheets: SheetsEntity[];
 }

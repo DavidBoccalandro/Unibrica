@@ -24,14 +24,14 @@
     class="file-type-form-field"
     floatLabel="always"
   >
-    <mat-label>Banco o Entidad</mat-label>
+    <mat-label>Entidad financiera</mat-label>
     <mat-select formControlName="bank">
       <mat-option
-        *ngFor="let bank of banks"
-        [value]="bank.name"
-        (onSelectionChange)="selectedBankId = bank.id"
+        *ngFor="let client of clients"
+        [value]="client.name"
+        (onSelectionChange)="selectedClientId = client.id"
       >
-        {{ bank.name }}
+      {{ client.clientId }} - {{ client.name }}
       </mat-option>
     </mat-select>
   </mat-form-field>

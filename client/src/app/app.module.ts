@@ -25,6 +25,7 @@ import { BanksService } from './core/services/banks.service';
 import { ClientsService } from './core/services/clients.service';
 import { UploadFileService } from './core/services/upload-file.service';
 import { AuthInterceptor } from './core/authentication/auth.interceptor';
+import { ClientModalComponent } from './shared/modal/clients/client-modal/client-modal.component';
 
 @NgModule({
   declarations: [AppComponent],

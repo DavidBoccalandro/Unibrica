@@ -41,11 +41,16 @@
       }
     }
   }
-  
+
   .calendar-container {
     margin-top: 2rem;
     padding-top: 2rem;
     border-top: 1px solid $alternative-base;
     width: 100%;
+  }
+
+  .buttons {
+    display: flex;
+    gap: 20px;
   }
 }

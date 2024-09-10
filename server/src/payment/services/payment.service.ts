@@ -49,7 +49,7 @@ export class PaymentService {
         const month = parseInt(debitDateStr.substring(4, 6), 10) - 1;
         const day = parseInt(debitDateStr.substring(6, 8), 10);
         const debitDate = new Date(year, month, day);
-        const subscriberID = line.substring(49, 60).trim();
+        const debtAmount = parseFloat(line.substring(49, 60).trim()) / 100;
         const bankCode = line.substring(60, 63).trim();
         const customerAccountType = parseInt(line.substring(63, 64).trim(), 10);
         const branchCode = parseInt(line.substring(64, 67).trim(), 10);
@@ -82,7 +82,7 @@ export class PaymentService {
             recordType,
             agreementNumber,
             creditCompany,
-            subscriberID,
+            debtAmount,
             customerAccountType,
             branchCode,
             debitSequence,
@@ -112,7 +112,7 @@ export class PaymentService {
           creditCompany,
           companyAccountNumber,
           debitDate,
-          subscriberID,
+          debtAmount,
           bank,
           customerAccountType,
           branchCode,
@@ -224,34 +224,32 @@ export class PaymentService {
   ): Promise<string> {
     // Definir los encabezados en español
     const headers = [
-      'Registro',
       'Convenio',
       'Empresa',
       'N° de abonado',
+      'N° Cuenta',
       'Fecha de Débito',
-      'ID del Suscriptor',
-      'Banco',
+      'Monto deuda',
+      'Monto cobrado',
       'Tipo de Cuenta',
+      'Banco',
       'Sucursal',
-      'N° Cuenta Banco',
       'Secuencia de Débito',
       'N° Cuota',
       'Estado de Débito',
-      'Monto cobrado',
     ];
 
     // Mapear los registros a un formato adecuado para el archivo Excel
     const data = paymentRecords.map((record) => ({
-      'Registro': record.recordType,
       'Convenio': record.agreementNumber,
       'Empresa': record.creditCompany,
       'N° de abonado': record.companyAccountNumber,
+      'N° Cuenta': record.bankAccountNumber,
       'Fecha de Débito': record.debitDate.toISOString().split('T')[0], // Formato YYYY-MM-DD
-      'ID del Suscriptor': record.subscriberID,
-      'Banco': record.bank?.name || 'Desconocido',
+      'Monto deuda': record.debtAmount.toFixed(2),
+      'Banco': record.bank?.bankId || 'Desconocido',
       'Tipo de Cuenta': record.customerAccountType,
       'Sucursal': record.branchCode,
-      'N° Cuenta Banco': record.bankAccountNumber,
       'Secuencia de Débito': record.debitSequence,
       'N° Cuota': record.installmentNumber,
       'Estado de Débito': record.debitStatus,
@@ -273,18 +271,17 @@ export class PaymentService {
     const wscols = [
       { wch: 10 },
       { wch: 10 },
-      { wch: 10 },
       { wch: 21 },
-      { wch: 13 },
-      { wch: 15 },
-      { wch: 9 },
-      { wch: 9 },
-      { wch: 9 },
       { wch: 16 },
       { wch: 15 },
-      { wch: 10 },
-      { wch: 10 },
-      { wch: 15 },
+      { wch: 9 },
+      { wch: 13 },
+      { wch: 9 },
+      { wch: 9 },
+      { wch: 9 },
+      { wch: 9 },
+      { wch: 9 },
+      { wch: 9 },
     ];
     worksheet['!cols'] = wscols;
 
