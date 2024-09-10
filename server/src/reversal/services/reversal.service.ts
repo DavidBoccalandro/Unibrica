@@ -125,15 +125,12 @@ export class ReversalService {
       .createQueryBuilder('reversal_records')
       .leftJoinAndSelect('reversal_records.bank', 'bank');
 
-    // if (
-    //   filterBy &&
-    //   ['companyAccountNumber', 'subscriberID', 'bankAccountNumber'].includes(filterBy)
-    // ) {
-    //   const lowerFilterValue = filterValue.toLowerCase();
-    //   queryBuilder = queryBuilder.where(`LOWER(payment_records.${filterBy}) LIKE :filterValue`, {
-    //     filterValue: `%${lowerFilterValue}%`,
-    //   });
-    // }
+    if (filterBy && ['debitID', 'currentID', 'accountNumber'].includes(filterBy)) {
+      const lowerFilterValue = filterValue.toLowerCase();
+      queryBuilder = queryBuilder.where(`LOWER(reversal_records.${filterBy}) LIKE :filterValue`, {
+        filterValue: `%${lowerFilterValue}%`,
+      });
+    }
 
     if (startDate && endDate) {
       if (date && ['createdAt', 'updatedAt', 'dueDate'].includes(date)) {

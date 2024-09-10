@@ -25,9 +25,13 @@ export class FilterComponent {
     ],
     pagos: [
       { value: 'companyAccountNumber', label: 'N de abonado' },
-      { value: 'subscriberID', label: 'N de abonado banco' },
       { value: 'bankAccountNumber', label: 'N° cuenta bancaria' },
     ],
+    reversas: [
+      {value: 'accountNumber', label: 'N de cuenta'},
+      {value: 'debitID', label: 'ID débito'},
+      {value: 'currentID', label: 'ID actual'},
+    ]
   };
 
   constructor(private filterService: FilterService) {}
