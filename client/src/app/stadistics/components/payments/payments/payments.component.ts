@@ -33,20 +33,20 @@ export class PaymentsComponent {
   payments!: Payment[];
   tableData!: MatTableDataSource<MatTableDataSourceInput>;
   tableColumns: string[] = [
-    'id',
-    'recordType',
+    // 'id',
+    // 'recordType',
     'agreementNumber',
     'creditCompany',
     'companyAccountNumber',
+    'bankAccountNumber',
     'debitDate',
-    'subscriberID',
     'bank',
     'customerAccountType',
     'branchCode',
-    'bankAccountNumber',
     'debitSequence',
     'installmentNumber',
     'debitStatus',
+    'debtAmount',
     'chargedAmount',
   ];
   clickableColumns = new Set<string>([this.tableColumns[0]]);

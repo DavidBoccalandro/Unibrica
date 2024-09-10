@@ -60,7 +60,8 @@ export class TableComponent {
     debitSequence: 'Secuencial débito',
     installmentNumber: 'N° cuota',
     debitStatus: 'Estado de débito',
-    chargedAmount: 'Monto cobrado'
+    chargedAmount: 'Monto cobrado',
+    debtAmount: 'Monto deuda'
   };
 
   ngOnInit() {}

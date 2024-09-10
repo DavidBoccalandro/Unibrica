@@ -21,8 +21,8 @@ export class PaymentRecord {
   @Column({ type: 'date' })
   debitDate: Date;
 
-  @Column({ type: 'varchar' })
-  subscriberID: string;
+  @Column({ type: 'float' })
+  debtAmount: number;
 
   @ManyToOne(() => BankEntity, (bank) => bank.bankId, { nullable: true })
   bank: BankEntity;
