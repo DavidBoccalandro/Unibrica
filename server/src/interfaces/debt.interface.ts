@@ -4,10 +4,6 @@ export interface IDebt {
   amount: number;
 }
 
-export interface IDebtSheet {
-  date: Date;
-}
-
 export interface IDebtor {
   dni: string;
   idDebtor: string;

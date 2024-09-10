@@ -5,8 +5,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { PaymentRecord } from '../entities/payment.entity';
 import { BankEntity } from 'src/banks/entities/banks.entity';
-import { FindAllPaymentsDto } from '../dto/findAllPayments.dto';
 import { PaginationQueryDto } from 'src/debts/controllers/debts.controller';
+import * as XLSX from 'xlsx';
 import { DebtEntity } from 'src/debts/entities/debts.entity';
 
 @Injectable()
@@ -26,13 +26,15 @@ export class PaymentService {
     if (!file) {
       throw new Error('No file provided');
     }
-    //! Al trabajar con Angular, de-comentar las lineas 24-25 y comentar la 26
-    // const filePath = path.join(__dirname, '..', 'uploads', file.filename);
-    // const fileContent = fs.readFileSync(filePath, 'utf-8');
+
     const fileContent = file.buffer.toString('utf-8');
     const lines = fileContent.split('\n');
+    const originalFileName = path.basename(file.originalname);
 
     const processedData: PaymentRecord[] = [];
+
+    const allBanks = await this.bankRepository.find();
+    const bankMap = new Map(allBanks.map((bank) => [bank.bankId, bank]));
 
     for (const line of lines) {
       try {
@@ -47,7 +49,6 @@ export class PaymentService {
         const month = parseInt(debitDateStr.substring(4, 6), 10) - 1;
         const day = parseInt(debitDateStr.substring(6, 8), 10);
         const debitDate = new Date(year, month, day);
-
         const subscriberID = line.substring(49, 60).trim();
         const bankCode = line.substring(60, 63).trim();
         const customerAccountType = parseInt(line.substring(63, 64).trim(), 10);
@@ -56,7 +57,15 @@ export class PaymentService {
         const debitSequence = parseInt(line.substring(83, 85).trim(), 10);
         const installmentNumber = parseInt(line.substring(85, 87).trim(), 10);
         const debitStatus = line.substring(87, 88).trim();
-        const chargedAmount = parseInt(line.substring(108, 119).trim());
+        const chargedAmount = parseFloat(line.substring(108, 119).trim()) / 100;
+
+        let bank = bankMap.get(bankCode);
+
+        if (!bank) {
+          bank = this.bankRepository.create({ bankId: bankCode, name: 'Unknown Bank' });
+          await this.bankRepository.save(bank);
+          bankMap.set(bankCode, bank);
+        }
 
         if (
           isNaN(recordType) ||
@@ -81,13 +90,6 @@ export class PaymentService {
             chargedAmount
           );
           continue;
-        }
-
-        // Buscar o crear el banco
-        let bank = await this.bankRepository.findOne({ where: { bankId: bankCode } });
-        if (!bank) {
-          bank = this.bankRepository.create({ bankId: bankCode, name: 'Unknown Bank' });
-          await this.bankRepository.save(bank);
         }
 
         // Buscar la deuda relacionada en función del account y bankAccountNumber
@@ -122,7 +124,6 @@ export class PaymentService {
           debt,
         });
 
-        await this.paymentRecordRepository.save(paymentRecord);
         processedData.push(paymentRecord);
       } catch (error) {
         console.error(`Error processing line: ${line}. Error: ${error.message}`);
@@ -130,6 +131,11 @@ export class PaymentService {
       }
     }
 
+    // Crear archivo Excel
+    const filePath = await this.createExcelFile(processedData, originalFileName);
+    console.log(`Excel file created at: ${filePath}`);
+
+    await this.paymentRecordRepository.save(processedData);
     return processedData;
   }
 
@@ -209,5 +215,82 @@ export class PaymentService {
     if (result.affected === 0) {
       throw new Error('Payment record not found');
     }
+  }
+
+  // Función para crear el archivo Excel
+  async createExcelFile(
+    paymentRecords: PaymentRecord[],
+    originalFileName: string
+  ): Promise<string> {
+    // Definir los encabezados en español
+    const headers = [
+      'Registro',
+      'Convenio',
+      'Empresa',
+      'N° de abonado',
+      'Fecha de Débito',
+      'ID del Suscriptor',
+      'Banco',
+      'Tipo de Cuenta',
+      'Sucursal',
+      'N° Cuenta Banco',
+      'Secuencia de Débito',
+      'N° Cuota',
+      'Estado de Débito',
+      'Monto cobrado',
+    ];
+
+    // Mapear los registros a un formato adecuado para el archivo Excel
+    const data = paymentRecords.map((record) => ({
+      'Registro': record.recordType,
+      'Convenio': record.agreementNumber,
+      'Empresa': record.creditCompany,
+      'N° de abonado': record.companyAccountNumber,
+      'Fecha de Débito': record.debitDate.toISOString().split('T')[0], // Formato YYYY-MM-DD
+      'ID del Suscriptor': record.subscriberID,
+      'Banco': record.bank?.name || 'Desconocido',
+      'Tipo de Cuenta': record.customerAccountType,
+      'Sucursal': record.branchCode,
+      'N° Cuenta Banco': record.bankAccountNumber,
+      'Secuencia de Débito': record.debitSequence,
+      'N° Cuota': record.installmentNumber,
+      'Estado de Débito': record.debitStatus,
+      'Monto cobrado': record.chargedAmount.toFixed(2),
+    }));
+
+    // Crear una hoja de trabajo
+    const worksheet = XLSX.utils.json_to_sheet(data, { header: headers });
+    // Crear un libro de trabajo
+    const workbook = XLSX.utils.book_new();
+    // Añadir la hoja de trabajo al libro
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Registros de Pago');
+
+    // Eliminar la extensión .lis del nombre del archivo original
+    const fileNameWithoutExtension = originalFileName.replace('.lis', '') + '.xlsx';
+    // Ruta para guardar el archivo Excel
+    const filePath = path.join(__dirname, '..', '..', '..', 'uploads', fileNameWithoutExtension);
+
+    const wscols = [
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 21 },
+      { wch: 13 },
+      { wch: 15 },
+      { wch: 9 },
+      { wch: 9 },
+      { wch: 9 },
+      { wch: 16 },
+      { wch: 15 },
+      { wch: 10 },
+      { wch: 10 },
+      { wch: 15 },
+    ];
+    worksheet['!cols'] = wscols;
+
+    // Escribir el archivo en el sistema
+    fs.writeFileSync(filePath, XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' }));
+
+    return filePath;
   }
 }

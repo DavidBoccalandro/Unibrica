@@ -3,7 +3,6 @@ import { BaseEntity } from '../../config/base.entity';
 import { IUser } from '../../interfaces/user.interface';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { DebtSheetsEntity } from 'src/debts/entities/debtSheets.entity';
 import { RequestEntity } from 'src/requests/entities/request.entity';
 import { AttendanceEntity } from 'src/attendance/entities/attendance.entity';
 
@@ -30,11 +29,9 @@ export class UserEntity extends BaseEntity implements IUser {
   @ManyToOne(() => RoleEntity, (role) => role.user)
   role: RoleEntity;
 
-  @OneToMany(() => DebtSheetsEntity, (debtSheet) => debtSheet.user)
-  debtSheets: DebtSheetsEntity[];
-  @OneToMany(() => RequestEntity, request => request.user)
+  @OneToMany(() => RequestEntity, (request) => request.user)
   requests: RequestEntity[];
 
-  @OneToMany(() => AttendanceEntity, attendance => attendance.user)
+  @OneToMany(() => AttendanceEntity, (attendance) => attendance.user)
   attendances: AttendanceEntity[];
 }

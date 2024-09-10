@@ -1,5 +1,4 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { DebtSheetsEntity } from '../entities/debtSheets.entity';
 import * as XLSX from 'xlsx';
 import { Repository } from 'typeorm';
 import { BadRequestException, Injectable } from '@nestjs/common';
@@ -7,12 +6,15 @@ import { BankEntity } from '../../banks/entities/banks.entity';
 import { DebtEntity } from '../entities/debts.entity';
 import { PaginationQueryDto } from '../controllers/debts.controller';
 import { RepeatedDebtEntity } from '../entities/repeatedDebts.entity';
+import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
 
 @Injectable()
 export class DebtsService {
   constructor(
-    @InjectRepository(DebtSheetsEntity)
-    private readonly debtSheetRepository: Repository<DebtSheetsEntity>,
+    @InjectRepository(SheetsEntity)
+    private readonly sheetRepository: Repository<SheetsEntity>,
+    @InjectRepository(SheetsEntity)
+    private readonly debtSheetRepository: Repository<SheetsEntity>,
     @InjectRepository(DebtEntity) private readonly debtRepository: Repository<DebtEntity>,
     @InjectRepository(BankEntity) private readonly bankRepository: Repository<BankEntity>,
     @InjectRepository(RepeatedDebtEntity)

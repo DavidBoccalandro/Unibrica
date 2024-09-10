@@ -22,11 +22,11 @@ export class AttendanceService {
       if (userUnfinishedAttendance) {
         const updatedAttendance = await this.attendanceRepository.save({
           cycle_finished: true,
-          ...userUnfinishedAttendance
+          ...userUnfinishedAttendance,
         });
         return userUnfinishedAttendance;
       }
-      console.log(userUnfinishedAttendance)
+      console.log(userUnfinishedAttendance);
 
       const attendance = this.attendanceRepository.create();
       attendance.user = await this.findUser(userID);
@@ -53,7 +53,10 @@ export class AttendanceService {
 
   async findOneByUser(userId: string) {
     try {
-      const attendance = await this.attendanceRepository.findOneBy({ user:{id:userId}, cycle_finished:false});
+      const attendance = await this.attendanceRepository.findOneBy({
+        user: { id: userId },
+        cycle_finished: false,
+      });
       return attendance;
     } catch (error) {
       throw ErrorManager.createSignatureError(error);

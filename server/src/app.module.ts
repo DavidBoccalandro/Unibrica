@@ -15,6 +15,8 @@ import { AttendanceModule } from './attendance/attendance.module';
 import { BanksModule } from './banks/banks.module';
 import { DebtorsModule } from './debtors/debtors.module';
 import { PaymentModule } from './payment/payment.module';
+import { ReversalModule } from './reversal/reversal.module';
+import { SheetsModule } from './sheets/sheets.module';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { PaymentModule } from './payment/payment.module';
     AttendanceModule,
     BreaksModule,
     PaymentModule,
+    ReversalModule,
+    SheetsModule,
   ],
   providers: [],
 })

@@ -13,11 +13,7 @@ export class BanksService {
 
   public async getAllBanks(): Promise<BankEntity[]> {
     try {
-      const banks: BankEntity[] = await this.bankRepository.find({
-        relations: {
-          debtSheets: true,
-        },
-      });
+      const banks: BankEntity[] = await this.bankRepository.find();
       return banks;
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
