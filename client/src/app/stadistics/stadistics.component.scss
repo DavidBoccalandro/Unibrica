@@ -33,6 +33,12 @@
   max-height: calc(56px*4);
 }
 
+.statistics-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
 @media ( width > b.$mobile-breakpoint) {
   .shown{
     max-height: 112px;
