@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -13,6 +14,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ReversalService } from '../services/reversal.service';
 import { ReversalRecord } from '../entities/reversal.entity';
 import { UpdateReversalDto } from '../dto/updateReversalDto';
+import { PaginationQueryDto } from 'src/debts/controllers/debts.controller';
 
 @Controller('reversal')
 export class ReversalController {
@@ -27,8 +29,10 @@ export class ReversalController {
 
   // Obtener todos los registros de reversión
   @Get()
-  async findAll(): Promise<ReversalRecord[]> {
-    return this.reversalService.findAll();
+  async findAll(
+    @Query() findAllReversalsDto: PaginationQueryDto
+  ): Promise<{ reversals: ReversalRecord[]; totalItems: number }> {
+    return this.reversalService.findAll(findAllReversalsDto);
   }
 
   // Obtener un registro de reversión por ID
