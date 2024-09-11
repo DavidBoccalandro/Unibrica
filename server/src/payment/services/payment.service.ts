@@ -8,6 +8,7 @@ import { BankEntity } from 'src/banks/entities/banks.entity';
 import { PaginationQueryDto } from 'src/debts/controllers/debts.controller';
 import * as XLSX from 'xlsx';
 import { DebtEntity } from 'src/debts/entities/debts.entity';
+import { ClientEntity } from 'src/clients/entities/clients.entity';
 
 @Injectable()
 export class PaymentService {
@@ -19,10 +20,17 @@ export class PaymentService {
     private bankRepository: Repository<BankEntity>,
 
     @InjectRepository(DebtEntity)
-    private debtRepository: Repository<DebtEntity>
+    private debtRepository: Repository<DebtEntity>,
+
+    @InjectRepository(ClientEntity)
+    private clientRepository: Repository<ClientEntity>
   ) {}
 
-  async uploadPaymentSheet(file: Express.Multer.File): Promise<PaymentRecord[]> {
+  async uploadPaymentSheet(
+    file: Express.Multer.File,
+    clientId: string,
+    clientName: string
+  ): Promise<PaymentRecord[]> {
     if (!file) {
       throw new Error('No file provided');
     }
@@ -32,6 +40,8 @@ export class PaymentService {
     const originalFileName = path.basename(file.originalname);
 
     const processedData: PaymentRecord[] = [];
+
+    const client = await this.clientRepository.find({ where: { clientId: +clientId } })[0];
 
     const allBanks = await this.bankRepository.find();
     const bankMap = new Map(allBanks.map((bank) => [bank.bankId, bank]));
@@ -101,8 +111,8 @@ export class PaymentService {
         });
 
         if (!debt) {
-          console.log(`No se encontró una deuda relacionada para la cuenta: ${bankAccountNumber}`);
-          console.log('DEBT: ', debt);
+          // console.log(`No se encontró una deuda relacionada para la cuenta: ${bankAccountNumber}`);
+          // console.log('DEBT: ', debt);
         }
 
         // Crear y guardar el registro de pago
@@ -122,6 +132,7 @@ export class PaymentService {
           debitStatus,
           chargedAmount,
           debt,
+          client,
         });
 
         processedData.push(paymentRecord);
@@ -132,10 +143,10 @@ export class PaymentService {
     }
 
     // Crear archivo Excel
-    const filePath = await this.createExcelFile(processedData, originalFileName);
-    console.log(`Excel file created at: ${filePath}`);
+    // const filePath = await this.createExcelFile(processedData, originalFileName);
+    // console.log(`Excel file created at: ${filePath}`);
 
-    await this.paymentRecordRepository.save(processedData);
+    // await this.paymentRecordRepository.save(processedData);
     return processedData;
   }
 

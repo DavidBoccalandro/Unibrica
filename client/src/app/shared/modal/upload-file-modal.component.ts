@@ -1,6 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -56,8 +63,8 @@ export class UploadFileModalComponent implements OnInit {
     private excelService: ExcelService
   ) {
     this.form = this.fb.group({
-      client: [null, [Validators.required]],
-      fileType: [null, [Validators.required]],
+      client: ['', [Validators.required]],
+      fileType: ['cobros', [Validators.required]],
     });
   }
 
@@ -68,7 +75,7 @@ export class UploadFileModalComponent implements OnInit {
         this.snackBar.emitNotification(
           'La información se está procesando. Por favor espere unos minutos a que finalice la carga en la base de datos.',
           'info',
-          500,
+          500
         );
       }
     });
@@ -97,11 +104,11 @@ export class UploadFileModalComponent implements OnInit {
   }
 
   onUploadFiles(): void {
-    const client = this.clients.find(client => client.clientId === this.form.value['client'])
+    const client = this.clients.find((client) => client.name === this.form.value['client']!);
     this.uploadFileService.postUploadDebtSheet(
       this.files!,
       'e1cac08c-145b-469b-ae9d-c1c76d3ff001',
-      client ?? null,
+      client?.clientId ? client : null,
       this.selectedBankId,
       this.form.value['fileType']
     );

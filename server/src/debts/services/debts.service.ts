@@ -174,7 +174,6 @@ export class DebtsService {
     }
 
     const debts = await queryBuilder.getMany();
-    console.log('DEBTS AND DEBTORS: ', debts);
 
     // It return debts and total amount of item
     return { debts, totalItems };

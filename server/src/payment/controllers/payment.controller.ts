@@ -21,8 +21,12 @@ export class PaymentController {
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadPaymentSheet(@UploadedFile() file: Express.Multer.File): Promise<any> {
-    const paymentRecords = await this.paymentService.uploadPaymentSheet(file);
+  async uploadPaymentSheet(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('clientId') clientId: string,
+    @Body('clientName') clientName: string
+  ): Promise<any> {
+    const paymentRecords = await this.paymentService.uploadPaymentSheet(file, clientId, clientName);
     return { message: 'File processed and Excel file created.' };
   }
 
