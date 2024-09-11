@@ -187,7 +187,7 @@ export class PaymentService {
     return { payments, totalItems };
   }
 
-  async findOne(id: number): Promise<PaymentRecord> {
+  async findOne(id: string): Promise<PaymentRecord> {
     const paymentRecord = await this.paymentRecordRepository.findOne({
       where: { id },
       relations: ['bank'],
@@ -198,7 +198,7 @@ export class PaymentService {
     return paymentRecord;
   }
 
-  async update(id: number, updateData: Partial<PaymentRecord>): Promise<PaymentRecord> {
+  async update(id: string, updateData: Partial<PaymentRecord>): Promise<PaymentRecord> {
     await this.paymentRecordRepository.update(id, updateData);
     const updatedRecord = await this.paymentRecordRepository.findOne({
       where: { id },

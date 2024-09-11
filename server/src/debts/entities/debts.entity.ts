@@ -4,6 +4,7 @@ import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { BankEntity } from 'src/banks/entities/banks.entity';
 import { PaymentRecord } from 'src/payment/entities/payment.entity';
 import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
+import { ClientEntity } from 'src/clients/entities/clients.entity';
 
 @Entity({ name: 'debts' })
 export class DebtEntity extends BaseEntity implements IDebt {
@@ -36,4 +37,7 @@ export class DebtEntity extends BaseEntity implements IDebt {
 
   @OneToMany(() => PaymentRecord, (payment) => payment.debt)
   payments: PaymentRecord;
+
+  @ManyToOne(() => ClientEntity, (client) => client.debts, { nullable: true })
+  client: ClientEntity;
 }

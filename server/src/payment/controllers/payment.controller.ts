@@ -32,13 +32,13 @@ export class PaymentController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number): Promise<PaymentRecord> {
+  async findOne(@Param('id') id: string): Promise<PaymentRecord> {
     return this.paymentService.findOne(id);
   }
 
   @Patch(':id')
   async update(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() updateData: Partial<PaymentRecord>
   ): Promise<PaymentRecord> {
     return this.paymentService.update(id, updateData);

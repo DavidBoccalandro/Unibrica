@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { Client } from 'src/app/stadistics/components/clients/clients.interfaces';
 import { environment } from 'src/enviroments/enviroment';
 
 @Injectable()
@@ -22,7 +23,7 @@ export class UploadFileService {
   postUploadDebtSheet(
     files: FileList,
     userId: string,
-    clientId: string,
+    client: Client | null,
     bankId: string,
     fileType: 'cobros' | 'deudas' | 'reversas',
   ): Observable<any> {
@@ -33,7 +34,8 @@ export class UploadFileService {
       formData.append('file', files[i], files[i].name);
     }
     formData.append('userId', userId);
-    formData.append('clientId', clientId);
+    formData.append('clientId', client ? client.clientId.toString() : '');
+    formData.append('clientName', client ? client.name : '');
     formData.append('bankId', bankId);
 
     let postUpload = this.http.post<any>(this.UploadFileUrls[fileType], formData);

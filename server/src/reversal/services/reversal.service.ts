@@ -117,12 +117,12 @@ export class ReversalService {
   }
 
   // Obtener un registro de reversión por ID
-  async findOne(id: number): Promise<ReversalRecord> {
+  async findOne(id: string): Promise<ReversalRecord> {
     return this.reversalRecordRepository.findOne({ where: { id } });
   }
 
   // Actualizar un registro de reversión
-  async update(id: number, updateReversalDto: UpdateReversalDto): Promise<ReversalRecord> {
+  async update(id: string, updateReversalDto: UpdateReversalDto): Promise<ReversalRecord> {
     await this.reversalRecordRepository.update(id, updateReversalDto);
     return this.findOne(id);
   }

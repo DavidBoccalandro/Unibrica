@@ -12,6 +12,7 @@ import { ClientsService } from 'src/app/core/services/clients.service';
 import { ExcelService } from 'src/app/core/services/excel.service';
 import { NotificationsService } from 'src/app/core/services/notifications.service';
 import { UploadFileService } from 'src/app/core/services/upload-file.service';
+import { Client } from 'src/app/stadistics/components/clients/clients.interfaces';
 
 const MaterialModules = [
   MatDialogModule,
@@ -35,7 +36,7 @@ export class UploadFileModalComponent implements OnInit {
   form!: FormGroup;
   files!: FileList | null;
   multipleFilesAccepted = false;
-  clients: any[] = [];
+  clients: Client[] = [];
   banks: any[] = [];
   selectedClientId!: string;
   selectedBankId!: string;
@@ -55,7 +56,7 @@ export class UploadFileModalComponent implements OnInit {
     private excelService: ExcelService
   ) {
     this.form = this.fb.group({
-      bank: [null, [Validators.required]],
+      client: [null, [Validators.required]],
       fileType: [null, [Validators.required]],
     });
   }
@@ -96,10 +97,11 @@ export class UploadFileModalComponent implements OnInit {
   }
 
   onUploadFiles(): void {
+    const client = this.clients.find(client => client.clientId === this.form.value['client'])
     this.uploadFileService.postUploadDebtSheet(
       this.files!,
       'e1cac08c-145b-469b-ae9d-c1c76d3ff001',
-      this.selectedClientId,
+      client ?? null,
       this.selectedBankId,
       this.form.value['fileType']
     );
