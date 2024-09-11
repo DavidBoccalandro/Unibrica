@@ -9,6 +9,8 @@ import { PaginationQueryDto } from 'src/debts/controllers/debts.controller';
 import * as XLSX from 'xlsx';
 import { DebtEntity } from 'src/debts/entities/debts.entity';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
+import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
+import { findOrCreateSheet } from 'src/reversal/utils/reversal.util';
 
 @Injectable()
 export class PaymentService {
@@ -23,7 +25,10 @@ export class PaymentService {
     private debtRepository: Repository<DebtEntity>,
 
     @InjectRepository(ClientEntity)
-    private clientRepository: Repository<ClientEntity>
+    private clientRepository: Repository<ClientEntity>,
+
+    @InjectRepository(SheetsEntity)
+    private sheetRepository: Repository<SheetsEntity>
   ) {}
 
   async uploadPaymentSheet(
@@ -38,6 +43,8 @@ export class PaymentService {
     const fileContent = file.buffer.toString('utf-8');
     const lines = fileContent.split('\n');
     const originalFileName = path.basename(file.originalname);
+
+    const sheet = await findOrCreateSheet(file.originalname, this.sheetRepository, 'pagos');
 
     const processedData: PaymentRecord[] = [];
 
@@ -136,6 +143,7 @@ export class PaymentService {
           chargedAmount,
           debt,
           client,
+          sheet,
         });
 
         processedData.push(paymentRecord);
