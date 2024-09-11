@@ -8,6 +8,7 @@ import { environment } from 'src/enviroments/enviroment';
 import { Debtor } from './components/debtors/debtors.interface';
 import { Client } from './components/clients/clients.interfaces';
 import { Payment } from './components/payments/payments/payments.component';
+import { Reversal } from './components/reversals/reversals.component';
 
 export interface StatisticsParams {
   limit: number;
@@ -25,6 +26,7 @@ export class StadisticsService {
   private DebtorsUrl = `${environment.envVar.API_URL}/debtors`;
   private ClientsUrl = `${environment.envVar.API_URL}/clients`;
   private PaymentsUrl = `${environment.envVar.API_URL}/payment`;
+  private ReversalURL = `${environment.envVar.API_URL}/reversal`;
 
   params$!: Observable<Params>;
 
@@ -106,6 +108,36 @@ export class StadisticsService {
       withCredentials: true,
     });
   }
+
+  getAllReversals(
+    params: StatisticsParams
+  ): Observable<{ totalItems: number; reversals: Reversal[] }> {
+    let httpParams = new HttpParams()
+      .set('limit', params.limit.toString())
+      .set('offset', params.offset.toString())
+      .set('filterBy', params.filterBy ?? 'serviceNumber')
+      .set('filterValue', params.filterValue ?? '');
+
+    if (params.startDate) {
+      httpParams = httpParams.set('startDate', params.startDate);
+    }
+
+    if (params.endDate) {
+      const adjustedEndDate = new Date(params.endDate);
+      adjustedEndDate.setHours(23, 59, 59, 999);
+      httpParams = httpParams.set('endDate', adjustedEndDate.toISOString());
+    }
+
+    if (params.date) {
+      httpParams = httpParams.set('date', params.date);
+    }
+
+    return this.http.get<{ totalItems: number; reversals: Reversal[] }>(this.ReversalURL, {
+      params: httpParams,
+      withCredentials: true,
+    });
+  }
+
   navigateWithQueryParams(pageInfo: PageEvent, filters: FilterValues, route: string): void {
     const queryParams: any = {
       pageIndex: pageInfo.pageIndex || 1,
