@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import path from 'path';
 import { BankEntity } from 'src/banks/entities/banks.entity';
@@ -13,6 +13,7 @@ import {
 } from '../utils/reversal.util';
 import { UpdateReversalDto } from '../dto/updateReversalDto';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
+import { PaginationQueryDto } from 'src/debts/controllers/debts.controller';
 
 @Injectable()
 export class ReversalService {
@@ -131,8 +132,52 @@ export class ReversalService {
   }
 
   // Obtener todos los registros de reversión
-  async findAll(): Promise<ReversalRecord[]> {
-    return this.reversalRecordRepository.find({ relations: ['sheet'] });
+  // async findAll(): Promise<ReversalRecord[]> {
+  //   return this.reversalRecordRepository.find({ relations: ['sheet'] });
+  // }
+  async findAll(
+    paginationQuery: PaginationQueryDto
+  ): Promise<{ reversals: ReversalRecord[]; totalItems: number }> {
+    const { limit, offset, sortBy, sortOrder, filterBy, filterValue, date, startDate, endDate } =
+      paginationQuery;
+    let queryBuilder = this.reversalRecordRepository
+      .createQueryBuilder('reversal_records')
+      .leftJoinAndSelect('reversal_records.bank', 'bank');
+
+    if (filterBy && ['debitID', 'currentID', 'accountNumber'].includes(filterBy)) {
+      const lowerFilterValue = filterValue.toLowerCase();
+      queryBuilder = queryBuilder.where(`LOWER(reversal_records.${filterBy}) LIKE :filterValue`, {
+        filterValue: `%${lowerFilterValue}%`,
+      });
+    }
+
+    if (startDate && endDate) {
+      if (date && ['createdAt', 'updatedAt', 'dueDate'].includes(date)) {
+        queryBuilder = queryBuilder.andWhere(
+          `reversal_records.${date} >= :startDate AND reversal_records.${date} <= :endDate`,
+          { startDate, endDate }
+        );
+      } else {
+        throw new BadRequestException('Invalid date field specified for filtering');
+      }
+    }
+
+    // Ejecuta la consulta para obtener el total de elementos
+    const totalItems = await queryBuilder.getCount();
+
+    if (sortBy && sortOrder) {
+      const order = {};
+      order[`reversal_records.${sortBy}`] = sortOrder.toUpperCase();
+      queryBuilder = queryBuilder.orderBy(order);
+    }
+
+    if (limit) {
+      queryBuilder = queryBuilder.limit(limit).offset(offset ?? 0);
+    }
+
+    const reversals = await queryBuilder.getMany();
+
+    return { reversals, totalItems };
   }
 
   // Obtener un registro de reversión por ID

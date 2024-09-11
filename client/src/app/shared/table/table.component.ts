@@ -7,6 +7,7 @@ import { Debt } from 'src/app/stadistics/components/debts/debts.interface';
 import { Debtor } from 'src/app/stadistics/components/debtors/debtors.interface';
 import { Client } from 'src/app/stadistics/components/clients/clients.interfaces';
 import { Payment } from 'src/app/stadistics/components/payments/payments/payments.component';
+import { Reversal } from 'src/app/stadistics/components/reversals/reversals.component';
 
 const MaterialModules = [
   MatTableModule,
@@ -17,7 +18,7 @@ interface TableClickEvent {
   value: any
 }
 
-export type MatTableDataSourceInput = Debt | Debtor | Client | Payment;
+export type MatTableDataSourceInput = Debt | Debtor | Client | Payment | Reversal;
 @Component({
   selector: 'app-table',
   standalone: true,
@@ -61,7 +62,16 @@ export class TableComponent {
     installmentNumber: 'N° cuota',
     debitStatus: 'Estado de débito',
     chargedAmount: 'Monto cobrado',
-    debtAmount: 'Monto deuda'
+    debtAmount: 'Monto deuda',
+    serviceNumber: 'N° de servicio',
+    companyNumber: 'N° de empresa',
+    accountType: 'Tipo de cuenta',
+    accountNumber: 'N° de cuenta',
+    currentID: 'ID actual',
+    debitID: 'ID débito',
+    movementFunction: 'Función del movimiento',
+    rejectionCode: 'Código de rechazo',
+    debitAmount: 'Monto débito'
   };
 
   ngOnInit() {}

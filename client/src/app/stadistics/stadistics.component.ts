@@ -26,7 +26,7 @@ const DEFAULT_FILTERS:FilterValues = {
 export class StadisticsComponent implements OnInit, OnDestroy {
   currentRoute!: string;
   routerEvents$!: Subscription;
-  tabs = ['deudas','deudores','pagos'];
+  tabs = ['deudas','pagos','reversas'];
   filtersShown = false;
   pageInfo: PageEvent = DEFAULT_PAGE_INFO;
   filters: FilterValues = DEFAULT_FILTERS;

@@ -170,10 +170,7 @@ export class PaymentService {
       .createQueryBuilder('payment_records')
       .leftJoinAndSelect('payment_records.bank', 'bank');
 
-    if (
-      filterBy &&
-      ['companyAccountNumber', 'subscriberID', 'bankAccountNumber'].includes(filterBy)
-    ) {
+    if (filterBy && ['companyAccountNumber', 'bankAccountNumber'].includes(filterBy)) {
       const lowerFilterValue = filterValue.toLowerCase();
       queryBuilder = queryBuilder.where(`LOWER(payment_records.${filterBy}) LIKE :filterValue`, {
         filterValue: `%${lowerFilterValue}%`,
