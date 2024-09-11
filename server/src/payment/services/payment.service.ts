@@ -41,8 +41,11 @@ export class PaymentService {
 
     const processedData: PaymentRecord[] = [];
 
-    const client = await this.clientRepository.find({ where: { clientId: +clientId } })[0];
+    // Busca el cliente en la DB
+    const clientSearch = await this.clientRepository.find({ where: { clientId: +clientId } });
+    const client = clientSearch[0];
 
+    // Busca todos los bancos UNA ÚNICA VEZ y crea un Map.
     const allBanks = await this.bankRepository.find();
     const bankMap = new Map(allBanks.map((bank) => [bank.bankId, bank]));
 
@@ -143,10 +146,10 @@ export class PaymentService {
     }
 
     // Crear archivo Excel
-    // const filePath = await this.createExcelFile(processedData, originalFileName);
-    // console.log(`Excel file created at: ${filePath}`);
+    const filePath = await this.createExcelFile(processedData, originalFileName);
+    console.log(`Excel file created at: ${filePath}`);
 
-    // await this.paymentRecordRepository.save(processedData);
+    await this.paymentRecordRepository.save(processedData);
     return processedData;
   }
 

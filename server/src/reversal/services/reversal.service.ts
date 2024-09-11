@@ -12,6 +12,7 @@ import {
   parseDate,
 } from '../utils/reversal.util';
 import { UpdateReversalDto } from '../dto/updateReversalDto';
+import { ClientEntity } from 'src/clients/entities/clients.entity';
 
 @Injectable()
 export class ReversalService {
@@ -21,10 +22,15 @@ export class ReversalService {
     @InjectRepository(ReversalRecord)
     private readonly reversalRecordRepository: Repository<ReversalRecord>,
     @InjectRepository(SheetsEntity)
-    private readonly sheetRepository: Repository<SheetsEntity>
+    private readonly sheetRepository: Repository<SheetsEntity>,
+    @InjectRepository(ClientEntity)
+    private clientRepository: Repository<ClientEntity>
   ) {}
 
-  async uploadReversalSheet(file: Express.Multer.File): Promise<ReversalRecord[]> {
+  async uploadReversalSheet(
+    file: Express.Multer.File,
+    clientId: string
+  ): Promise<ReversalRecord[]> {
     if (!file) {
       throw new Error('No file provided');
     }
@@ -35,22 +41,30 @@ export class ReversalService {
 
     const sheet = await findOrCreateSheet(originalFileName, this.sheetRepository);
 
-    const processedData = await this.processLines(lines, sheet);
+    // Busca el cliente en la DB
+    const clientSearch = await this.clientRepository.find({ where: { clientId: +clientId } });
+    const client = clientSearch[0];
+
+    const processedData = await this.processLines(lines, sheet, client);
 
     const filePath = await createExcelFile(processedData, originalFileName);
     console.log('El archivo fue creado en: ', filePath);
 
+    await this.reversalRecordRepository.save(processedData);
     return processedData;
   }
 
-  private async processLines(lines: string[], sheet: SheetsEntity): Promise<ReversalRecord[]> {
+  private async processLines(
+    lines: string[],
+    sheet: SheetsEntity,
+    client: ClientEntity
+  ): Promise<ReversalRecord[]> {
     const processedData: ReversalRecord[] = [];
 
     for (const line of lines) {
       try {
-        const reversalRecord = await this.parseLine(line, sheet);
+        const reversalRecord = await this.parseLine(line, sheet, client);
         if (reversalRecord) {
-          await this.reversalRecordRepository.save(reversalRecord);
           processedData.push(reversalRecord);
         }
       } catch (error) {
@@ -61,7 +75,11 @@ export class ReversalService {
     return processedData;
   }
 
-  private async parseLine(line: string, sheet: SheetsEntity): Promise<ReversalRecord | null> {
+  private async parseLine(
+    line: string,
+    sheet: SheetsEntity,
+    client: ClientEntity
+  ): Promise<ReversalRecord | null> {
     // const recordType = parseInt(line.substring(0, 1).trim(), 10); // Filler
     const agreementNumber = parseInt(line.substring(1, 6).trim(), 10); // Nro de convenio
     const serviceNumber = line.substring(6, 16).trim(); // Nro de servicio
@@ -108,6 +126,7 @@ export class ReversalService {
       dueDate,
       debitAmount,
       sheet,
+      client,
     });
   }
 

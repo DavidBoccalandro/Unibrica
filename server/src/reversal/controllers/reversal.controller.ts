@@ -21,8 +21,11 @@ export class ReversalController {
   // Subir un archivo de reversión
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadReversal(@UploadedFile() file: Express.Multer.File): Promise<ReversalRecord[]> {
-    return this.reversalService.uploadReversalSheet(file);
+  async uploadReversal(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('clientId') clientId: string
+  ): Promise<ReversalRecord[]> {
+    return this.reversalService.uploadReversalSheet(file, clientId);
   }
 
   // Obtener todos los registros de reversión
