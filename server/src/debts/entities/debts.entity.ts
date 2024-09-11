@@ -34,7 +34,7 @@ export class DebtEntity extends BaseEntity implements IDebt {
   amount: number;
 
   @ManyToOne(() => SheetsEntity, (debtSheet) => debtSheet.debts)
-  debtSheet: SheetsEntity;
+  sheet: SheetsEntity;
 
   @OneToMany(() => PaymentRecord, (payment) => payment.debt, { nullable: true })
   payments: PaymentRecord[];

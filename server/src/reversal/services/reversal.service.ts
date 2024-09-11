@@ -39,7 +39,7 @@ export class ReversalService {
     const lines = fileContent.split('\n');
     const originalFileName = path.basename(file.originalname, '.lis');
 
-    const sheet = await findOrCreateSheet(originalFileName, this.sheetRepository);
+    const sheet = await findOrCreateSheet(originalFileName, this.sheetRepository, 'reversas');
 
     // Busca el cliente en la DB
     const clientSearch = await this.clientRepository.find({ where: { clientId: +clientId } });

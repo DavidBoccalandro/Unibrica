@@ -28,7 +28,7 @@ export class DebtsService {
 
       const blockSize = 200; // Tamaño del bloque
 
-      // const sheet = await findOrCreateSheet(file.filename, this.sheetRepository);
+      const sheet = await findOrCreateSheet(file.originalname, this.sheetRepository, 'deudas');
 
       // Busca el cliente en la DB
       const clientSearch = await this.clientRepository.find({ where: { clientId: +clientId } });
@@ -41,7 +41,7 @@ export class DebtsService {
         const endRow = Math.min(startRow + blockSize, excelData.length);
         const blockData = excelData.slice(startRow, endRow);
 
-        await this.processDebtSheet(blockData, client);
+        await this.processDebtSheet(blockData, client, sheet);
       }
 
       return 'Debt sheet uploaded successfully, and it is being processed.';
@@ -53,7 +53,7 @@ export class DebtsService {
   /*
    * Function to process de file
    */
-  public async processDebtSheet(excelData: any, client: ClientEntity) {
+  public async processDebtSheet(excelData: any, client: ClientEntity, sheet: SheetsEntity) {
     const debts: DebtEntity[] = [];
     const debtors: DebtorEntity[] = [];
 
@@ -100,6 +100,7 @@ export class DebtsService {
       debt.idDebt = row['Id_debito'];
       debt.client = client;
       debt.debtor = debtor;
+      debt.sheet = sheet;
 
       // Add the debt to the list to be saved later
       debts.push(debt);

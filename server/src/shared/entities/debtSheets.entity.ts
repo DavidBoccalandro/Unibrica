@@ -13,10 +13,10 @@ export class SheetsEntity extends BaseEntity {
   @Column()
   fileName: string;
 
-  @OneToMany(() => DebtEntity, (debt) => debt.debtSheet, { nullable: true })
+  @OneToMany(() => DebtEntity, (debt) => debt.sheet, { nullable: true })
   debts: DebtEntity[];
 
-  @OneToMany(() => DebtEntity, (debt) => debt.debtSheet, { nullable: true })
+  @OneToMany(() => DebtEntity, (debt) => debt.sheet, { nullable: true })
   payments: PaymentRecord[];
 
   @OneToMany(() => ReversalRecord, (debt) => debt.sheet, { nullable: true })
