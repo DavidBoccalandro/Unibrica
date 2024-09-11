@@ -5,10 +5,11 @@ import { BankEntity } from 'src/banks/entities/banks.entity';
 import { PaymentRecord } from 'src/payment/entities/payment.entity';
 import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
+import { DebtorEntity } from './debtors.entity';
 
 @Entity({ name: 'debts' })
 export class DebtEntity extends BaseEntity implements IDebt {
-  @ManyToOne(() => BankEntity, (bank) => bank.debts)
+  @ManyToOne(() => BankEntity, (bank) => bank.debts, { nullable: true })
   bank: BankEntity;
 
   @Column({ type: 'int' })
@@ -35,9 +36,12 @@ export class DebtEntity extends BaseEntity implements IDebt {
   @ManyToOne(() => SheetsEntity, (debtSheet) => debtSheet.debts)
   debtSheet: SheetsEntity;
 
-  @OneToMany(() => PaymentRecord, (payment) => payment.debt)
-  payments: PaymentRecord;
+  @OneToMany(() => PaymentRecord, (payment) => payment.debt, { nullable: true })
+  payments: PaymentRecord[];
 
   @ManyToOne(() => ClientEntity, (client) => client.debts, { nullable: true })
   client: ClientEntity;
+
+  @ManyToOne(() => DebtorEntity, (debtor) => debtor.debts)
+  debtor: DebtorEntity;
 }

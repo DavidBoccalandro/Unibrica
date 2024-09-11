@@ -1,8 +1,6 @@
 import { BaseEntity } from 'src/config/base.entity';
 import { IAccount } from 'src/interfaces/debt.interface';
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
-import { DebtorEntity } from './debtors.entity';
-import { DebtEntity } from './debts.entity';
+import { Column, Entity } from 'typeorm';
 
 @Entity({ name: 'accounts' })
 export class AccountEntity extends BaseEntity implements IAccount {
@@ -17,10 +15,4 @@ export class AccountEntity extends BaseEntity implements IAccount {
 
   @Column()
   exchangeType: number;
-
-  @OneToMany(() => DebtEntity, (debt) => debt.account)
-  debts: DebtEntity[];
-
-  @ManyToOne(() => DebtorEntity ,(debtor) => debtor.accounts)
-  debtor: DebtorEntity;
 }
