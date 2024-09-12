@@ -1,12 +1,12 @@
 import { BankEntity } from 'src/banks/entities/banks.entity';
+import { ClientEntity } from 'src/clients/entities/clients.entity';
+import { BaseEntity } from 'src/config/base.entity';
 import { DebtEntity } from 'src/debts/entities/debts.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn } from 'typeorm';
+import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
+import { Entity, Column, ManyToOne } from 'typeorm';
 
 @Entity('payment_records')
-export class PaymentRecord {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class PaymentRecord extends BaseEntity {
   @Column({ type: 'int' })
   recordType: number;
 
@@ -52,6 +52,9 @@ export class PaymentRecord {
   @ManyToOne(() => DebtEntity, (debt) => debt.payments, { nullable: true })
   debt: DebtEntity;
 
-  @CreateDateColumn({ type: 'timestamp' })
-  createdAt: Date;
+  @ManyToOne(() => SheetsEntity, (sheet) => sheet.payments, { nullable: true })
+  sheet: SheetsEntity;
+
+  @ManyToOne(() => ClientEntity, (client) => client.debts, { nullable: true })
+  client: ClientEntity;
 }

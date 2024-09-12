@@ -6,9 +6,8 @@ export interface IDebt {
 
 export interface IDebtor {
   dni: string;
-  idDebtor: string;
-  // firstNames: string;
-  // lastNames: string;
+  firstNames: string;
+  lastNames: string;
 }
 
 export interface IAccount {

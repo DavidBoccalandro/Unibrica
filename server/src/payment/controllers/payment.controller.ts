@@ -20,8 +20,12 @@ export class PaymentController {
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadPaymentSheet(@UploadedFile() file: Express.Multer.File): Promise<any> {
-    await this.paymentService.uploadPaymentSheet(file);
+  async uploadPaymentSheet(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('clientId') clientId: string,
+    @Body('clientName') clientName: string
+  ): Promise<any> {
+    const paymentRecords = await this.paymentService.uploadPaymentSheet(file, clientId, clientName);
     return { message: 'File processed and Excel file created.' };
   }
 
@@ -61,13 +65,13 @@ export class PaymentController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number): Promise<PaymentRecord> {
+  async findOne(@Param('id') id: string): Promise<PaymentRecord> {
     return this.paymentService.findOne(id);
   }
 
   @Patch(':id')
   async update(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() updateData: Partial<PaymentRecord>
   ): Promise<PaymentRecord> {
     return this.paymentService.update(id, updateData);

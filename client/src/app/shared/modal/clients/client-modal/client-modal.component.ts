@@ -61,7 +61,6 @@ export class ClientModalComponent implements OnInit {
   }
 
   onClientSelect(): void {
-    console.log('form: ', this.selectedClientId);
     this.selectedClient = this.clients.find((client) => client.clientId === this.selectedClientId);
     if (this.selectedClient) {
       this.clientForm.patchValue({
@@ -83,12 +82,9 @@ export class ClientModalComponent implements OnInit {
 
   onSave(): void {
     if (this.clientForm.valid) {
-      console.log('selectedClient', this.selectedClient);
-      console.log('form values', this.clientForm.value);
       if (this.selectedClient === null || this.selectedClient === undefined) {
         this.clientService.createClient(this.clientForm.value).pipe(take(1)).subscribe();
       } else {
-        console.log('ACTUALIZAR');
         this.clientService
           .updateClient(this.clientForm.value, this.clientForm.value.clientId)
           .pipe(take(1))

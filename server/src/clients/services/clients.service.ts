@@ -47,10 +47,8 @@ export class ClientsService {
     oldClientId: number,
     updateClientDto: UpdateClientDto
   ): Promise<ClientEntity> {
-    console.log('Update Client: ', oldClientId, updateClientDto);
     try {
       const client = await this.clientRepository.findOne({ where: { clientId: oldClientId } });
-      console.log('Cliente encontrado: ', client);
 
       if (!client) {
         throw new ErrorManager({ type: 'BAD_REQUEST', message: 'Could Not Find Client' });

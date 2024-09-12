@@ -7,6 +7,9 @@ import { PaymentRecord } from '../entities/payment.entity';
 import { BankEntity } from 'src/banks/entities/banks.entity';
 import * as XLSX from 'xlsx';
 import { DebtEntity } from 'src/debts/entities/debts.entity';
+import { ClientEntity } from 'src/clients/entities/clients.entity';
+import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
+import { findOrCreateSheet } from 'src/reversal/utils/reversal.util';
 import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDto';
 
 @Injectable()
@@ -19,10 +22,20 @@ export class PaymentService {
     private bankRepository: Repository<BankEntity>,
 
     @InjectRepository(DebtEntity)
-    private debtRepository: Repository<DebtEntity>
+    private debtRepository: Repository<DebtEntity>,
+
+    @InjectRepository(ClientEntity)
+    private clientRepository: Repository<ClientEntity>,
+
+    @InjectRepository(SheetsEntity)
+    private sheetRepository: Repository<SheetsEntity>
   ) {}
 
-  async uploadPaymentSheet(file: Express.Multer.File): Promise<PaymentRecord[]> {
+  async uploadPaymentSheet(
+    file: Express.Multer.File,
+    clientId: string,
+    clientName: string
+  ): Promise<PaymentRecord[]> {
     if (!file) {
       throw new Error('No file provided');
     }
@@ -31,8 +44,15 @@ export class PaymentService {
     const lines = fileContent.split('\n');
     const originalFileName = path.basename(file.originalname);
 
+    const sheet = await findOrCreateSheet(file.originalname, this.sheetRepository, 'pagos');
+
     const processedData: PaymentRecord[] = [];
 
+    // Busca el cliente en la DB
+    const clientSearch = await this.clientRepository.find({ where: { clientId: +clientId } });
+    const client = clientSearch[0];
+
+    // Busca todos los bancos UNA ÚNICA VEZ y crea un Map.
     const allBanks = await this.bankRepository.find();
     const bankMap = new Map(allBanks.map((bank) => [bank.bankId, bank]));
 
@@ -101,8 +121,8 @@ export class PaymentService {
         });
 
         if (!debt) {
-          console.log(`No se encontró una deuda relacionada para la cuenta: ${bankAccountNumber}`);
-          console.log('DEBT: ', debt);
+          // console.log(`No se encontró una deuda relacionada para la cuenta: ${bankAccountNumber}`);
+          // console.log('DEBT: ', debt);
         }
 
         // Crear y guardar el registro de pago
@@ -122,6 +142,8 @@ export class PaymentService {
           debitStatus,
           chargedAmount,
           debt,
+          client,
+          sheet,
         });
 
         processedData.push(paymentRecord);
@@ -227,7 +249,7 @@ export class PaymentService {
     return { payments, totalItems };
   }
 
-  async findOne(id: number): Promise<PaymentRecord> {
+  async findOne(id: string): Promise<PaymentRecord> {
     const paymentRecord = await this.paymentRecordRepository.findOne({
       where: { id },
       relations: ['bank'],
@@ -238,7 +260,7 @@ export class PaymentService {
     return paymentRecord;
   }
 
-  async update(id: number, updateData: Partial<PaymentRecord>): Promise<PaymentRecord> {
+  async update(id: string, updateData: Partial<PaymentRecord>): Promise<PaymentRecord> {
     await this.paymentRecordRepository.update(id, updateData);
     const updatedRecord = await this.paymentRecordRepository.findOne({
       where: { id },
