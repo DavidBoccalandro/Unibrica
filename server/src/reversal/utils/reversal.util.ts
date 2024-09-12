@@ -8,12 +8,13 @@ import * as fs from 'fs';
 
 export async function findOrCreateSheet(
   originalFileName: string,
-  sheetRepository: Repository<SheetsEntity>
+  sheetRepository: Repository<SheetsEntity>,
+  fileType: 'deudas' | 'pagos' | 'reversas'
 ): Promise<SheetsEntity> {
   let sheet = await sheetRepository.findOne({ where: { fileName: originalFileName } });
 
   if (!sheet) {
-    const date = extractDateFromFileName(originalFileName);
+    const date = extractDateFromFileName(originalFileName, fileType);
 
     sheet = sheetRepository.create({
       fileName: originalFileName,
@@ -25,16 +26,68 @@ export async function findOrCreateSheet(
   return sheet;
 }
 
-export function extractDateFromFileName(fileName: string): Date | null {
-  const regex = /_(\d{6})_/;
-  const match = fileName.match(regex);
+export function extractDateFromFileName(fileName: string, fileType: string): Date | null {
+  switch (fileType) {
+    case 'reversas': {
+      // Para 'reversas' buscamos una fecha en formato _DDMMYY_
+      const regex = /_(\d{6})_/;
+      const match = fileName.match(regex);
 
-  if (match) {
-    const dateString = match[1];
-    const day = parseInt(dateString.slice(0, 2), 10);
-    const month = parseInt(dateString.slice(2, 4), 10) - 1;
-    const year = parseInt('20' + dateString.slice(4, 6), 10);
-    return new Date(year, month, day);
+      if (match) {
+        const dateString = match[1];
+        const day = parseInt(dateString.slice(0, 2), 10);
+        const month = parseInt(dateString.slice(2, 4), 10) - 1;
+        const year = parseInt('20' + dateString.slice(4, 6), 10);
+        return new Date(year, month, day);
+      }
+      break;
+    }
+
+    case 'deudas': {
+      // Para 'deudas' buscamos una fecha en formato YYYYMMDD
+      const regex = /(\d{8})/;
+      const match = fileName.match(regex);
+
+      if (match) {
+        const dateStr = match[0];
+        const year = parseInt(dateStr.slice(0, 4), 10);
+        const month = parseInt(dateStr.slice(4, 6), 10) - 1;
+        const day = parseInt(dateStr.slice(6, 8), 10);
+        return new Date(year, month, day);
+      }
+      break;
+    }
+
+    case 'cobros': {
+      // Para 'cobros' buscamos una fecha en formato DDMMYYYY
+      const regex = /_(\d{2})(\d{2})(\d{4})_/;
+      const match = fileName.match(regex);
+
+      if (match) {
+        const day = parseInt(match[1], 10);
+        const month = parseInt(match[2], 10) - 1;
+        const year = parseInt(match[3], 10);
+        return new Date(year, month, day);
+      }
+      break;
+    }
+
+    case 'pagos': {
+      // Para 'pagos' suponemos que sigue el mismo formato que 'cobros'
+      const regex = /_(\d{2})(\d{2})(\d{4})_/;
+      const match = fileName.match(regex);
+
+      if (match) {
+        const day = parseInt(match[1], 10);
+        const month = parseInt(match[2], 10) - 1;
+        const year = parseInt(match[3], 10);
+        return new Date(year, month, day);
+      }
+      break;
+    }
+
+    default:
+      break;
   }
 
   return null;

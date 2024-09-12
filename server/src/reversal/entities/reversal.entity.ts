@@ -1,12 +1,11 @@
 import { BankEntity } from 'src/banks/entities/banks.entity';
+import { ClientEntity } from 'src/clients/entities/clients.entity';
+import { BaseEntity } from 'src/config/base.entity';
 import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
-import { Entity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, ManyToOne } from 'typeorm';
 
 @Entity('reversal_records')
-export class ReversalRecord {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class ReversalRecord extends BaseEntity {
   @Column()
   agreementNumber: number;
 
@@ -48,4 +47,7 @@ export class ReversalRecord {
 
   @ManyToOne(() => SheetsEntity, (sheet) => sheet.reversals)
   sheet: SheetsEntity;
+
+  @ManyToOne(() => ClientEntity, (client) => client.debts, { nullable: true })
+  client: ClientEntity;
 }

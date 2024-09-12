@@ -20,7 +20,6 @@ export class ClientService {
   }
 
   updateClient(client: Client | null, oldClientId: number) {
-    console.log('Clients: ', client, oldClientId);
     return this.http.put(`${this.apiUrl}/${oldClientId}`, client, { withCredentials: true });
   }
 }

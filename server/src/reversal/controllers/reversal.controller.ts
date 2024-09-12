@@ -23,8 +23,11 @@ export class ReversalController {
   // Subir un archivo de reversión
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadReversal(@UploadedFile() file: Express.Multer.File): Promise<ReversalRecord[]> {
-    return this.reversalService.uploadReversalSheet(file);
+  async uploadReversal(
+    @UploadedFile() file: Express.Multer.File,
+    @Body('clientId') clientId: string
+  ): Promise<ReversalRecord[]> {
+    return this.reversalService.uploadReversalSheet(file, clientId);
   }
 
   // Obtener todos los registros de reversión
@@ -38,7 +41,7 @@ export class ReversalController {
   // Obtener un registro de reversión por ID
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<ReversalRecord> {
-    return this.reversalService.findOne(+id);
+    return this.reversalService.findOne(id);
   }
 
   @Get('sheet/:id')
@@ -52,7 +55,7 @@ export class ReversalController {
     @Param('id') id: string,
     @Body() updateReversalDto: UpdateReversalDto
   ): Promise<ReversalRecord> {
-    return this.reversalService.update(+id, updateReversalDto);
+    return this.reversalService.update(id, updateReversalDto);
   }
 
   // Eliminar un registro de reversión por ID
