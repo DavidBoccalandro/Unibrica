@@ -3,11 +3,12 @@ import { FormGroup, FormControl, FormBuilder, FormArray, Validators } from '@ang
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { FilterService } from 'src/app/core/services/filter.service';
+import { columnNamesMap } from 'src/app/shared/table/table.component';
 
 @Component({
   selector: 'app-filter-modal',
   templateUrl: './filter-modal.component.html',
-  styleUrls: ['./filter-modal.component.scss']
+  styleUrls: ['./filter-modal.component.scss'],
 })
 export class FilterModalComponent {
   @Input() currentRoute!: string;
@@ -36,17 +37,21 @@ export class FilterModalComponent {
 
   filtersForm: FormGroup;
 
-  constructor(private filterService: FilterService, private fb: FormBuilder, private router: Router) {
+  constructor(
+    private filterService: FilterService,
+    private fb: FormBuilder,
+    private router: Router
+  ) {
     this.filtersForm = this.fb.group({
       filters: this.fb.array([]),
     });
   }
 
-  ngOnInit(): void {    this.router.events
-    .pipe(filter((event) => event instanceof NavigationEnd))
-    .subscribe(() => {
+  ngOnInit(): void {
+    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
       this.resetFilters(); // Reinicia los filtros cuando cambia la ruta
-    }); }
+    });
+  }
 
   get filters(): FormArray {
     return this.filtersForm.get('filters') as FormArray;
@@ -54,16 +59,16 @@ export class FilterModalComponent {
 
   get filtersControl(): FormGroup[] {
     const formArray = this.filtersForm.get('filters') as FormArray;
-    return formArray.controls as FormGroup[]
+    return formArray.controls as FormGroup[];
   }
 
   addFilter() {
     const filter = this.fb.group({
       name: [this.selectedFilter],
-      value: ['', Validators.required]
-    })
+      value: ['', Validators.required],
+    });
 
-    this.filters.push(filter)
+    this.filters.push(filter);
   }
 
   changeSearchField(field: any): void {
@@ -72,7 +77,7 @@ export class FilterModalComponent {
   }
 
   removeFilter(index: number): void {
-    this.filters.removeAt(index)
+    this.filters.removeAt(index);
   }
 
   resetFilters(): void {
@@ -80,6 +85,20 @@ export class FilterModalComponent {
       this.filters.removeAt(0);
     }
     this.selectedFilter = ''; // Reinicia el filtro seleccionado
+  }
+
+  filtrar(): void {
+    // console.log(this.filters.value)
+    const filterData = this.filters.value.map((filter: { name: string; value: any; }) => ({
+      filterBy: this.mapFilterNameToColumn(filter.name),
+      filterValue: filter.value
+    }));
+    this.filterService.updateFilters(filterData);
+  }
+
+  mapFilterNameToColumn(filterName: string): string {
+    const entry = Object.entries(columnNamesMap).find(([key, value]) => value === filterName);
+    return entry ? entry[0] : '';
   }
 
   // changeSearchValue(search: string): void {

@@ -20,6 +20,15 @@ export interface StatisticsParams {
   endDate?: string;
 }
 
+export interface StatisticsParams2 {
+  limit: number;
+  offset: number;
+  filters?: { filterBy: string; filterValue: string }[];
+  date?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
 @Injectable()
 export class StadisticsService {
   private DebtsUrl = `${environment.envVar.API_URL}/debts`;
@@ -81,13 +90,12 @@ export class StadisticsService {
   }
 
   getAllPayments(
-    params: StatisticsParams
+    params: StatisticsParams2
   ): Observable<{ totalItems: number; payments: Payment[] }> {
     let httpParams = new HttpParams()
       .set('limit', params.limit.toString())
       .set('offset', params.offset.toString())
-      .set('filterBy', params.filterBy ?? 'firstNames')
-      .set('filterValue', params.filterValue ?? '');
+      .set('filters', JSON.stringify(params.filters))
 
     if (params.startDate) {
       httpParams = httpParams.set('startDate', params.startDate);

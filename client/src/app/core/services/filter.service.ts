@@ -1,8 +1,12 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
+export interface FilterParams {
+  filters: { name: string; value: string }[];
+  dates: { date: string; startDate: Date; endDate: Date }[];
+}
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class FilterService {
   private searchValueSubject = new BehaviorSubject<string>('');
@@ -20,7 +24,10 @@ export class FilterService {
   private dateFieldSubject = new BehaviorSubject<String>('');
   dateFieldSubject$: Observable<String> = this.dateFieldSubject.asObservable();
 
-  constructor() { }
+  private filtersSubject = new BehaviorSubject<FilterParams | null >(null);
+  filters$: Observable<FilterParams | null> = this.filtersSubject.asObservable();
+
+  constructor() {}
 
   updateSearchValue(search: string): void {
     this.searchValueSubject.next(search);
@@ -40,5 +47,9 @@ export class FilterService {
 
   updateDateField(field: string): void {
     this.dateFieldSubject.next(field);
+  }
+
+  updateFilters(filtersArray: FilterParams) {
+    this.filtersSubject.next(filtersArray);
   }
 }

@@ -3,7 +3,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, debounceTime, Subscription, take } from 'rxjs';
 import { MatTableDataSourceInput } from 'src/app/shared/table/table.component';
-import { StadisticsService, StatisticsParams } from 'src/app/stadistics/stadistics.service';
+import { StadisticsService, StatisticsParams, StatisticsParams2 } from 'src/app/stadistics/stadistics.service';
 import { FilterService } from '../../../../core/services/filter.service';
 
 export interface Payment {
@@ -51,7 +51,7 @@ export class PaymentsComponent {
   ];
   clickableColumns = new Set<string>([this.tableColumns[0]]);
   subscriptions: Subscription[] = [];
-  params = new BehaviorSubject<StatisticsParams>({
+  params = new BehaviorSubject<StatisticsParams2>({
     limit: 5,
     offset: 0,
   });
@@ -64,21 +64,11 @@ export class PaymentsComponent {
     this.$params.subscribe(() => this.fetchPayments());
 
     this.subscriptions.push(
-      this.filterService.searchValue$.pipe(debounceTime(500)).subscribe((searchValue) => {
-        const newParams = { ...this.params.getValue(), filterValue: searchValue };
+      this.filterService.filters$.subscribe((value) => {
+        const newParams = {...this.params.getValue(), value}
         this.params.next(newParams);
-        this.resetParams();
-        this.fetchPayments();
       })
-    );
-
-    this.subscriptions.push(
-      this.filterService.searchField$.subscribe((value) => {
-        const newParams = { ...this.params.getValue(), filterBy: value };
-        this.params.next(newParams);
-        this.fetchPayments();
-      })
-    );
+    )
 
     this.subscriptions.push(
       this.filterService.rangeStart$.subscribe((startDate) => {
@@ -105,6 +95,7 @@ export class PaymentsComponent {
       })
     );
   }
+
   resetParams() {
     if(this.paginator) {
       const currentPageSize = this.paginator?.pageSize ?? 10;
