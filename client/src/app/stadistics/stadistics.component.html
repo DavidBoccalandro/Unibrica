@@ -1,21 +1,24 @@
 <div class="mat-elevation-z3 statistics-container">
-  <nav
-    mat-tab-nav-bar
-    ngClass="tabs"
-    [tabPanel]="tabPanel"
-    class="mat-elevation-z4"
-  >
-    <a mat-tab-link *ngFor="let tab of tabs" [routerLink]="tab" [active]="currentRoute.includes(tab)">{{
-      tab | titlecase
-    }}</a>
-    <button mat-tab-link class="filter-button" (click)="displayFilters()" >
+  <nav mat-tab-nav-bar ngClass="tabs" [tabPanel]="tabPanel" class="mat-elevation-z4">
+    <a
+      mat-tab-link
+      *ngFor="let tab of tabs"
+      [routerLink]="tab"
+      [active]="currentRoute.includes(tab)"
+      >{{ tab | titlecase }}</a
+    >
+    <button mat-tab-link class="filter-button" (click)="displayFilters()">
       <mat-icon [color]="filtersShown && 'accent'">filter_alt</mat-icon>
     </button>
   </nav>
   <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
-  <div class="filters" [class.shown]="filtersShown">
-      <app-filter [currentRoute]="currentRoute"></app-filter>
+  <div class="filters" [class.shown]="filtersShown" hidden="true">
+    <app-filter [currentRoute]="currentRoute"></app-filter>
   </div>
+  <div class="filters" class="modal" [class.hidden]="!filtersShown" >
+    <app-filter-modal [currentRoute]="currentRoute"></app-filter-modal>
+  </div>
+
   <div class="mat-elevation-z8 table-container">
     <router-outlet></router-outlet>
     <!-- <app-pagination (pageEventEmitter)="handlePageEvent($event)"></app-pagination> -->

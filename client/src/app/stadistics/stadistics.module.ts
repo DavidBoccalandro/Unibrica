@@ -24,6 +24,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { PaymentsComponent } from './components/payments/payments/payments.component';
 import { ReversalsComponent } from './components/reversals/reversals.component';
+import { FilterModalComponent } from './components/filter-modal/filter-modal.component';
+import { MatInputModule } from '@angular/material/input';
 
 const MaterialModules = [
   MatTabsModule,
@@ -34,6 +36,7 @@ const MaterialModules = [
   MatDatepickerModule,
   MatButtonModule,
   MatPaginatorModule,
+  MatInputModule,
 ];
 
 @NgModule({
@@ -43,8 +46,10 @@ const MaterialModules = [
     DebtorsComponent,
     ClientsComponent,
     FilterComponent,
+    FilterModalComponent,
     PaymentsComponent,
     ReversalsComponent,
+    FilterModalComponent,
   ],
   imports: [
     TableComponent,
