@@ -23,7 +23,8 @@ export interface StatisticsParams {
 export interface StatisticsParams2 {
   limit: number;
   offset: number;
-  filters?: { filterBy: string; filterValue: string }[];
+  stringFilters?: { filterBy: string; filterValue: string }[];
+  numericFilters?: { filterBy: string; operator: string; filterValue: number }[];
   date?: string;
   startDate?: string;
   endDate?: string;
@@ -95,7 +96,8 @@ export class StadisticsService {
     let httpParams = new HttpParams()
       .set('limit', params.limit.toString())
       .set('offset', params.offset.toString())
-      .set('filters', JSON.stringify(params.filters))
+      .set('stringFilters', JSON.stringify(params.stringFilters))
+      .set('numericFilters', JSON.stringify(params.numericFilters))
 
     if (params.startDate) {
       httpParams = httpParams.set('startDate', params.startDate);

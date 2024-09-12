@@ -12,28 +12,34 @@ import { columnNamesMap } from 'src/app/shared/table/table.component';
 })
 export class FilterModalComponent {
   @Input() currentRoute!: string;
-  selectedFilter = '';
+  selectedFilter: { value: string; label: string; type: string } = {
+    value: '',
+    label: '',
+    type: '',
+  };
 
-  selectOptions: { [key: string]: { value: string; label: string }[] } = {
-    deudas: [{ value: 'idDebt', label: 'ID Deuda' }],
+  selectOptions: { [key: string]: { value: string; label: string; type: string }[] } = {
+    deudas: [{ value: 'idDebt', label: 'ID Deuda', type: 'numeric' }],
     deudores: [
-      { value: 'firstNames', label: 'Nombre' },
-      { value: 'dni', label: 'DNI' },
+      { value: 'firstNames', label: 'Nombre', type: 'string' },
+      { value: 'dni', label: 'DNI', type: 'string' },
     ],
     clientes: [
-      { value: 'name', label: 'Nombre' },
-      { value: 'idClient', label: 'ID Cliente' },
+      { value: 'name', label: 'Nombre', type: 'string' },
+      { value: 'idClient', label: 'ID Cliente', type: 'string' },
     ],
     pagos: [
-      { value: 'companyAccountNumber', label: 'N° de abonado' },
-      { value: 'bankAccountNumber', label: 'N° de cuenta' },
-      { value: 'agreementNumber', label: 'N° de convenio' },
-      { value: 'branchCode', label: 'Sucursal' }
+      { value: 'companyAccountNumber', label: 'N° de abonado', type: 'string' },
+      { value: 'bankAccountNumber', label: 'N° de cuenta', type: 'string' },
+      { value: 'agreementNumber', label: 'N° de convenio', type: 'string' },
+      { value: 'branchCode', label: 'Sucursal', type: 'numeric' },
+      { value: 'chargedAmount', label: 'Monto cobrado', type: 'numeric' },
+      { value: 'debtAmount', label: 'Monto deuda', type: 'numeric' },
     ],
     reversas: [
-      { value: 'accountNumber', label: 'N de cuenta' },
-      { value: 'debitID', label: 'ID débito' },
-      { value: 'currentID', label: 'ID actual' },
+      { value: 'accountNumber', label: 'N de cuenta', type: 'string' },
+      { value: 'debitID', label: 'ID débito', type: 'numeric' },
+      { value: 'currentID', label: 'ID actual', type: 'numeric' },
     ],
   };
 
@@ -51,7 +57,7 @@ export class FilterModalComponent {
 
   ngOnInit(): void {
     this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
-      this.resetFilters(); // Reinicia los filtros cuando cambia la ruta
+      this.resetFilters();
     });
   }
 
@@ -65,16 +71,32 @@ export class FilterModalComponent {
   }
 
   addFilter() {
-    const filter = this.fb.group({
-      name: [this.selectedFilter],
-      value: ['', Validators.required],
-    });
+    const filterType = this.selectedFilter.type;
+    let filterGroup: FormGroup;
 
-    this.filters.push(filter);
+    if (filterType === 'string') {
+      filterGroup = this.fb.group({
+        name: [this.selectedFilter.label],
+        value: ['', Validators.required],
+      });
+      // } else if(filterType === 'numeric') {   // Lo usaremos cuando añadamos los filtros para Date
+    } else {
+      filterGroup = this.fb.group({
+        name: [this.selectedFilter.label],
+        value: ['', Validators.required],
+        operator: ['>=', Validators.required],
+      });
+    }
+
+    this.filters.push(filterGroup);
   }
 
   changeSearchField(field: any): void {
-    this.selectedFilter = field.value;
+    console.log('filter name:', field)
+    this.selectedFilter = this.selectOptions[this.currentRoute].find(
+      (option) => option.label === field.value
+    )!;
+    console.log('Filtro seleccionado: ', this.selectedFilter)
     this.filterService.updateSearchField(field.value);
   }
 
@@ -86,24 +108,60 @@ export class FilterModalComponent {
     while (this.filters.length !== 0) {
       this.filters.removeAt(0);
     }
-    this.selectedFilter = ''; // Reinicia el filtro seleccionado
+    this.selectedFilter = { value: '', label: '', type: '' }; // Reinicia el filtro seleccionado
   }
 
   filtrar(): void {
-    console.log('Filters array en filter-modal: ', this.filters.value);
-    const filterData: { filterBy: string; filterValue: string }[] = this.filters.value.map(
-      (filter: { name: string; value: any }) => ({
-        filterBy: this.mapFilterNameToColumn(filter.name),
-        filterValue: filter.value,
-      })
-    );
-    this.filterService.updateFilters({ filters: filterData });
+    if (this.filters.length > 0) {
+      const stringFilterData = this.filters.value
+        .filter((filter: { name: string; value: any }) => {
+          const filterType = this.selectOptions[this.currentRoute].find(
+            (option) => option.label === filter.name
+          )?.type;
+          return filterType === 'string';
+        })
+        .map((filter: { name: string; value: any }) => ({
+          filterBy: this.mapFilterNameToColumn(filter.name),
+          filterValue: filter.value,
+        }));
+
+      const numericFilterData = this.filters.value
+        .filter((filter: { name: string; value: any; operator?: string }) => {
+          const filterType = this.selectOptions[this.currentRoute].find(
+            (option) => option.label === filter.name
+          )?.type;
+          return filterType === 'numeric';
+        })
+        .map((filter: { name: string; value: any; operator?: string }) => {
+          return {
+            filterBy: this.mapFilterNameToColumn(filter.name),
+            operator: filter.operator,
+            filterValue: filter.value,
+          };
+        });
+
+      // console.log('Filtros final: ', {
+      //   stringFilters: stringFilterData,
+      //   numericFilters: numericFilterData,
+      // });
+      this.filterService.updateFilters({
+        stringFilters: stringFilterData,
+        numericFilters: numericFilterData,
+      });
+    }
   }
 
   mapFilterNameToColumn(filterName: string): string {
     const entry = Object.entries(columnNamesMap).find(([key, value]) => value === filterName);
     return entry ? entry[0] : '';
   }
+
+  isNumericFilter(filter: FormGroup): boolean {
+    const filterType = this.selectOptions[this.currentRoute]
+      .find(option => option.label === filter.get('name')?.value)?.type;
+    return filterType === 'numeric';
+  }
+
 
   // changeSearchValue(search: string): void {
   //   this.filterService.updateSearchValue(search);

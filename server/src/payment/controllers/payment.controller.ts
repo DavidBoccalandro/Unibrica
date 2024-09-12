@@ -13,7 +13,6 @@ import {
 import { PaymentRecord } from '../entities/payment.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PaymentService } from '../services/payment.service';
-import { PaginationQueryDto } from 'src/debts/controllers/debts.controller';
 
 @Controller('payment')
 export class PaymentController {
@@ -30,18 +29,29 @@ export class PaymentController {
   findAll(
     @Query('limit') limit: number,
     @Query('offset') offset: number,
-    @Query('filters') filters: string
+    @Query('stringFilters') stringFilters: string,
+    @Query('numericFilters') numericFilters: string
   ) {
-    console.log('filters', filters);
-    let parsedFilters;
-    if (filters !== 'undefined') {
-      parsedFilters = JSON.parse(filters);
+    console.log(
+      'filters',
+      stringFilters,
+      typeof stringFilters,
+      numericFilters,
+      typeof numericFilters
+    );
+    let parsedStringFilters, parsedNumericFilters;
+    if (stringFilters && stringFilters !== 'undefined') {
+      parsedStringFilters = JSON.parse(stringFilters);
+    }
+    if (numericFilters && numericFilters !== 'undefined') {
+      parsedNumericFilters = JSON.parse(numericFilters);
     }
 
     return this.paymentService.getAllPayments({
       limit,
       offset,
-      filters: parsedFilters,
+      stringFilters: parsedStringFilters,
+      numericFilters: parsedNumericFilters,
     });
   }
 

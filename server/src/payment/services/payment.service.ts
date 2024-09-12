@@ -142,35 +142,59 @@ export class PaymentService {
   async getAllPayments(
     paginationQuery: PaginationFilterQueryDto
   ): Promise<{ payments: PaymentRecord[]; totalItems: number }> {
-    const { limit, offset, sortBy, sortOrder, filters, date, startDate, endDate } = paginationQuery;
+    const {
+      limit,
+      offset,
+      sortBy,
+      sortOrder,
+      stringFilters,
+      numericFilters,
+      date,
+      startDate,
+      endDate,
+    } = paginationQuery;
     let queryBuilder = this.paymentRecordRepository
       .createQueryBuilder('payment_records')
       .leftJoinAndSelect('payment_records.bank', 'bank');
 
-    // Aplicar múltiples filtros
-    if (filters && filters.length > 0) {
-      console.log('FIlters: ', filters);
-      filters.forEach((filter) => {
+    // Aplicar filtros de cadenas (stringFilters)
+    if (stringFilters && stringFilters.length > 0) {
+      stringFilters.forEach((filter) => {
         const { filterBy, filterValue } = filter;
+        queryBuilder = queryBuilder.andWhere(
+          `LOWER(payment_records.${filterBy}) LIKE :filterValue`,
+          { filterValue: `%${filterValue.toLowerCase()}%` }
+        );
+      });
+    }
 
-        if (filterBy === 'branchCode') {
-          // Convertir el valor a número para filtros en columnas enteras
-          const branchCodeValue = parseInt(filterValue, 10);
-          if (!isNaN(branchCodeValue)) {
-            queryBuilder = queryBuilder.andWhere('payment_records.branchCode = :branchCode', {
-              branchCode: branchCodeValue,
-            });
-          }
-        } else {
-          // Para filtros de cadenas
-          queryBuilder = queryBuilder.andWhere(
-            `LOWER(payment_records.${filterBy}) LIKE :filterValue`,
-            {
-              filterValue: `%${filterValue.toLowerCase()}%`,
-            }
-          );
+    // Aplicar filtros numéricos (numericFilters)
+    if (numericFilters && numericFilters.length > 0) {
+      numericFilters.forEach((filter, index) => {
+        const { filterBy, operator, filterValue } = filter;
+        const value = Number(filterValue);
+
+        if (operator === '=' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} = :value${index}`, {
+            [`value${index}`]: value,
+          });
+        } else if (operator === '<' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} < :value${index}`, {
+            [`value${index}`]: value,
+          });
+        } else if (operator === '>' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} > :value${index}`, {
+            [`value${index}`]: value,
+          });
+        } else if (operator === '<=' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} <= :value${index}`, {
+            [`value${index}`]: value,
+          });
+        } else if (operator === '>=' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} >= :value${index}`, {
+            [`value${index}`]: value,
+          });
         }
-        // Puedes seguir añadiendo más condiciones según los campos a filtrar...
       });
     }
 

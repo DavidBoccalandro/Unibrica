@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface FilterParams {
-  filters?: { filterBy: string; filterValue: string }[];
+  stringFilters?: { filterBy: string; filterValue: string }[];
+  numericFilters?: { filterBy: string; operator: string; filterValue: number }[];
   // dates?: { date: string; startDate: Date; endDate: Date }[];
 }
 @Injectable({
