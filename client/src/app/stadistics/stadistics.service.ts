@@ -25,9 +25,7 @@ export interface StatisticsParams2 {
   offset: number;
   stringFilters?: { filterBy: string; filterValue: string }[];
   numericFilters?: { filterBy: string; operator: string; filterValue: number }[];
-  date?: string;
-  startDate?: string;
-  endDate?: string;
+  dateFilters?: { filterBy: string; startDate: Date; endDate: Date }[];
 }
 
 @Injectable()
@@ -98,20 +96,21 @@ export class StadisticsService {
       .set('offset', params.offset.toString())
       .set('stringFilters', JSON.stringify(params.stringFilters))
       .set('numericFilters', JSON.stringify(params.numericFilters))
+      .set('dateFilters', JSON.stringify(params.dateFilters))
 
-    if (params.startDate) {
-      httpParams = httpParams.set('startDate', params.startDate);
-    }
+    // if (params.startDate) {
+    //   httpParams = httpParams.set('startDate', params.startDate);
+    // }
 
-    if (params.endDate) {
-      const adjustedEndDate = new Date(params.endDate);
-      adjustedEndDate.setHours(23, 59, 59, 999);
-      httpParams = httpParams.set('endDate', adjustedEndDate.toISOString());
-    }
+    // if (params.endDate) {
+    //   const adjustedEndDate = new Date(params.endDate);
+    //   adjustedEndDate.setHours(23, 59, 59, 999);
+    //   httpParams = httpParams.set('endDate', adjustedEndDate.toISOString());
+    // }
 
-    if (params.date) {
-      httpParams = httpParams.set('date', params.date);
-    }
+    // if (params.date) {
+    //   httpParams = httpParams.set('date', params.date);
+    // }
 
     return this.http.get<{ totalItems: number; payments: Payment[] }>(this.PaymentsUrl, {
       params: httpParams,

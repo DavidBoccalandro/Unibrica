@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export interface FilterParams {
   stringFilters?: { filterBy: string; filterValue: string }[];
   numericFilters?: { filterBy: string; operator: string; filterValue: number }[];
-  // dates?: { date: string; startDate: Date; endDate: Date }[];
+  dateFilters?: { filterBy: string; startDate: Date; endDate: Date }[];
 }
 @Injectable({
   providedIn: 'root',
@@ -50,7 +50,7 @@ export class FilterService {
     this.dateFieldSubject.next(field);
   }
 
-  updateFilters(filtersArray: FilterParams) {
+  updateFilters(filtersArray: FilterParams | null) {
     this.filtersSubject.next(filtersArray);
   }
 }

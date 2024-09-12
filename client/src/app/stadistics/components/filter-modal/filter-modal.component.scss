@@ -45,3 +45,22 @@
     font-size: 17px;
   }
 }
+
+.range-picker-form{
+  width: 300px;
+  padding-bottom: 20px;
+
+
+  mat-date-range-input{
+    display: flex;
+    flex-direction: column;
+    font-size: small;
+    margin-top: 17px;
+    height: 2em;
+  }
+}
+
+.delete-filter-button {
+  // align-self: center;
+  margin-top: 5px;
+}

@@ -31,10 +31,11 @@ export class FilterModalComponent {
     pagos: [
       { value: 'companyAccountNumber', label: 'N° de abonado', type: 'string' },
       { value: 'bankAccountNumber', label: 'N° de cuenta', type: 'string' },
-      { value: 'agreementNumber', label: 'N° de convenio', type: 'string' },
+      { value: 'agreementNumber', label: 'N° de convenio', type: 'numeric' },
       { value: 'branchCode', label: 'Sucursal', type: 'numeric' },
       { value: 'chargedAmount', label: 'Monto cobrado', type: 'numeric' },
       { value: 'debtAmount', label: 'Monto deuda', type: 'numeric' },
+      { value: 'debitDate', label: 'Fecha débito', type: 'date' },
     ],
     reversas: [
       { value: 'accountNumber', label: 'N de cuenta', type: 'string' },
@@ -79,12 +80,17 @@ export class FilterModalComponent {
         name: [this.selectedFilter.label],
         value: ['', Validators.required],
       });
-      // } else if(filterType === 'numeric') {   // Lo usaremos cuando añadamos los filtros para Date
-    } else {
+    } else if (filterType === 'numeric') {
       filterGroup = this.fb.group({
         name: [this.selectedFilter.label],
         value: ['', Validators.required],
         operator: ['>=', Validators.required],
+      });
+    } else {
+      filterGroup = this.fb.group({
+        name: [this.selectedFilter.label, Validators.required],
+        start: ['', Validators.required],
+        end: ['', Validators.required],
       });
     }
 
@@ -92,11 +98,11 @@ export class FilterModalComponent {
   }
 
   changeSearchField(field: any): void {
-    console.log('filter name:', field)
+    console.log('filter name:', field);
     this.selectedFilter = this.selectOptions[this.currentRoute].find(
       (option) => option.label === field.value
     )!;
-    console.log('Filtro seleccionado: ', this.selectedFilter)
+    console.log('Filtro seleccionado: ', this.selectedFilter);
     this.filterService.updateSearchField(field.value);
   }
 
@@ -108,7 +114,8 @@ export class FilterModalComponent {
     while (this.filters.length !== 0) {
       this.filters.removeAt(0);
     }
-    this.selectedFilter = { value: '', label: '', type: '' }; // Reinicia el filtro seleccionado
+    this.selectedFilter = { value: '', label: '', type: '' };
+    this.filterService.updateFilters(null);
   }
 
   filtrar(): void {
@@ -140,13 +147,31 @@ export class FilterModalComponent {
           };
         });
 
+        const dateFilterData = this.filters.value
+        .filter((filter: { name: string; start: Date; end: Date }) => {
+          const filterType = this.selectOptions[this.currentRoute].find(
+            (option) => option.label === filter.name
+          )?.type;
+          return filterType === 'date';
+        })
+        .map((filter: { name: string; start: Date; end: Date }) => {
+          return {
+            filterBy: this.mapFilterNameToColumn(filter.name),
+            startDate: filter.start,
+            endDate: filter.end,
+          };
+        });
+
+
       // console.log('Filtros final: ', {
       //   stringFilters: stringFilterData,
       //   numericFilters: numericFilterData,
+      //   dateFilters: dateFilterData
       // });
       this.filterService.updateFilters({
         stringFilters: stringFilterData,
         numericFilters: numericFilterData,
+        dateFilters: dateFilterData,
       });
     }
   }
@@ -156,12 +181,14 @@ export class FilterModalComponent {
     return entry ? entry[0] : '';
   }
 
-  isNumericFilter(filter: FormGroup): boolean {
-    const filterType = this.selectOptions[this.currentRoute]
-      .find(option => option.label === filter.get('name')?.value)?.type;
-    return filterType === 'numeric';
+  filterType(filter: FormGroup): string {
+    // console.log('FIlter: ', filter)
+    const filterType = this.selectOptions[this.currentRoute].find(
+      (option) => option.label === filter.get('name')?.value
+    )?.type;
+    // console.log('filterType:', filterType)
+    return filterType!;
   }
-
 
   // changeSearchValue(search: string): void {
   //   this.filterService.updateSearchValue(search);

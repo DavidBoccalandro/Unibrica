@@ -24,7 +24,7 @@ export const DataSourceConfig: DataSourceOptions = {
   migrations: [__dirname + '/../migrations/*{.ts,.js}'],
   synchronize: true,
   migrationsRun: true,
-  logging: true,
+  logging: false,
   namingStrategy: new SnakeNamingStrategy(),
   ssl: configService.get('POSTGRESS_SSL') === "true",
       extra: {

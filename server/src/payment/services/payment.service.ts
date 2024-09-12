@@ -142,17 +142,8 @@ export class PaymentService {
   async getAllPayments(
     paginationQuery: PaginationFilterQueryDto
   ): Promise<{ payments: PaymentRecord[]; totalItems: number }> {
-    const {
-      limit,
-      offset,
-      sortBy,
-      sortOrder,
-      stringFilters,
-      numericFilters,
-      date,
-      startDate,
-      endDate,
-    } = paginationQuery;
+    const { limit, offset, sortBy, sortOrder, stringFilters, numericFilters, dateFilters } =
+      paginationQuery;
     let queryBuilder = this.paymentRecordRepository
       .createQueryBuilder('payment_records')
       .leftJoinAndSelect('payment_records.bank', 'bank');
@@ -161,6 +152,7 @@ export class PaymentService {
     if (stringFilters && stringFilters.length > 0) {
       stringFilters.forEach((filter) => {
         const { filterBy, filterValue } = filter;
+        console.log('filterValue type: ', typeof filterValue);
         queryBuilder = queryBuilder.andWhere(
           `LOWER(payment_records.${filterBy}) LIKE :filterValue`,
           { filterValue: `%${filterValue.toLowerCase()}%` }
@@ -198,15 +190,23 @@ export class PaymentService {
       });
     }
 
-    if (startDate && endDate) {
-      if (date && ['createdAt', 'updatedAt', 'dueDate'].includes(date)) {
-        queryBuilder = queryBuilder.andWhere(
-          `payment_records.${date} >= :startDate AND payment_records.${date} <= :endDate`,
-          { startDate, endDate }
-        );
-      } else {
-        throw new BadRequestException('Invalid date field specified for filtering');
-      }
+    // Aplicar filtros de fechas (dateFilters)
+    if (dateFilters && dateFilters.length > 0) {
+      dateFilters.forEach((filter, index) => {
+        const { filterBy, startDate, endDate } = filter;
+
+        if (startDate && endDate && filterBy) {
+          queryBuilder = queryBuilder.andWhere(
+            `payment_records.${filterBy} BETWEEN :startDate${index} AND :endDate${index}`,
+            {
+              [`startDate${index}`]: startDate,
+              [`endDate${index}`]: endDate,
+            }
+          );
+        } else {
+          throw new BadRequestException('Invalid date range or field for filtering');
+        }
+      });
     }
 
     // Ejecuta la consulta para obtener el total de elementos

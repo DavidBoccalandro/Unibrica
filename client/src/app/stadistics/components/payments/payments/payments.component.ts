@@ -52,7 +52,7 @@ export class PaymentsComponent {
   clickableColumns = new Set<string>([this.tableColumns[0]]);
   subscriptions: Subscription[] = [];
   params = new BehaviorSubject<StatisticsParams2>({
-    limit: 5,
+    limit: 10,
     offset: 0,
   });
   $params = this.params.asObservable();
@@ -65,7 +65,9 @@ export class PaymentsComponent {
 
     this.subscriptions.push(
       this.filterService.filters$.subscribe((value) => {
-        console.log('Filtros en component: ', value)
+        if(!value) {
+          this.resetParams()
+        }
         const newParams = {...this.params.getValue(), ...value}
         this.params.next(newParams);
       })
@@ -100,7 +102,7 @@ export class PaymentsComponent {
   resetParams() {
     if(this.paginator) {
       const currentPageSize = this.paginator?.pageSize ?? 10;
-      this.params.next({ ...this.params.getValue(), offset: 0, limit: currentPageSize });
+      this.params.next({ offset: 0, limit: currentPageSize });
       this.paginator.pageIndex = 0;
     }
   }
