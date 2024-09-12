@@ -31,11 +31,7 @@ export class PaymentService {
     private sheetRepository: Repository<SheetsEntity>
   ) {}
 
-  async uploadPaymentSheet(
-    file: Express.Multer.File,
-    clientId: string,
-    clientName: string
-  ): Promise<PaymentRecord[]> {
+  async uploadPaymentSheet(file: Express.Multer.File, clientId: string): Promise<PaymentRecord[]> {
     if (!file) {
       throw new Error('No file provided');
     }
@@ -168,7 +164,9 @@ export class PaymentService {
       paginationQuery;
     let queryBuilder = this.paymentRecordRepository
       .createQueryBuilder('payment_records')
-      .leftJoinAndSelect('payment_records.bank', 'bank');
+      .leftJoinAndSelect('payment_records.bank', 'bank')
+      .leftJoinAndSelect('payment_records.sheet', 'sheet')
+      .leftJoinAndSelect('payment_records.client', 'client');
 
     // Aplicar filtros de cadenas (stringFilters)
     if (stringFilters && stringFilters.length > 0) {
@@ -217,7 +215,15 @@ export class PaymentService {
       dateFilters.forEach((filter, index) => {
         const { filterBy, startDate, endDate } = filter;
 
-        if (startDate && endDate && filterBy) {
+        if (filterBy === 'fileDate' && startDate && endDate) {
+          queryBuilder = queryBuilder.andWhere(
+            `sheet.date BETWEEN :startDate${index} AND :endDate${index}`,
+            {
+              [`startDate${index}`]: startDate,
+              [`endDate${index}`]: endDate,
+            }
+          );
+        } else if (startDate && endDate && filterBy) {
           queryBuilder = queryBuilder.andWhere(
             `payment_records.${filterBy} BETWEEN :startDate${index} AND :endDate${index}`,
             {

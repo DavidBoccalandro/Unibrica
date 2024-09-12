@@ -17,9 +17,14 @@
         <ng-container *ngIf="column === 'bank'; else defaultColumn">
           {{ element[column].bankId }}
         </ng-container>
-      </ng-template>
-      <ng-template #defaultColumn>
-        {{ element[column] }}
+        <ng-template #defaultColumn>
+          <ng-container *ngIf="column === 'fileDate'; else regularColumn">
+            {{ element['sheet'].date | date: 'dd/MM/yyyy' }}
+          </ng-container>
+        </ng-template>
+        <ng-template #regularColumn>
+          {{ element[column] }}
+        </ng-template>
       </ng-template>
       </td>
     </ng-container>
@@ -27,4 +32,3 @@
     <tr mat-row *matRowDef="let row; columns: columns"></tr>
   </table>
 </section>
-

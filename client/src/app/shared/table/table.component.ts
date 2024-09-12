@@ -53,7 +53,9 @@ export const columnNamesMap: { [key: string]: string } = {
   debitID: 'ID débito',
   movementFunction: 'Función del movimiento',
   rejectionCode: 'Código de rechazo',
-  debitAmount: 'Monto débito'
+  debitAmount: 'Monto débito',
+  fileDate: 'Fecha archivo',
+  "sheet.date": 'Fecha archivo',
 };
 
 export type MatTableDataSourceInput = Debt | Debtor | Client | Payment | Reversal;
@@ -78,6 +80,7 @@ export class TableComponent {
   ngOnInit() {}
 
   elementClick (event: TableClickEvent):void {
+    console.log('dataSource: ', this.dataSource.data)
     if (!this.clickableColumns) return;
     if(this.clickableColumns.has(event.column)) {
       this.elementClickEmitter.emit(event)

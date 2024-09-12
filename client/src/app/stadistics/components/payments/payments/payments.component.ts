@@ -5,6 +5,7 @@ import { BehaviorSubject, debounceTime, Subscription, take } from 'rxjs';
 import { MatTableDataSourceInput } from 'src/app/shared/table/table.component';
 import { StadisticsService, StatisticsParams2 } from 'src/app/stadistics/stadistics.service';
 import { FilterService } from '../../../../core/services/filter.service';
+import { Sheet } from 'src/app/shared/interfaces/sheet.interface';
 
 export interface Payment {
   id: number;
@@ -22,7 +23,10 @@ export interface Payment {
   installmentNumber: number;
   debitStatus: string;
   chargedAmount: number;
+  sheet: Sheet
 }
+
+
 
 @Component({
   selector: 'app-payments',
@@ -36,10 +40,11 @@ export class PaymentsComponent {
     // 'id',
     // 'recordType',
     'agreementNumber',
-    'creditCompany',
+    // 'creditCompany',
     'companyAccountNumber',
     'bankAccountNumber',
     'debitDate',
+    'fileDate',
     'bank',
     'customerAccountType',
     'branchCode',
@@ -72,31 +77,6 @@ export class PaymentsComponent {
         this.params.next(newParams);
       })
     )
-
-    this.subscriptions.push(
-      this.filterService.rangeStart$.subscribe((startDate) => {
-        // const newParams = { ...this.params.getValue(), startDate, date: 'createdAt' };
-        const newParams = {
-          ...this.params.getValue(),
-          date: 'createdAt',
-          startDate: startDate ? startDate.toISOString() : undefined,
-        };
-        this.params.next(newParams);
-        this.resetParams();
-      })
-    );
-
-    this.subscriptions.push(
-      this.filterService.rangeEnd$.subscribe((endDate) => {
-        const newParams = {
-          ...this.params.getValue(),
-          date: 'createdAt',
-          endDate: endDate ? endDate.toISOString() : undefined  // Convertir a string
-        };
-        this.params.next(newParams);
-        this.resetParams();
-      })
-    );
   }
 
   resetParams() {
@@ -112,6 +92,7 @@ export class PaymentsComponent {
       .getAllPayments(this.params.getValue())
       .pipe(take(1))
       .subscribe((data) => {
+        console.log('PAYMENTS: ', data)
         this.payments = data.payments;
         this.totalItems = data.totalItems;
         this.tableData = new MatTableDataSource<MatTableDataSourceInput>(this.payments);
@@ -119,6 +100,9 @@ export class PaymentsComponent {
       });
   }
 
+  formatData(data: Payment[]) {
+
+  }
   handleClick(page: PageEvent) {
     this.params.next({
       ...this.params.getValue(),
