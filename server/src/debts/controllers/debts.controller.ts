@@ -23,7 +23,6 @@ export interface PaginationQueryDto {
   startDate: Date;
   endDate: Date;
 }
-
 @Controller('debts')
 export class DebtsController {
   constructor(private readonly debtsService: DebtsService) {}

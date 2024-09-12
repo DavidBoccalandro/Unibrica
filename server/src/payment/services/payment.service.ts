@@ -5,9 +5,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { PaymentRecord } from '../entities/payment.entity';
 import { BankEntity } from 'src/banks/entities/banks.entity';
-import { PaginationQueryDto } from 'src/debts/controllers/debts.controller';
 import * as XLSX from 'xlsx';
 import { DebtEntity } from 'src/debts/entities/debts.entity';
+import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDto';
 
 @Injectable()
 export class PaymentService {
@@ -139,19 +139,38 @@ export class PaymentService {
     return processedData;
   }
 
-  async findAll(
-    paginationQuery: PaginationQueryDto
+  async getAllPayments(
+    paginationQuery: PaginationFilterQueryDto
   ): Promise<{ payments: PaymentRecord[]; totalItems: number }> {
-    const { limit, offset, sortBy, sortOrder, filterBy, filterValue, date, startDate, endDate } =
-      paginationQuery;
+    const { limit, offset, sortBy, sortOrder, filters, date, startDate, endDate } = paginationQuery;
     let queryBuilder = this.paymentRecordRepository
       .createQueryBuilder('payment_records')
       .leftJoinAndSelect('payment_records.bank', 'bank');
 
-    if (filterBy && ['companyAccountNumber', 'bankAccountNumber'].includes(filterBy)) {
-      const lowerFilterValue = filterValue.toLowerCase();
-      queryBuilder = queryBuilder.where(`LOWER(payment_records.${filterBy}) LIKE :filterValue`, {
-        filterValue: `%${lowerFilterValue}%`,
+    // Aplicar múltiples filtros
+    if (filters && filters.length > 0) {
+      console.log('FIlters: ', filters);
+      filters.forEach((filter) => {
+        const { filterBy, filterValue } = filter;
+
+        if (filterBy === 'branchCode') {
+          // Convertir el valor a número para filtros en columnas enteras
+          const branchCodeValue = parseInt(filterValue, 10);
+          if (!isNaN(branchCodeValue)) {
+            queryBuilder = queryBuilder.andWhere('payment_records.branchCode = :branchCode', {
+              branchCode: branchCodeValue,
+            });
+          }
+        } else {
+          // Para filtros de cadenas
+          queryBuilder = queryBuilder.andWhere(
+            `LOWER(payment_records.${filterBy}) LIKE :filterValue`,
+            {
+              filterValue: `%${filterValue.toLowerCase()}%`,
+            }
+          );
+        }
+        // Puedes seguir añadiendo más condiciones según los campos a filtrar...
       });
     }
 

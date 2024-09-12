@@ -3,7 +3,7 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, debounceTime, Subscription, take } from 'rxjs';
 import { MatTableDataSourceInput } from 'src/app/shared/table/table.component';
-import { StadisticsService, StatisticsParams, StatisticsParams2 } from 'src/app/stadistics/stadistics.service';
+import { StadisticsService, StatisticsParams2 } from 'src/app/stadistics/stadistics.service';
 import { FilterService } from '../../../../core/services/filter.service';
 
 export interface Payment {
@@ -65,7 +65,8 @@ export class PaymentsComponent {
 
     this.subscriptions.push(
       this.filterService.filters$.subscribe((value) => {
-        const newParams = {...this.params.getValue(), value}
+        console.log('Filtros en component: ', value)
+        const newParams = {...this.params.getValue(), ...value}
         this.params.next(newParams);
       })
     )

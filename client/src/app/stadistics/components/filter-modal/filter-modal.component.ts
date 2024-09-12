@@ -25,8 +25,10 @@ export class FilterModalComponent {
       { value: 'idClient', label: 'ID Cliente' },
     ],
     pagos: [
-      { value: 'companyAccountNumber', label: 'N de abonado' },
-      { value: 'bankAccountNumber', label: 'N° cuenta bancaria' },
+      { value: 'companyAccountNumber', label: 'N° de abonado' },
+      { value: 'bankAccountNumber', label: 'N° de cuenta' },
+      { value: 'agreementNumber', label: 'N° de convenio' },
+      { value: 'branchCode', label: 'Sucursal' }
     ],
     reversas: [
       { value: 'accountNumber', label: 'N de cuenta' },
@@ -88,12 +90,14 @@ export class FilterModalComponent {
   }
 
   filtrar(): void {
-    // console.log(this.filters.value)
-    const filterData = this.filters.value.map((filter: { name: string; value: any; }) => ({
-      filterBy: this.mapFilterNameToColumn(filter.name),
-      filterValue: filter.value
-    }));
-    this.filterService.updateFilters(filterData);
+    console.log('Filters array en filter-modal: ', this.filters.value);
+    const filterData: { filterBy: string; filterValue: string }[] = this.filters.value.map(
+      (filter: { name: string; value: any }) => ({
+        filterBy: this.mapFilterNameToColumn(filter.name),
+        filterValue: filter.value,
+      })
+    );
+    this.filterService.updateFilters({ filters: filterData });
   }
 
   mapFilterNameToColumn(filterName: string): string {

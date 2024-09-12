@@ -27,8 +27,22 @@ export class PaymentController {
   }
 
   @Get()
-  findAll(@Query() findAllPaymentsDto: PaginationQueryDto) {
-    return this.paymentService.findAll(findAllPaymentsDto);
+  findAll(
+    @Query('limit') limit: number,
+    @Query('offset') offset: number,
+    @Query('filters') filters: string
+  ) {
+    console.log('filters', filters);
+    let parsedFilters;
+    if (filters !== 'undefined') {
+      parsedFilters = JSON.parse(filters);
+    }
+
+    return this.paymentService.getAllPayments({
+      limit,
+      offset,
+      filters: parsedFilters,
+    });
   }
 
   @Get(':id')
