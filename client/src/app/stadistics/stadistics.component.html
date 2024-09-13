@@ -7,7 +7,7 @@
       [active]="currentRoute.includes(tab)"
       >{{ tab | titlecase }}</a
     >
-    <button mat-tab-link class="filter-button" (click)="displayFilters()">
+    <button mat-tab-link class="filter-button" (click)="displayFilters($event)">
       <mat-icon [color]="filtersShown && 'accent'">filter_alt</mat-icon>
     </button>
   </nav>

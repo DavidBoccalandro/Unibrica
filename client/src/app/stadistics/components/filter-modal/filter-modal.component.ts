@@ -1,16 +1,17 @@
-import { Component, Input } from '@angular/core';
-import { FormGroup, FormControl, FormBuilder, FormArray, Validators } from '@angular/forms';
+import { Component, Input, OnDestroy } from '@angular/core';
+import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
+import { MatDialogRef } from '@angular/material/dialog';
 import { NavigationEnd, Router } from '@angular/router';
-import { filter } from 'rxjs';
+import { filter, take } from 'rxjs';
 import { FilterService } from 'src/app/core/services/filter.service';
-import { columnNamesMap } from 'src/app/shared/table/table.component';
+
 
 @Component({
   selector: 'app-filter-modal',
   templateUrl: './filter-modal.component.html',
   styleUrls: ['./filter-modal.component.scss'],
 })
-export class FilterModalComponent {
+export class FilterModalComponent implements OnDestroy {
   @Input() currentRoute!: string;
   selectedFilter: { value: string; label: string; type: string } = {
     value: '',
@@ -66,18 +67,30 @@ export class FilterModalComponent {
   filtersForm: FormGroup;
 
   constructor(
+    public dialogRef: MatDialogRef<FilterModalComponent>,
     private filterService: FilterService,
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
   ) {
+    // this.currentRoute = data.currentRoute;
     this.filtersForm = this.fb.group({
       filters: this.fb.array([]),
     });
   }
 
+  ngOnDestroy(): void {
+    this.filterService.updateFilterForm(this.filters)
+  }
+
   ngOnInit(): void {
+    this.currentRoute = this.router.url.split('/')[2].split('?')[0];
     this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
       this.resetFilters();
+    });
+    this.filterService.filterForm$.pipe(take(1)).subscribe((filters) => {
+      if(filters.controls?.length > 0) {
+        this.setFiltersToForm(filters);
+      }
     });
   }
 
@@ -114,14 +127,24 @@ export class FilterModalComponent {
     }
 
     this.filters.push(filterGroup);
+    // this.filterService.updateFilterForm(this.filters)
+  }
+
+  setFiltersToForm(filters: FormArray) {
+    const filtersArray = this.filtersForm.get('filters') as FormArray;
+
+    if(filters) {
+      filtersArray.clear();
+      filters.controls.forEach((filter) => {
+        this.filters.push(filter);
+      });
+    }
   }
 
   changeSearchField(field: any): void {
-    console.log('filter name:', field);
     this.selectedFilter = this.selectOptions[this.currentRoute].find(
       (option) => option.label === field.value
     )!;
-    console.log('Filtro seleccionado: ', this.selectedFilter);
     this.filterService.updateSearchField(field.value);
   }
 
@@ -130,11 +153,13 @@ export class FilterModalComponent {
   }
 
   resetFilters(): void {
-    while (this.filters.length !== 0) {
-      this.filters.removeAt(0);
-    }
+    // while (this.filters.length !== 0) {
+    //   this.filters.removeAt(0);
+    // }
+    this.filters.clear()
     this.selectedFilter = { value: '', label: '', type: '' };
     this.filterService.updateFilters(null);
+    this.filterService.updateFilterForm(this.fb.array([]))
   }
 
   filtrar(): void {
@@ -181,11 +206,11 @@ export class FilterModalComponent {
           };
         });
 
-      console.log('Filtros final: ', {
-        stringFilters: stringFilterData,
-        numericFilters: numericFilterData,
-        dateFilters: dateFilterData,
-      });
+      // console.log('Filtros final: ', {
+      //   stringFilters: stringFilterData,
+      //   numericFilters: numericFilterData,
+      //   dateFilters: dateFilterData,
+      // });
 
       this.filterService.updateFilters({
         stringFilters: stringFilterData,
@@ -203,11 +228,9 @@ export class FilterModalComponent {
   }
 
   filterType(filter: FormGroup): string {
-    // console.log('FIlter: ', filter)
     const filterType = this.selectOptions[this.currentRoute].find(
       (option) => option.label === filter.get('name')?.value
     )?.type;
-    // console.log('filterType:', filterType)
     return filterType!;
   }
 }

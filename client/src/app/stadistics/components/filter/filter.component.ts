@@ -36,37 +36,27 @@ export class FilterComponent {
 
   constructor(private filterService: FilterService) {}
 
-  ngOnInit(): void {
-    this.range.get('start')?.valueChanges.subscribe((start) => {
-      this.filterService.updateDateField('updatedAt')
-      this.filterService.updateRangeStart(start);
-    });
+  ngOnInit(): void { }
 
-    this.range.get('end')?.valueChanges.subscribe((end) => {
-      this.filterService.updateDateField('updatedAt')
-      this.filterService.updateRangeEnd(end);
-    });
-  }
+  // changeSearchValue(search: string): void {
+  //   this.filterService.updateSearchValue(search);
+  // }
 
-  changeSearchValue(search: string): void {
-    this.filterService.updateSearchValue(search);
-  }
+  // changeSearchField(field: any): void {
+  //   this.filterService.updateSearchField(field.value);
+  // }
 
-  changeSearchField(field: any): void {
-    this.filterService.updateSearchField(field.value);
-  }
+  // changeRangeStart(start: Date | null): void {
+  //   this.filterService.updateRangeStart(start);
+  // }
 
-  changeRangeStart(start: Date | null): void {
-    this.filterService.updateRangeStart(start);
-  }
+  // changeRangeEnd(end: Date | null): void {
+  //   this.filterService.updateRangeEnd(end);
+  // }
 
-  changeRangeEnd(end: Date | null): void {
-    this.filterService.updateRangeEnd(end);
-  }
-
-  clearSearchValue(): void {
-    this.filterService.updateSearchValue('');
-  }
+  // clearSearchValue(): void {
+  //   this.filterService.updateSearchValue('');
+  // }
 
   searchButtonClick(): void {
     // You can perform additional logic here if needed
