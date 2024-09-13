@@ -19,7 +19,17 @@ export class FilterModalComponent {
   };
 
   selectOptions: { [key: string]: { value: string; label: string; type: string }[] } = {
-    deudas: [{ value: 'idDebt', label: 'ID Deuda', type: 'numeric' }],
+    deudas: [
+      { value: 'idDebt', label: 'ID Deuda', type: 'string' },
+      { value: 'account', label: 'Cuenta', type: 'string' },
+      { value: 'clientName', label: 'Cliente', type: 'string' },
+      { value: 'debtorDNI', label: 'DNI', type: 'string' },
+      { value: 'debtorLastname', label: 'Apellido', type: 'string' },
+      { value: 'branchCode', label: 'Sucursal', type: 'numeric' },
+      { value: 'dueDate', label: 'Vencimiento', type: 'date' },
+      { value: 'fileDate', label: 'Fecha archivo', type: 'date' },
+      { value: 'amount', label: 'Monto', type: 'numeric' },
+    ],
     deudores: [
       { value: 'firstNames', label: 'Nombre', type: 'string' },
       { value: 'dni', label: 'DNI', type: 'string' },
@@ -166,11 +176,11 @@ export class FilterModalComponent {
         });
 
 
-      // console.log('Filtros final: ', {
-      //   stringFilters: stringFilterData,
-      //   numericFilters: numericFilterData,
-      //   dateFilters: dateFilterData
-      // });
+      console.log('Filtros final: ', {
+        stringFilters: stringFilterData,
+        numericFilters: numericFilterData,
+        dateFilters: dateFilterData
+      });
       this.filterService.updateFilters({
         stringFilters: stringFilterData,
         numericFilters: numericFilterData,

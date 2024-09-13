@@ -60,6 +60,7 @@ export const columnNamesMap: { [key: string]: string } = {
   'debtor.dni': 'DNI',
   'sheet.date': 'Fecha Archivo',
   'bank.bankId': 'Banco',
+  'client.name': 'Cliente'
 };
 
 export type MatTableDataSourceInput = Debt | Debtor | Client | Payment | Reversal;
