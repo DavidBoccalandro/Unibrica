@@ -82,7 +82,7 @@ export class PaymentsComponent {
   resetParams() {
     if(this.paginator) {
       const currentPageSize = this.paginator?.pageSize ?? 10;
-      this.params.next({ offset: 0, limit: currentPageSize });
+      this.params.next({ offset: 0, limit: 10 });
       this.paginator.pageIndex = 0;
     }
   }

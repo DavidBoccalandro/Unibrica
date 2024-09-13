@@ -55,7 +55,7 @@ export const columnNamesMap: { [key: string]: string } = {
   rejectionCode: 'Código de rechazo',
   debitAmount: 'Monto débito',
   fileDate: 'Fecha archivo',
-  "sheet.date": 'Fecha archivo',
+  clientName: 'Cliente'
 };
 
 export type MatTableDataSourceInput = Debt | Debtor | Client | Payment | Reversal;

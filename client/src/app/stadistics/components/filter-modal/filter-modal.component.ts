@@ -32,6 +32,7 @@ export class FilterModalComponent {
       { value: 'companyAccountNumber', label: 'N° de abonado', type: 'string' },
       { value: 'bankAccountNumber', label: 'N° de cuenta', type: 'string' },
       { value: 'debitStatus', label: 'Estado de débito', type: 'string' },
+      { value: 'clientName', label: 'Cliente', type: 'string' },
       { value: 'agreementNumber', label: 'N° de convenio', type: 'numeric' },
       { value: 'branchCode', label: 'Sucursal', type: 'numeric' },
       { value: 'chargedAmount', label: 'Monto cobrado', type: 'numeric' },

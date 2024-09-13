@@ -172,11 +172,18 @@ export class PaymentService {
     if (stringFilters && stringFilters.length > 0) {
       stringFilters.forEach((filter) => {
         const { filterBy, filterValue } = filter;
-        console.log('filterValue type: ', typeof filterValue);
-        queryBuilder = queryBuilder.andWhere(
-          `LOWER(payment_records.${filterBy}) LIKE :filterValue`,
-          { filterValue: `%${filterValue.toLowerCase()}%` }
-        );
+        console.log('filterBy: ', filterBy);
+        // console.log('filterValue type: ', typeof filterValue);
+        if (filterBy === 'clientName') {
+          queryBuilder = queryBuilder.andWhere(`LOWER(client.name) LIKE :filterValue`, {
+            filterValue: `%${filterValue.toLowerCase()}%`,
+          });
+        } else {
+          queryBuilder = queryBuilder.andWhere(
+            `LOWER(payment_records.${filterBy}) LIKE :filterValue`,
+            { filterValue: `%${filterValue.toLowerCase()}%` }
+          );
+        }
       });
     }
 
