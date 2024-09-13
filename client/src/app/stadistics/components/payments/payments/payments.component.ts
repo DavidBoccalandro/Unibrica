@@ -44,8 +44,8 @@ export class PaymentsComponent {
     'companyAccountNumber',
     'bankAccountNumber',
     'debitDate',
-    'fileDate',
-    'bank',
+    'sheet.date',
+    'bank.bankId',
     'customerAccountType',
     'branchCode',
     'debitSequence',
@@ -72,9 +72,10 @@ export class PaymentsComponent {
       this.filterService.filters$.subscribe((value) => {
         if(!value) {
           this.resetParams()
+        } else {
+          const newParams = {...this.params.getValue(), ...value}
+          this.params.next(newParams);
         }
-        const newParams = {...this.params.getValue(), ...value}
-        this.params.next(newParams);
       })
     )
   }
@@ -92,7 +93,7 @@ export class PaymentsComponent {
       .getAllPayments(this.params.getValue())
       .pipe(take(1))
       .subscribe((data) => {
-        console.log('PAYMENTS: ', data)
+        // console.log('PAYMENTS: ', data)
         this.payments = data.payments;
         this.totalItems = data.totalItems;
         this.tableData = new MatTableDataSource<MatTableDataSourceInput>(this.payments);

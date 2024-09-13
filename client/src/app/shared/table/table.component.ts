@@ -55,8 +55,11 @@ export const columnNamesMap: { [key: string]: string } = {
   movementFunction: 'Función del movimiento',
   rejectionCode: 'Código de rechazo',
   debitAmount: 'Monto débito',
-  fileDate: 'Fecha archivo',
-  clientName: 'Cliente'
+  // fileDate: 'Fecha archivo',
+  clientName: 'Cliente',
+  'debtor.dni': 'DNI',
+  'sheet.date': 'Fecha Archivo',
+  'bank.bankId': 'Banco',
 };
 
 export type MatTableDataSourceInput = Debt | Debtor | Client | Payment | Reversal;
@@ -87,4 +90,13 @@ export class TableComponent {
       this.elementClickEmitter.emit(event)
     }
   }
+
+  getColumnValue(element: any, column: string): any {
+    return this.getNestedValue(element, column);
+  }
+
+  getNestedValue(element: any, path: string): any {
+    return path.split('.').reduce((acc, key) => acc && acc[key], element);
+  }
+
 }

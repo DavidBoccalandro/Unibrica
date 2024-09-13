@@ -16,7 +16,7 @@ import { FilterService } from 'src/app/core/services/filter.service';
 })
 export class DebtsComponent implements OnDestroy {
   tableData!: MatTableDataSource<MatTableDataSourceInput>;
-  tableColumns: string[] = ['account', 'idDebt', 'dueDate', 'branchCode', 'amount'];
+  tableColumns: string[] = ['account', 'debtor.dni', 'idDebt', 'dueDate', 'branchCode', 'amount'];
   clickableColumns = new Set<string>();
   subscriptions: Subscription[] = [];
   debts: Debt[] = [];
