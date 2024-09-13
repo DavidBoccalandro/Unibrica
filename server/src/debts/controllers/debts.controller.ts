@@ -30,13 +30,16 @@ export class DebtsController {
   @Post('uploadDebtSheet')
   @UseInterceptors(FileInterceptor('file'))
   public async uploadDebtSheet(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() files: Express.Multer.File[],
     @Body('clientId') clientId: string
   ): Promise<string> {
-    if (!file) {
-      throw new BadRequestException('No file uploaded');
+    if (!files || files.length === 0) {
+      throw new BadRequestException('No files uploaded');
     }
-    return await this.debtsService.uploadDebtSheet(file, clientId);
+    const uploadPromises = files.map((file) => this.debtsService.uploadDebtSheet(file, clientId));
+    await Promise.all(uploadPromises);
+
+    return 'All debt sheets uploaded successfully, and they are being processed.';
   }
 
   @Get('all')

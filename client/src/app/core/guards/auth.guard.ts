@@ -1,31 +1,27 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { Router } from '@angular/router';
+import { AuthService } from '../authentication/auth.service';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { selectUser } from '../authentication/auth-store/auth.selectors';
 import { AuthState } from '../authentication/auth.interfaces';
 import { NotificationsService } from '../services/notifications.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AuthGuard implements CanActivate {
-  constructor(private store: Store<AuthState>, private router: Router, private notificationsService: NotificationsService) { }
+export class AuthGuard {
+  constructor(
+    private authService: AuthService,
+    notificationsService: NotificationsService
+  ) {}
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-    return this.store.select(selectUser).pipe(
-      tap(user => {
-        if (!user) {
-          this.notificationsService.emitNotification(
-            'Debes iniciar sesión para acceder a esta página.',
-            'error',
-            3000
-          );
-          this.router.navigate(['/login']);
-        }
-      }),
-      map(user => !!user)
-    );
+  canActivate(): boolean {
+    const token = this.authService.getToken();
+
+    if (token && !this.authService.isTokenExpired(token)) {
+      return true;
+    } else {
+      this.authService.logout();
+      return false;
+    }
   }
 }

@@ -23,10 +23,15 @@ export class ReversalController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadReversal(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() files: Express.Multer.File[],
     @Body('clientId') clientId: string
-  ): Promise<ReversalRecord[]> {
-    return this.reversalService.uploadReversalSheet(file, clientId);
+  ): Promise<string> {
+    const uploadPromises = files.map((file) =>
+      this.reversalService.uploadReversalSheet(file, clientId)
+    );
+    await Promise.all(uploadPromises);
+
+    return 'All debt sheets uploaded successfully, and they are being processed.';
   }
 
   // Obtener todos los registros de reversión
