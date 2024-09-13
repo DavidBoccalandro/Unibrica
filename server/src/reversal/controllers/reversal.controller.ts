@@ -14,7 +14,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ReversalService } from '../services/reversal.service';
 import { ReversalRecord } from '../entities/reversal.entity';
 import { UpdateReversalDto } from '../dto/updateReversalDto';
-import { PaginationQueryDto } from 'src/debts/controllers/debts.controller';
 
 @Controller('reversal')
 export class ReversalController {
@@ -33,9 +32,30 @@ export class ReversalController {
   // Obtener todos los registros de reversión
   @Get()
   async findAll(
-    @Query() findAllReversalsDto: PaginationQueryDto
-  ): Promise<{ reversals: ReversalRecord[]; totalItems: number }> {
-    return this.reversalService.findAll(findAllReversalsDto);
+    @Query('limit') limit: number,
+    @Query('offset') offset: number,
+    @Query('stringFilters') stringFilters: string,
+    @Query('numericFilters') numericFilters: string,
+    @Query('dateFilters') dateFilters: string
+  ) {
+    let parsedStringFilters, parsedNumericFilters, parsedDateFilters;
+    if (stringFilters && stringFilters !== 'undefined') {
+      parsedStringFilters = JSON.parse(stringFilters);
+    }
+    if (numericFilters && numericFilters !== 'undefined') {
+      parsedNumericFilters = JSON.parse(numericFilters);
+    }
+    if (dateFilters && dateFilters !== 'undefined') {
+      parsedDateFilters = JSON.parse(dateFilters);
+    }
+
+    return this.reversalService.findAll({
+      limit,
+      offset,
+      stringFilters: parsedStringFilters,
+      numericFilters: parsedNumericFilters,
+      dateFilters: parsedDateFilters,
+    });
   }
 
   // Obtener un registro de reversión por ID

@@ -51,9 +51,9 @@ export class FilterModalComponent {
       { value: 'fileDate', label: 'Fecha archivo', type: 'date' },
     ],
     reversas: [
-      { value: 'accountNumber', label: 'N de cuenta', type: 'string' },
-      { value: 'debitID', label: 'ID débito', type: 'numeric' },
-      { value: 'currentID', label: 'ID actual', type: 'numeric' },
+      { value: 'accountNumber', label: 'N° de cuenta', type: 'string' },
+      { value: 'debitId', label: 'ID débito', type: 'string' },
+      { value: 'currentId', label: 'ID actual', type: 'string' },
     ],
   };
 
@@ -141,7 +141,7 @@ export class FilterModalComponent {
           return filterType === 'string';
         })
         .map((filter: { name: string; value: any }) => ({
-          filterBy: this.mapFilterNameToColumn(filter.name),
+          filterBy: this.getFilterValueFromLabel(filter.name),
           filterValue: filter.value,
         }));
 
@@ -154,13 +154,13 @@ export class FilterModalComponent {
         })
         .map((filter: { name: string; value: any; operator?: string }) => {
           return {
-            filterBy: this.mapFilterNameToColumn(filter.name),
+            filterBy: this.getFilterValueFromLabel(filter.name),
             operator: filter.operator,
             filterValue: filter.value,
           };
         });
 
-        const dateFilterData = this.filters.value
+      const dateFilterData = this.filters.value
         .filter((filter: { name: string; start: Date; end: Date }) => {
           const filterType = this.selectOptions[this.currentRoute].find(
             (option) => option.label === filter.name
@@ -169,18 +169,18 @@ export class FilterModalComponent {
         })
         .map((filter: { name: string; start: Date; end: Date }) => {
           return {
-            filterBy: this.mapFilterNameToColumn(filter.name),
+            filterBy: this.getFilterValueFromLabel(filter.name),
             startDate: filter.start,
             endDate: filter.end,
           };
         });
 
-
       console.log('Filtros final: ', {
         stringFilters: stringFilterData,
         numericFilters: numericFilterData,
-        dateFilters: dateFilterData
+        dateFilters: dateFilterData,
       });
+
       this.filterService.updateFilters({
         stringFilters: stringFilterData,
         numericFilters: numericFilterData,
@@ -189,9 +189,11 @@ export class FilterModalComponent {
     }
   }
 
-  mapFilterNameToColumn(filterName: string): string {
-    const entry = Object.entries(columnNamesMap).find(([key, value]) => value === filterName);
-    return entry ? entry[0] : '';
+  getFilterValueFromLabel(label: string): string {
+    const selectedOption = this.selectOptions[this.currentRoute].find(
+      (option) => option.label === label
+    );
+    return selectedOption ? selectedOption.value : '';
   }
 
   filterType(filter: FormGroup): string {
@@ -202,24 +204,4 @@ export class FilterModalComponent {
     // console.log('filterType:', filterType)
     return filterType!;
   }
-
-  // changeSearchValue(search: string): void {
-  //   this.filterService.updateSearchValue(search);
-  // }
-
-  // changeRangeStart(start: Date | null): void {
-  //   this.filterService.updateRangeStart(start);
-  // }
-
-  // changeRangeEnd(end: Date | null): void {
-  //   this.filterService.updateRangeEnd(end);
-  // }
-
-  // clearSearchValue(): void {
-  //   this.filterService.updateSearchValue('');
-  // }
-
-  // searchButtonClick(): void {
-  //   // You can perform additional logic here if needed
-  // }
 }

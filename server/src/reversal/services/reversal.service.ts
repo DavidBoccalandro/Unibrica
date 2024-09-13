@@ -2,7 +2,6 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import path from 'path';
 import { BankEntity } from 'src/banks/entities/banks.entity';
-import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
 import { Repository } from 'typeorm';
 import { ReversalRecord } from '../entities/reversal.entity';
 import {
@@ -13,7 +12,8 @@ import {
 } from '../utils/reversal.util';
 import { UpdateReversalDto } from '../dto/updateReversalDto';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
-import { PaginationQueryDto } from 'src/debts/controllers/debts.controller';
+import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDto';
+import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
 
 @Injectable()
 export class ReversalService {
@@ -89,8 +89,8 @@ export class ReversalService {
     const branchCode = parseInt(line.substring(24, 28).trim(), 10); // Codigo de sucursal de la cuenta
     const accountType = parseInt(line.substring(28, 29).trim(), 10); // Tipo de cuenta
     const accountNumber = line.substring(29, 44).trim(); // Cuenta bancaria del adherente
-    const currentID = line.substring(44, 66).trim(); // Identificación actual del adherente
-    const debitID = line.substring(66, 81).trim(); // Identificación del débito
+    const currentId = line.substring(44, 66).trim(); // Identificación actual del adherente
+    const debitId = line.substring(66, 81).trim(); // Identificación del débito
 
     const movementFunction = line.substring(81, 83).trim(); // Función o uso del movimiento
     const rejectionCode = line.substring(83, 87).trim(); // Código de motivo o rechazo
@@ -120,8 +120,8 @@ export class ReversalService {
       branchCode,
       accountType,
       accountNumber,
-      currentID,
-      debitID,
+      currentId,
+      debitId,
       movementFunction,
       rejectionCode,
       dueDate,
@@ -136,30 +136,100 @@ export class ReversalService {
   //   return this.reversalRecordRepository.find({ relations: ['sheet'] });
   // }
   async findAll(
-    paginationQuery: PaginationQueryDto
+    paginationQuery: PaginationFilterQueryDto
   ): Promise<{ reversals: ReversalRecord[]; totalItems: number }> {
-    const { limit, offset, sortBy, sortOrder, filterBy, filterValue, date, startDate, endDate } =
+    const { limit, offset, sortBy, sortOrder, stringFilters, numericFilters, dateFilters } =
       paginationQuery;
     let queryBuilder = this.reversalRecordRepository
       .createQueryBuilder('reversal_records')
-      .leftJoinAndSelect('reversal_records.bank', 'bank');
+      .leftJoinAndSelect('reversal_records.bank', 'bank')
+      .leftJoinAndSelect('reversal_records.client', 'client')
+      .leftJoinAndSelect('reversal_records.sheet', 'sheet');
 
-    if (filterBy && ['debitID', 'currentID', 'accountNumber'].includes(filterBy)) {
-      const lowerFilterValue = filterValue.toLowerCase();
-      queryBuilder = queryBuilder.where(`LOWER(reversal_records.${filterBy}) LIKE :filterValue`, {
-        filterValue: `%${lowerFilterValue}%`,
+    // Aplicar filtros de cadenas (stringFilters)
+    if (stringFilters && stringFilters.length > 0) {
+      stringFilters.forEach((filter, index) => {
+        const { filterBy, filterValue } = filter;
+
+        // if (filterBy === 'debtorLastname') {
+        //   queryBuilder = queryBuilder.andWhere(`LOWER(debtor.lastname) LIKE :filterValue${index}`, {
+        //     [`filterValue${index}`]: `%${filterValue.toLowerCase()}%`,
+        //   });
+        // } else if (filterBy === 'dni') {
+        //   queryBuilder = queryBuilder.andWhere(`LOWER(debtor.dni) LIKE :filterValue${index}`, {
+        //     [`filterValue${index}`]: `%${filterValue.toLowerCase()}%`,
+        //   });
+        // } else
+        if (filterBy === 'clientName') {
+          queryBuilder = queryBuilder.andWhere(`LOWER(client.name) LIKE :filterValue${index}`, {
+            [`filterValue${index}`]: `%${filterValue.toLowerCase()}%`,
+          });
+        } else {
+          queryBuilder = queryBuilder.andWhere(
+            `LOWER(reversal_records.${filterBy}) LIKE :filterValue${index}`,
+            {
+              [`filterValue${index}`]: `%${filterValue.toLowerCase()}%`,
+            }
+          );
+        }
       });
     }
 
-    if (startDate && endDate) {
-      if (date && ['createdAt', 'updatedAt', 'dueDate'].includes(date)) {
-        queryBuilder = queryBuilder.andWhere(
-          `reversal_records.${date} >= :startDate AND reversal_records.${date} <= :endDate`,
-          { startDate, endDate }
-        );
-      } else {
-        throw new BadRequestException('Invalid date field specified for filtering');
-      }
+    // Aplicar filtros numéricos (numericFilters)
+    if (numericFilters && numericFilters.length > 0) {
+      numericFilters.forEach((filter, index) => {
+        const { filterBy, operator, filterValue } = filter;
+        const value = Number(filterValue);
+
+        if (operator === '=' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`reversal_records.${filterBy} = :value${index}`, {
+            [`value${index}`]: value,
+          });
+        } else if (operator === '<' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`reversal_records.${filterBy} < :value${index}`, {
+            [`value${index}`]: value,
+          });
+        } else if (operator === '>' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`reversal_records.${filterBy} > :value${index}`, {
+            [`value${index}`]: value,
+          });
+        } else if (operator === '<=' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`reversal_records.${filterBy} <= :value${index}`, {
+            [`value${index}`]: value,
+          });
+        } else if (operator === '>=' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`reversal_records.${filterBy} >= :value${index}`, {
+            [`value${index}`]: value,
+          });
+        }
+      });
+    }
+
+    // Aplicar filtros de fechas (dateFilters)
+    if (dateFilters && dateFilters.length > 0) {
+      dateFilters.forEach((filter, index) => {
+        const { filterBy, startDate, endDate } = filter;
+
+        if (filterBy === 'fileDate' && startDate && endDate) {
+          queryBuilder = queryBuilder.andWhere(
+            `sheet.date BETWEEN :startDate${index} AND :endDate${index}`,
+            {
+              [`startDate${index}`]: startDate,
+              [`endDate${index}`]: endDate,
+            }
+          );
+        } else if (startDate && endDate && filterBy) {
+          queryBuilder = queryBuilder.andWhere(
+            `reversal_records.${filterBy} BETWEEN :startDate${index} AND :endDate${index}`,
+            {
+              [`startDate${index}`]: startDate,
+              [`endDate${index}`]: endDate,
+            }
+          );
+        } else {
+          throw new BadRequestException('Invalid date range or field for filtering');
+        }
+      });
     }
 
     // Ejecuta la consulta para obtener el total de elementos
