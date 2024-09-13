@@ -7,10 +7,10 @@ import {
   Patch,
   Post,
   Query,
-  UploadedFile,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { ReversalService } from '../services/reversal.service';
 import { ReversalRecord } from '../entities/reversal.entity';
 import { UpdateReversalDto } from '../dto/updateReversalDto';
@@ -21,14 +21,14 @@ export class ReversalController {
 
   // Subir un archivo de reversión
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FilesInterceptor('files'))
   async uploadReversal(
-    @UploadedFile() files: Express.Multer.File[],
+    @UploadedFiles() files: Express.Multer.File[],
     @Body('clientId') clientId: string
   ): Promise<string> {
-    const uploadPromises = files.map((file) =>
-      this.reversalService.uploadReversalSheet(file, clientId)
-    );
+    const uploadPromises = files.map((file) => {
+      return this.reversalService.uploadReversalSheet(file, clientId);
+    });
     await Promise.all(uploadPromises);
 
     return 'All debt sheets uploaded successfully, and they are being processed.';

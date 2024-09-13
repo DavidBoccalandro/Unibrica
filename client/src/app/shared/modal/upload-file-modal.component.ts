@@ -42,7 +42,7 @@ export class UploadFileModalComponent implements OnInit {
   @Input() fileAccept = '.lis,.xlsx,.xls,.csv,.txt';
   form!: FormGroup;
   files!: FileList | null;
-  multipleFilesAccepted = false;
+  multipleFilesAccepted = true;
   clients: Client[] = [];
   banks: any[] = [];
   selectedClientId!: string;
@@ -86,6 +86,7 @@ export class UploadFileModalComponent implements OnInit {
   }
 
   onSelectedFiles(event: any): void {
+    console.log('FILES SELECTED: ', event)
     this.files = event.target.files ?? null;
     this.fileSelected = this.files![0].name.substring(0, this.files![0].name.length - 4);
   }

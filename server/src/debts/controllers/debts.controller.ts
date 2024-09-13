@@ -3,14 +3,13 @@ import {
   BadRequestException,
   Controller,
   Post,
-  UploadedFile,
   UseInterceptors,
   Get,
   Query,
+  UploadedFiles,
 } from '@nestjs/common';
 import { DebtsService } from '../services/debts.service';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { Express } from 'express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 export interface PaginationQueryDto {
   limit: number;
@@ -28,9 +27,9 @@ export class DebtsController {
   constructor(private readonly debtsService: DebtsService) {}
 
   @Post('uploadDebtSheet')
-  @UseInterceptors(FileInterceptor('file'))
-  public async uploadDebtSheet(
-    @UploadedFile() files: Express.Multer.File[],
+  @UseInterceptors(FilesInterceptor('files'))
+  async uploadReversal(
+    @UploadedFiles() files: Express.Multer.File[],
     @Body('clientId') clientId: string
   ): Promise<string> {
     if (!files || files.length === 0) {

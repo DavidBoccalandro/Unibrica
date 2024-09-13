@@ -7,11 +7,11 @@ import {
   Patch,
   Delete,
   UseInterceptors,
-  UploadedFile,
   Query,
+  UploadedFiles,
 } from '@nestjs/common';
 import { PaymentRecord } from '../entities/payment.entity';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { PaymentService } from '../services/payment.service';
 
 @Controller('payment')
@@ -19,9 +19,9 @@ export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadPaymentSheet(
-    @UploadedFile() files: Express.Multer.File[],
+  @UseInterceptors(FilesInterceptor('files'))
+  async uploadReversal(
+    @UploadedFiles() files: Express.Multer.File[],
     @Body('clientId') clientId: string
   ): Promise<any> {
     const uploadPromises = files.map((file) =>

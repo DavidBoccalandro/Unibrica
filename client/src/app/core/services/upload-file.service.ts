@@ -31,7 +31,7 @@ export class UploadFileService {
 
     const formData: FormData = new FormData();
     for (let i = 0; i < files.length; i++) {
-      formData.append('file', files[i], files[i].name);
+      formData.append('files', files[i], files[i].name);
     }
     formData.append('userId', userId);
     formData.append('clientId', client ? client.clientId.toString() : '');
