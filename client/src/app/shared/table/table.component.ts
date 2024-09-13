@@ -31,6 +31,7 @@ export const columnNamesMap: { [key: string]: string } = {
   name: 'Nombre',
   clientId: 'ID Cliente',
   recordType: 'Tipo de registro',
+  account: 'Cuenta',
   agreementNumber: 'N° de convenio',
   creditCompany: 'Empresa crédito',
   companyAccountNumber: 'N° de abonado',

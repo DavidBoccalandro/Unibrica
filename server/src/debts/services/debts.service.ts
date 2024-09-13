@@ -93,7 +93,7 @@ export class DebtsService {
       debt.dueDate = dueDate;
 
       // Set additional properties
-      debt.branch = row['Sucursal'];
+      debt.branchCode = row['Sucursal'];
       debt.accountType = row['Tipo_Cuenta'];
       debt.account = row['Cuenta'];
       debt.currency = row['Moneda'];
@@ -119,7 +119,9 @@ export class DebtsService {
   async getAllDebts(paginationQuery: PaginationQueryDto) {
     const { limit, offset, sortBy, sortOrder, filterBy, filterValue, date, startDate, endDate } =
       paginationQuery;
-    let queryBuilder = this.debtRepository.createQueryBuilder('debts');
+    let queryBuilder = this.debtRepository
+      .createQueryBuilder('debts')
+      .leftJoinAndSelect('debts.debtor', 'debtor');
 
     if (filterBy && ['idDebt'].includes(filterBy)) {
       const lowerFilterValue = filterValue.toLowerCase();
