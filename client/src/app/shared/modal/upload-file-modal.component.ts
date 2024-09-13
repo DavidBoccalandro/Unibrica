@@ -5,6 +5,7 @@ import {
   FormBuilder,
   FormControl,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -14,6 +15,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { BanksService } from 'src/app/core/services/banks.service';
 import { ClientsService } from 'src/app/core/services/clients.service';
 import { ExcelService } from 'src/app/core/services/excel.service';
@@ -28,12 +30,13 @@ const MaterialModules = [
   MatSelectModule,
   MatInputModule,
   MatIconModule,
+  MatSlideToggleModule
 ];
 
 @Component({
   selector: 'app-upload-file-modal',
   standalone: true,
-  imports: [CommonModule, ...MaterialModules, ReactiveFormsModule],
+  imports: [CommonModule, ...MaterialModules, ReactiveFormsModule, FormsModule],
   providers: [ExcelService, UploadFileService],
   templateUrl: './upload-file-modal.component.html',
   styleUrls: ['./upload-file-modal.component.scss'],
@@ -42,7 +45,6 @@ export class UploadFileModalComponent implements OnInit {
   @Input() fileAccept = '.lis,.xlsx,.xls,.csv,.txt';
   form!: FormGroup;
   files!: FileList | null;
-  multipleFilesAccepted = true;
   clients: Client[] = [];
   banks: any[] = [];
   selectedClientId!: string;
@@ -65,6 +67,7 @@ export class UploadFileModalComponent implements OnInit {
     this.form = this.fb.group({
       client: ['', [Validators.required]],
       fileType: ['cobros', [Validators.required]],
+      multipleFilesAccepted: [false]
     });
   }
 
@@ -86,7 +89,6 @@ export class UploadFileModalComponent implements OnInit {
   }
 
   onSelectedFiles(event: any): void {
-    console.log('FILES SELECTED: ', event)
     this.files = event.target.files ?? null;
     this.fileSelected = this.files![0].name.substring(0, this.files![0].name.length - 4);
   }

@@ -1,5 +1,23 @@
 <h1 mat-dialog-title>Subir Archivo</h1>
 <mat-dialog-content [formGroup]="form" #inputForm color="primary">
+  <!-- <mat-form-field
+    id="file-type-form-field"
+    appearance="outline"
+    class="file-type-form-field"
+    floatLabel="always"
+  >
+    <mat-label>Clientes</mat-label>
+    <mat-select formControlName="client">
+      <mat-option
+        *ngFor="let client of clients"
+        [value]="client.name"
+        (onSelectionChange)="selectedClientId = client.id"
+      >
+        {{ client.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field> -->
+
   <mat-form-field
     id="file-type-form-field"
     appearance="outline"
@@ -13,7 +31,7 @@
         [value]="client.name"
         (onSelectionChange)="selectedClientId = client.clientId.toString()"
       >
-        {{ client.clientId }} - {{ client.name }}
+      {{ client.clientId }} - {{ client.name }}
       </mat-option>
     </mat-select>
   </mat-form-field>
@@ -45,28 +63,22 @@
     [accept]="fileAccept"
     (change)="onSelectedFiles($event)"
     #fileInput
-    [multiple]="form.get('multipleFilesAccepted')?.value"
+    [multiple]="multipleFilesAccepted"
   />
-  <div class="file-type-form-field toggle-container">
-    <mat-slide-toggle formControlName="multipleFilesAccepted" color="primary">
-      Permitir múltiples archivos
-    </mat-slide-toggle>
-  </div>
-
-  <mat-dialog-actions>
-    <button mat-stroked-button color="warn" (click)="onCloseClick()">Cerrar</button>
-    <button mat-mini-fab (click)="downloadExcel()" [disabled]="!(uploadSuccess$ | async)">
-      <mat-icon>download</mat-icon>
-    </button>
-    <button
-      mat-flat-button
-      color="primary"
-      type="button"
-      form="inputForm"
-      (click)="onUploadFiles()"
-      [disabled]="!files || !form.valid"
-    >
-      Enviar
-    </button>
-  </mat-dialog-actions>
 </mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-stroked-button color="warn" (click)="onCloseClick()">Cerrar</button>
+  <button mat-mini-fab (click)="downloadExcel()" [disabled]="!(uploadSuccess$ | async)">
+    <mat-icon>download</mat-icon>
+  </button>
+  <button
+    mat-flat-button
+    color="primary"
+    type="button"
+    form="inputForm"
+    (click)="onUploadFiles()"
+    [disabled]="!files || !form.valid"
+  >
+    Enviar
+  </button>
+</mat-dialog-actions>
