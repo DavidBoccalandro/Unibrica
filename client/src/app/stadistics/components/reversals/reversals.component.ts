@@ -40,14 +40,16 @@ export class ReversalsComponent {
     // 'companyNumber',
     'bank.bankId',
     'branchCode',
-    'accountType',
+    // 'accountType',
     'accountNumber',
     'currentId',
     'debitId',
     // 'movementFunction',
     // 'rejectionCode',
+    'client.name',
+    'sheet.date',
     'dueDate',
-    'debitAmount'
+    'debitAmount',
   ];
   clickableColumns = new Set<string>([this.tableColumns[0]]);
   subscriptions: Subscription[] = [];
@@ -68,7 +70,7 @@ export class ReversalsComponent {
         if(!value) {
           this.resetParams()
         } else {
-          const newParams = {...this.params.getValue(), ...value}
+          const newParams = {...this.params.getValue(), ...value, offset: 0}
           this.params.next(newParams);
         }
       })

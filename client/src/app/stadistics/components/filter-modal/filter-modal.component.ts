@@ -54,6 +54,11 @@ export class FilterModalComponent {
       { value: 'accountNumber', label: 'N° de cuenta', type: 'string' },
       { value: 'debitId', label: 'ID débito', type: 'string' },
       { value: 'currentId', label: 'ID actual', type: 'string' },
+      { value: 'branchCode', label: 'Sucursal', type: 'numeric' },
+      { value: 'debitAmount', label: 'Monto cobrado', type: 'numeric' },
+      { value: 'dueDate', label: 'Vencimiento', type: 'date' },
+      { value: 'fileDate', label: 'Fecha archivo', type: 'date' },
+      { value: 'clientName', label: 'Cliente', type: 'string' },
     ],
   };
 
