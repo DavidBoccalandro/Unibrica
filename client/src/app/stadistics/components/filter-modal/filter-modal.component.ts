@@ -47,6 +47,7 @@ export class FilterModalComponent {
       { value: 'branchCode', label: 'Sucursal', type: 'numeric' },
       { value: 'chargedAmount', label: 'Monto cobrado', type: 'numeric' },
       { value: 'debtAmount', label: 'Monto deuda', type: 'numeric' },
+      { value: 'remainingDebt', label: 'Monto remanente', type: 'numeric' },
       { value: 'debitDate', label: 'Fecha débito', type: 'date' },
       { value: 'fileDate', label: 'Fecha archivo', type: 'date' },
     ],

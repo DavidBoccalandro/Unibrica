@@ -55,6 +55,7 @@ export const columnNamesMap: { [key: string]: string } = {
   movementFunction: 'Función del movimiento',
   rejectionCode: 'Código de rechazo',
   debitAmount: 'Monto débito',
+  remainingDebt: 'Deuda remanente',
   // fileDate: 'Fecha archivo',
   clientName: 'Cliente',
   'debtor.dni': 'DNI',

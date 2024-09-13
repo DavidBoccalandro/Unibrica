@@ -22,11 +22,11 @@ export interface Payment {
   debitSequence: number;
   installmentNumber: number;
   debitStatus: string;
+  debtAmount: number;
   chargedAmount: number;
-  sheet: Sheet
+  remainingDebt: number;
+  sheet: Sheet;
 }
-
-
 
 @Component({
   selector: 'app-payments',
@@ -53,6 +53,7 @@ export class PaymentsComponent {
     'debitStatus',
     'debtAmount',
     'chargedAmount',
+    'remainingDebt',
   ];
   clickableColumns = new Set<string>([this.tableColumns[0]]);
   subscriptions: Subscription[] = [];
@@ -70,18 +71,18 @@ export class PaymentsComponent {
 
     this.subscriptions.push(
       this.filterService.filters$.subscribe((value) => {
-        if(!value) {
-          this.resetParams()
+        if (!value) {
+          this.resetParams();
         } else {
-          const newParams = {...this.params.getValue(), ...value}
+          const newParams = { ...this.params.getValue(), ...value };
           this.params.next(newParams);
         }
       })
-    )
+    );
   }
 
   resetParams() {
-    if(this.paginator) {
+    if (this.paginator) {
       const currentPageSize = this.paginator?.pageSize ?? 10;
       this.params.next({ offset: 0, limit: 10 });
       this.paginator.pageIndex = 0;
@@ -101,9 +102,6 @@ export class PaymentsComponent {
       });
   }
 
-  formatData(data: Payment[]) {
-
-  }
   handleClick(page: PageEvent) {
     this.params.next({
       ...this.params.getValue(),

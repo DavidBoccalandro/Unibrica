@@ -74,6 +74,7 @@ export class PaymentService {
         const installmentNumber = parseInt(line.substring(85, 87).trim(), 10);
         const debitStatus = line.substring(87, 88).trim();
         const chargedAmount = parseFloat(line.substring(108, 119).trim()) / 100;
+        const remainingDebt = debtAmount - chargedAmount;
 
         let bank = bankMap.get(bankCode);
 
@@ -137,6 +138,7 @@ export class PaymentService {
           installmentNumber,
           debitStatus,
           chargedAmount,
+          remainingDebt,
           debt,
           client,
           sheet,
