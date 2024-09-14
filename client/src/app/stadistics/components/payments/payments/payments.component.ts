@@ -54,6 +54,8 @@ export class PaymentsComponent {
     'debtAmount',
     'chargedAmount',
     'remainingDebt',
+    'rejectCode',
+    'rejectText'
   ];
   clickableColumns = new Set<string>([this.tableColumns[0]]);
   subscriptions: Subscription[] = [];
@@ -74,7 +76,8 @@ export class PaymentsComponent {
         if (!value) {
           this.resetParams();
         } else {
-          const newParams = { ...this.params.getValue(), ...value };
+          const newParams = { ...this.params.getValue(), ...value,  offset: 0};
+          // this.paginator.pageIndex = 0;
           this.params.next(newParams);
         }
       })

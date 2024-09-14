@@ -56,6 +56,8 @@ export const columnNamesMap: { [key: string]: string } = {
   rejectionCode: 'Código de rechazo',
   debitAmount: 'Monto débito',
   remainingDebt: 'Deuda remanente',
+  rejectCode: 'Cod rechazo',
+  rejectText: 'Motivo rechazo',
   // fileDate: 'Fecha archivo',
   clientName: 'Cliente',
   'debtor.dni': 'DNI',
