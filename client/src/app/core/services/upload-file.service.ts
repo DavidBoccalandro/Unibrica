@@ -7,9 +7,9 @@ import { environment } from 'src/enviroments/enviroment';
 @Injectable()
 export class UploadFileService {
   private UploadFileUrls = {
-    'deudas': `${environment.envVar.API_URL}/debts/uploadDebtSheet`,
-    'cobros': `${environment.envVar.API_URL}/payment/upload`,
-    'reversas': `${environment.envVar.API_URL}/reversal/upload`
+    deudas: `${environment.envVar.API_URL}/debts/uploadDebtSheet`,
+    cobros: `${environment.envVar.API_URL}/payment/upload`,
+    reversas: `${environment.envVar.API_URL}/reversal/upload`,
   };
 
   private uploadingSubject = new BehaviorSubject<boolean>(false);
@@ -26,6 +26,7 @@ export class UploadFileService {
     client: Client | null,
     bankId: string,
     fileType: 'cobros' | 'deudas' | 'reversas',
+    optionalFile?: FileList
   ): Observable<any> {
     this.uploadingSubject.next(true);
 
@@ -37,6 +38,12 @@ export class UploadFileService {
     formData.append('clientId', client ? client.clientId.toString() : '');
     formData.append('clientName', client ? client.name : '');
     formData.append('bankId', bankId);
+
+    if (optionalFile) {
+      for (let i = 0; i < optionalFile.length; i++) {
+        formData.append('optionalFiles', optionalFile[i], optionalFile[i].name);
+      }
+    }
 
     let postUpload = this.http.post<any>(this.UploadFileUrls[fileType], formData);
 

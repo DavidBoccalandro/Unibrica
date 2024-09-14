@@ -46,6 +46,12 @@ export class PaymentRecord extends BaseEntity {
   @Column({ type: 'varchar', length: 1 })
   debitStatus: string;
 
+  @Column({ type: 'varchar', length: 5, nullable: true })
+  rejectCode: string;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  rejectText: string;
+
   @Column({ type: 'float' })
   chargedAmount: number;
 

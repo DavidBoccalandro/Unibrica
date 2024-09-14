@@ -9,10 +9,13 @@ import {
   UseInterceptors,
   Query,
   UploadedFiles,
+  UploadedFile,
 } from '@nestjs/common';
 import { PaymentRecord } from '../entities/payment.entity';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { PaymentService } from '../services/payment.service';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('payment')
 export class PaymentController {
@@ -24,11 +27,14 @@ export class PaymentController {
     @UploadedFiles() files: Express.Multer.File[],
     @Body('clientId') clientId: string
   ): Promise<any> {
-    const uploadPromises = files.map((file) =>
-      this.paymentService.uploadPaymentSheet(file, clientId)
-    );
-    await Promise.all(uploadPromises);
-    return { message: 'File processed and Excel file created.' };
+    const [file, optionalFile] = files;
+    // Handle primary files
+    // const uploadPromises = files.map((file) =>
+    await this.paymentService.uploadPaymentSheet(file, clientId, optionalFile);
+    // );
+    // await Promise.all(uploadPromises);
+
+    return { message: 'Files processed and Excel file created.' };
   }
 
   @Get()

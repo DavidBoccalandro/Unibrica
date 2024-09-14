@@ -11,6 +11,8 @@ import { ClientEntity } from 'src/clients/entities/clients.entity';
 import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
 import { findOrCreateSheet } from 'src/reversal/utils/reversal.util';
 import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDto';
+import { rejectionCodes } from '../utils/rejectionCodes';
+import { processSdaLines } from '../utils/processSda';
 
 @Injectable()
 export class PaymentService {
@@ -31,11 +33,16 @@ export class PaymentService {
     private sheetRepository: Repository<SheetsEntity>
   ) {}
 
-  async uploadPaymentSheet(file: Express.Multer.File, clientId: string): Promise<PaymentRecord[]> {
+  async uploadPaymentSheet(
+    file: Express.Multer.File,
+    clientId: string,
+    optionalFile?: Express.Multer.File
+  ): Promise<PaymentRecord[]> {
     if (!file) {
       throw new Error('No file provided');
     }
 
+    // Extrae líneas del PAGBA
     const fileContent = file.buffer.toString('utf-8');
     const lines = fileContent.split('\n');
     const originalFileName = path.basename(file.originalname);
@@ -51,6 +58,8 @@ export class PaymentService {
     // Busca todos los bancos UNA ÚNICA VEZ y crea un Map.
     const allBanks = await this.bankRepository.find();
     const bankMap = new Map(allBanks.map((bank) => [bank.bankId, bank]));
+
+    const sdaDataMap = processSdaLines(optionalFile);
 
     for (const line of lines) {
       try {
@@ -75,6 +84,8 @@ export class PaymentService {
         const debitStatus = line.substring(87, 88).trim();
         const chargedAmount = parseFloat(line.substring(108, 119).trim()) / 100;
         const remainingDebt = debtAmount - chargedAmount;
+        const rejectCode = sdaDataMap.get(bankAccountNumber);
+        const rejectText = rejectionCodes[rejectCode];
 
         let bank = bankMap.get(bankCode);
 
@@ -142,6 +153,8 @@ export class PaymentService {
           debt,
           client,
           sheet,
+          rejectCode,
+          rejectText,
         });
 
         processedData.push(paymentRecord);
