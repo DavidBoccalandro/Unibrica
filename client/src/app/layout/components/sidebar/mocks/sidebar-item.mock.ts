@@ -14,6 +14,12 @@ export const sidebarMock: SidebarItem[] = [
     selected: false
   },
   {
+    icon: 'description',
+    title: 'Archivos',
+    route: '/archivos',
+    selected: false
+  },
+  {
     icon: 'groups',
     title: 'RRHH',
     route: '/recursos-humanos',

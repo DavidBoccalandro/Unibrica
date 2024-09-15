@@ -8,6 +8,7 @@ import { Debtor } from 'src/app/stadistics/components/debtors/debtors.interface'
 import { Client } from 'src/app/stadistics/components/clients/clients.interfaces';
 import { Payment } from 'src/app/stadistics/components/payments/payments/payments.component';
 import { Reversal } from 'src/app/stadistics/components/reversals/reversals.component';
+import { File } from 'src/app/files/components/files/files.component';
 
 const MaterialModules = [
   MatTableModule,
@@ -60,13 +61,17 @@ export const columnNamesMap: { [key: string]: string } = {
   rejectText: 'Motivo rechazo',
   // fileDate: 'Fecha archivo',
   clientName: 'Cliente',
+  download: 'Descargar',
+  filename: 'Nombre archivo',
+  date: 'Fecha de archivo',
+  fileName: 'Nombre de archivo',
   'debtor.dni': 'DNI',
   'sheet.date': 'Fecha Archivo',
   'bank.bankId': 'Banco',
   'client.name': 'Cliente'
 };
 
-export type MatTableDataSourceInput = Debt | Debtor | Client | Payment | Reversal;
+export type MatTableDataSourceInput = Debt | Debtor | Client | Payment | Reversal | File;
 @Component({
   selector: 'app-table',
   standalone: true,

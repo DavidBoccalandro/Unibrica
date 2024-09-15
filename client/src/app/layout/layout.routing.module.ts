@@ -1,11 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LayoutComponent } from './layout.component';
+import { FilesModule } from '../files/files.module';
+import { FilesComponent } from '../files/components/files/files.component';
 
 export const LAYOUT_ROUTES: Routes = [
   {
     path: '',
-    redirectTo: 'dashboard', 
+    redirectTo: 'dashboard',
     pathMatch: 'full',
   },
   {
@@ -26,6 +28,14 @@ export const LAYOUT_ROUTES: Routes = [
         loadChildren: () =>
         import('../stadistics/stadistics.module').then(
           m => m.StadisticsModule
+        )
+      },
+      {
+        path: 'archivos',
+        title: 'Unibrica - Archivos',
+        loadChildren: () =>
+        import('../files/files.module').then(
+          m => m.FilesModule
         )
       },
       {

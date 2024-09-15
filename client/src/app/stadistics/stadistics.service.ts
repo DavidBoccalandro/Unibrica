@@ -9,6 +9,7 @@ import { Debtor } from './components/debtors/debtors.interface';
 import { Client } from './components/clients/clients.interfaces';
 import { Payment } from './components/payments/payments/payments.component';
 import { Reversal } from './components/reversals/reversals.component';
+import { File } from '../files/components/files/files.component';
 
 export interface StatisticsParams {
   limit: number;
@@ -35,6 +36,7 @@ export class StadisticsService {
   private ClientsUrl = `${environment.envVar.API_URL}/clients`;
   private PaymentsUrl = `${environment.envVar.API_URL}/payment`;
   private ReversalURL = `${environment.envVar.API_URL}/reversal`;
+  private SheetsURL = `${environment.envVar.API_URL}/sheets`;
 
   params$!: Observable<Params>;
 
@@ -116,6 +118,22 @@ export class StadisticsService {
     .set('dateFilters', JSON.stringify(params.dateFilters));
 
     return this.http.get<{ totalItems: number; reversals: Reversal[] }>(this.ReversalURL, {
+      params: httpParams,
+      withCredentials: true,
+    });
+  }
+
+  getAllSheets(
+    params: StatisticsParams2
+  ): Observable<{ totalItems: number; sheets: File[] }> {
+    let httpParams = new HttpParams()
+    .set('limit', params.limit.toString())
+    .set('offset', params.offset.toString())
+    .set('stringFilters', JSON.stringify(params.stringFilters))
+    .set('numericFilters', JSON.stringify(params.numericFilters))
+    .set('dateFilters', JSON.stringify(params.dateFilters));
+
+    return this.http.get<{ totalItems: number; sheets: File[] }>(this.SheetsURL, {
       params: httpParams,
       withCredentials: true,
     });

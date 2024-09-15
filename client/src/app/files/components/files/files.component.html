@@ -1,0 +1,35 @@
+<!-- <app-table [dataSource]="tableData" [columns]="tableColumns" [clickableColumns]="clickableColumns"></app-table> -->
+
+<section class="table-container mat-elevation-z8" tabindex="0">
+  <table mat-table [dataSource]="tableData">
+    <ng-container *ngFor="let column of tableColumns" [matColumnDef]="column">
+      <th mat-header-cell *matHeaderCellDef class="cell-center">{{ columnNames[column] }}</th>
+      <td
+        mat-cell
+        *matCellDef="let element"
+        [class.clickable-cell]="clickableColumns.has(column)"
+        (click)="elementClick({ column, value: getColumnValue(element, column) })"
+        class="cell-center"
+      >
+        <ng-container *ngIf="column === 'createdAt' || column === 'updatedAt' || column === 'dueDate' || column == 'date'; else otherColumns">
+          {{ getColumnValue(element, column) | date: 'dd/MM/yyyy' }}
+        </ng-container>
+        <ng-template #otherColumns>
+          {{ getColumnValue(element, column) }}
+        </ng-template>
+      </td>
+    </ng-container>
+    <ng-container matColumnDef="download">
+      <th mat-header-cell *matHeaderCellDef class="cell-center"></th>
+      <td mat-cell *matCellDef="let element" class="cell-center">
+        <button mat-icon-button (click)="download(element)">
+          <mat-icon>download</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="tableColumnsAll; sticky: true" class="first-row"></tr>
+    <tr mat-row *matRowDef="let row; columns: tableColumnsAll"></tr>
+  </table>
+</section>
+
+<mat-paginator [length]="totalItems" [pageSizeOptions]="[10, 25, 50]" (page)="handleClick($event)" showFirstLastButtons></mat-paginator>
