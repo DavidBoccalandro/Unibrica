@@ -57,14 +57,15 @@ export function processSdaLines(file: Express.Multer.File) {
         //   sinUso: line.substring(214, 219).trim(),
         //   filler: line.substring(219, 220).trim(),
         // };
+        // console.log('AuxMap: ', mapAux)
 
         optionalDataMap.set(line.substring(29, 44).trim(), line.substring(83, 87).trim());
-        return optionalDataMap;
       } catch (error) {
         console.error(`Error processing optional file line: ${line}. Error: ${error.message}`);
         continue;
       }
     }
+    return optionalDataMap;
   }
 
   return;

@@ -49,7 +49,7 @@
   />
   <div class="file-form-field" *ngIf="isPagbaSelected">
     <p *ngIf="filesLabel">{{ filesLabel }}</p>
-    <button mat-button (click)="fileInput.click()">
+    <button mat-button (click)="fileInputOptional.click()">
       <mat-icon matIconPrefix matTooltip="Choose file(s)..."> attach_file</mat-icon>
       Seleccionar SDA correspondiente
     </button>
@@ -59,7 +59,7 @@
     type="file"
     [accept]="fileAccept"
     (change)="onSelectedFiles($event, 'secondary')"
-    #fileInput
+    #fileInputOptional
     [multiple]="form.get('multipleFilesAccepted')?.value"
   />
   <div class="file-type-form-field toggle-container">

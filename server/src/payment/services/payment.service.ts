@@ -39,7 +39,10 @@ export class PaymentService {
     optionalFile?: Express.Multer.File
   ): Promise<PaymentRecord[]> {
     if (!file) {
-      throw new Error('No file provided');
+      throw new Error('No PAGBA provided');
+    }
+    if (!optionalFile) {
+      throw new Error('No SDA provided');
     }
 
     // Extrae líneas del PAGBA

@@ -41,7 +41,7 @@ export class UploadFileService {
 
     if (optionalFile) {
       for (let i = 0; i < optionalFile.length; i++) {
-        formData.append('optionalFiles', optionalFile[i], optionalFile[i].name);
+        formData.append('files', optionalFile[i], optionalFile[i].name);
       }
     }
 
