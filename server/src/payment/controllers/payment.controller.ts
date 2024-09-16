@@ -9,13 +9,10 @@ import {
   UseInterceptors,
   Query,
   UploadedFiles,
-  UploadedFile,
 } from '@nestjs/common';
 import { PaymentRecord } from '../entities/payment.entity';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { PaymentService } from '../services/payment.service';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 
 @Controller('payment')
 export class PaymentController {

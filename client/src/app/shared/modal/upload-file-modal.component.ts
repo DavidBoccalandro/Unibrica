@@ -143,11 +143,11 @@ export class UploadFileModalComponent implements OnInit {
 
   checkIfFileIsRepeated(): void {
     const aux = this.filesInDB.findIndex(file => file.match(this.fileSelected)) >= 0
-    if (aux) {
-      this.isFileRepeated = true;
-    } else {
-      this.isFileRepeated = false;
-    }
+    // if (aux) {
+    //   this.isFileRepeated = true;
+    // } else {
+    //   this.isFileRepeated = false;
+    // }
   }
 
   getClients() {

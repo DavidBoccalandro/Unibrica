@@ -9,6 +9,7 @@ import { ClientEntity } from 'src/clients/entities/clients.entity';
 import { DebtorEntity } from '../entities/debtors.entity';
 import { findOrCreateSheet } from 'src/reversal/utils/reversal.util';
 import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDto';
+import { RepeatedDebtorEntity } from 'src/repeated-debtor/entities/repeated-debtor.entity';
 
 @Injectable()
 export class DebtsService {
@@ -17,7 +18,9 @@ export class DebtsService {
     @InjectRepository(DebtorEntity) private readonly debtorRepository: Repository<DebtorEntity>,
     @InjectRepository(DebtEntity) private readonly debtRepository: Repository<DebtEntity>,
     @InjectRepository(BankEntity) private readonly bankRepository: Repository<BankEntity>,
-    @InjectRepository(ClientEntity) private readonly clientRepository: Repository<ClientEntity>
+    @InjectRepository(ClientEntity) private readonly clientRepository: Repository<ClientEntity>,
+    @InjectRepository(RepeatedDebtorEntity)
+    private readonly repeatedDebtorRepository: Repository<RepeatedDebtorEntity>
   ) {}
 
   public async uploadDebtSheet(file: Express.Multer.File, clientId: string): Promise<string> {
@@ -66,10 +69,11 @@ export class DebtsService {
 
     const allDebtors = await this.debtorRepository.find();
     const debtorsMap = new Map(allDebtors.map((debtor) => [debtor.dni, debtor]));
+    // console.log('debtorsMap: ', debtorsMap);
 
     for (const row of excelData) {
       // Check if debt exists
-      let debtor = debtorsMap.get(row['DNI']);
+      let debtor = debtorsMap.get(row['DNI'].toString());
       const bank = bankMap.get(row['bank']) ?? null;
 
       if (!debtor && row['DNI']) {
@@ -80,6 +84,16 @@ export class DebtsService {
         debtor.lastNames = splitName[0];
         debtors.push(debtor);
         debtorsMap.set(row['DNI'], debtor);
+      } else {
+        const repeatedDebtor = await this.repeatedDebtorRepository.findOne({
+          where: { debtor: debtor },
+        });
+        if (!repeatedDebtor) {
+          await this.repeatedDebtorRepository.save({ debtor });
+        } else {
+          console.log('Se encontró deudor repetido');
+          await this.repeatedDebtorRepository.save({ ...repeatedDebtor });
+        }
       }
 
       // Create a new debt

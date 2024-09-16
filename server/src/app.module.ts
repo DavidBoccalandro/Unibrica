@@ -17,6 +17,7 @@ import { DebtorsModule } from './debtors/debtors.module';
 import { PaymentModule } from './payment/payment.module';
 import { ReversalModule } from './reversal/reversal.module';
 import { SheetsModule } from './sheets/sheets.module';
+import { RepeatedDebtorModule } from './repeated-debtor/repeated-debtor.module';
 
 @Module({
   imports: [
@@ -40,7 +41,9 @@ import { SheetsModule } from './sheets/sheets.module';
     PaymentModule,
     ReversalModule,
     SheetsModule,
+    RepeatedDebtorModule,
   ],
   providers: [],
+  controllers: [],
 })
 export class AppModule {}
