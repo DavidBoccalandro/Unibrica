@@ -31,7 +31,6 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     CommonModule,
     MatTableModule,
-    // PaginationComponent,
     MatPaginatorModule,
     MatIconModule,
     MatButtonModule,

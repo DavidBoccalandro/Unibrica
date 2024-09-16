@@ -35,7 +35,7 @@ export class FilesService {
 
   getAllSheets(
     params: ParamsWithFilters
-  ): Observable<{ totalItems: number; file: File }> {
+  ): Observable<{ totalItems: number; sheets: File[] }> {
     let httpParams = new HttpParams()
       .set('limit', params.limit.toString())
       .set('offset', params.offset.toString())
@@ -43,7 +43,7 @@ export class FilesService {
       .set('numericFilters', JSON.stringify(params.numericFilters))
       .set('dateFilters', JSON.stringify(params.dateFilters));
 
-    return this.http.get<{ totalItems: number; file: File }>(this.SheetsURL, {
+    return this.http.get<{ totalItems: number; sheets: File[] }>(this.SheetsURL, {
       params: httpParams,
       withCredentials: true,
     });

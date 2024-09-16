@@ -16,12 +16,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { BanksService } from 'src/app/core/services/banks.service';
 import { ClientsService } from 'src/app/core/services/clients.service';
 import { ExcelService } from 'src/app/core/services/excel.service';
 import { NotificationsService } from 'src/app/core/services/notifications.service';
 import { UploadFileService } from 'src/app/core/services/upload-file.service';
 import { Client } from 'src/app/stadistics/components/clients/clients.interfaces';
+import { FilesService, ParamsWithFilters } from 'src/app/files/services/files.service';
+import { BehaviorSubject, take } from 'rxjs';
 
 const MaterialModules = [
   MatDialogModule,
@@ -37,7 +38,7 @@ const MaterialModules = [
   selector: 'app-upload-file-modal',
   standalone: true,
   imports: [CommonModule, ...MaterialModules, ReactiveFormsModule, FormsModule],
-  providers: [ExcelService, UploadFileService],
+  providers: [ExcelService, UploadFileService, FilesService],
   templateUrl: './upload-file-modal.component.html',
   styleUrls: ['./upload-file-modal.component.scss'],
 })
@@ -53,16 +54,24 @@ export class UploadFileModalComponent implements OnInit {
   userId!: string;
   fileSelected: string = '';
   isPagbaSelected = false;
+  isFileRepeated = false;
+  filesInDB: string[] = []
 
   uploading$ = this.uploadFileService.uploading$;
   uploadSuccess$ = this.uploadFileService.uploadSuccess$;
+
+  params = new BehaviorSubject<ParamsWithFilters>({
+    limit: 10,
+    offset: 0,
+  });
+  $params = this.params.asObservable();
 
   constructor(
     public dialogRef: MatDialogRef<UploadFileModalComponent>,
     private fb: FormBuilder,
     private uploadFileService: UploadFileService,
     private clientService: ClientsService,
-    private banksService: BanksService,
+    private filesService: FilesService,
     private snackBar: NotificationsService,
     private excelService: ExcelService
   ) {
@@ -84,6 +93,10 @@ export class UploadFileModalComponent implements OnInit {
         );
       }
     });
+
+    this.filesService.getAllSheets(this.params.value).pipe(take(1)).subscribe(data => {
+      this.filesInDB = data.sheets.map((file) => file.fileName)
+    })
   }
 
   onCloseClick(): void {
@@ -94,6 +107,7 @@ export class UploadFileModalComponent implements OnInit {
     if(type === 'main') {
       this.files = event.target.files ?? null;
       this.fileSelected = this.files![0].name.substring(0, this.files![0].name.length - 4);
+      this.checkIfFileIsRepeated()
     } else {
       this.optionalFiles = event.target.files ?? null;
     }
@@ -114,6 +128,7 @@ export class UploadFileModalComponent implements OnInit {
 
   onUploadFiles(): void {
     const client = this.clients.find((client) => client.name === this.form.value['client']!);
+
     this.uploadFileService.postUploadDebtSheet(
       this.files!,
       'e1cac08c-145b-469b-ae9d-c1c76d3ff001',
@@ -124,6 +139,15 @@ export class UploadFileModalComponent implements OnInit {
     );
     this.files = null;
     this.form.reset();
+  }
+
+  checkIfFileIsRepeated(): void {
+    const aux = this.filesInDB.findIndex(file => file.match(this.fileSelected)) >= 0
+    if (aux) {
+      this.isFileRepeated = true;
+    } else {
+      this.isFileRepeated = false;
+    }
   }
 
   getClients() {

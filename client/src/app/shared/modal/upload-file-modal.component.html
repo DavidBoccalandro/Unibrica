@@ -47,6 +47,7 @@
     #fileInput
     [multiple]="form.get('multipleFilesAccepted')?.value"
   />
+  <p *ngIf="isFileRepeated" class="error-message">El archivo ya existe en la base de datos.</p>
   <div class="file-form-field" *ngIf="isPagbaSelected">
     <p *ngIf="filesLabel">{{ filesLabel }}</p>
     <button mat-button (click)="fileInputOptional.click()">
@@ -79,7 +80,7 @@
       type="button"
       form="inputForm"
       (click)="onUploadFiles()"
-      [disabled]="!files || !form.valid"
+      [disabled]="!form.valid || !files || isFileRepeated"
     >
       Enviar
     </button>
