@@ -10,6 +10,8 @@ import { Payment } from 'src/app/stadistics/components/payments/payments/payment
 import { Reversal } from 'src/app/stadistics/components/reversals/reversals.component';
 import { StatisticsParams2, StadisticsService } from 'src/app/stadistics/stadistics.service';
 import { FilesService } from '../../services/files.service';
+import { MatDialog } from '@angular/material/dialog';
+import { UploadFileModalComponent } from 'src/app/shared/modal/upload-file-modal.component';
 
 export interface File {
   date: Date;
@@ -34,7 +36,8 @@ export class FilesComponent {
     // 'debts',
     // 'payments',
     // 'reversals',
-    // 'clients'
+    // 'clients',
+    'client.name'
   ];
   tableColumnsAll: string[] = [...this.tableColumns, 'download'];
   clickableColumns = new Set<string>([]);
@@ -54,7 +57,8 @@ export class FilesComponent {
   constructor(
     private statisticsService: StadisticsService,
     private filterService: FilterService,
-    private filesService: FilesService
+    private filesService: FilesService,
+    public dialog: MatDialog
   ) {
     this.$params.subscribe(() => this.fetchSheets());
 
@@ -97,6 +101,14 @@ export class FilesComponent {
       ...this.params.getValue(),
       limit: page.pageSize,
       offset: page.pageIndex * page.pageSize,
+    });
+  }
+
+  openUploadModal(): void {
+    const dialogRef = this.dialog.open(UploadFileModalComponent);
+
+    dialogRef.afterClosed().subscribe((result) => {
+      console.log(`Dialog result: ${result}`);
     });
   }
 

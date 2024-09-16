@@ -28,14 +28,18 @@ export class DebtsService {
 
       const blockSize = 200; // Tamaño del bloque
 
-      const sheet = await findOrCreateSheet(file.originalname, this.sheetRepository, 'deudas');
-
       // Busca el cliente en la DB
       const clientSearch = await this.clientRepository.find({ where: { clientId: +clientId } });
       const client = clientSearch[0];
       if (!client) {
         throw new Error('Client not found');
       }
+      const sheet = await findOrCreateSheet(
+        file.originalname,
+        this.sheetRepository,
+        'deudas',
+        client
+      );
 
       for (let startRow = 1; startRow < excelData.length; startRow += blockSize) {
         const endRow = Math.min(startRow + blockSize, excelData.length);

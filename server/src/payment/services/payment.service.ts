@@ -47,13 +47,12 @@ export class PaymentService {
     const lines = fileContent.split('\n');
     const originalFileName = path.basename(file.originalname);
 
-    const sheet = await findOrCreateSheet(file.originalname, this.sheetRepository, 'pagos');
-
     const processedData: PaymentRecord[] = [];
 
     // Busca el cliente en la DB
     const clientSearch = await this.clientRepository.find({ where: { clientId: +clientId } });
     const client = clientSearch[0];
+    const sheet = await findOrCreateSheet(file.originalname, this.sheetRepository, 'pagos', client);
 
     // Busca todos los bancos UNA ÚNICA VEZ y crea un Map.
     const allBanks = await this.bankRepository.find();

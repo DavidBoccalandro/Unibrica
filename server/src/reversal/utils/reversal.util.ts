@@ -5,11 +5,13 @@ import { ReversalRecord } from '../entities/reversal.entity';
 import * as XLSX from 'xlsx';
 import * as path from 'path';
 import * as fs from 'fs';
+import { ClientEntity } from 'src/clients/entities/clients.entity';
 
 export async function findOrCreateSheet(
   originalFileName: string,
   sheetRepository: Repository<SheetsEntity>,
-  fileType: 'deudas' | 'pagos' | 'reversas'
+  fileType: 'deudas' | 'pagos' | 'reversas',
+  client: ClientEntity
 ): Promise<SheetsEntity> {
   let sheet = await sheetRepository.findOne({ where: { fileName: originalFileName } });
 
@@ -19,6 +21,7 @@ export async function findOrCreateSheet(
     sheet = sheetRepository.create({
       fileName: originalFileName,
       date,
+      client,
     });
     await sheetRepository.save(sheet);
   }

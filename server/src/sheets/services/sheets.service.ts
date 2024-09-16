@@ -13,10 +13,11 @@ export class SheetsService {
   ): Promise<{ sheets: SheetsEntity[]; totalItems: number }> {
     const { limit, offset, sortBy, sortOrder, stringFilters, numericFilters, dateFilters } =
       paginationQuery;
-    let queryBuilder = this.sheetRepository.createQueryBuilder('sheets');
+    let queryBuilder = this.sheetRepository
+      .createQueryBuilder('sheets')
+      .leftJoinAndSelect('sheets.client', 'client');
     // .leftJoinAndSelect('sheets.bank', 'bank')
     // .leftJoinAndSelect('sheets.sheet', 'sheet')
-    // .leftJoinAndSelect('sheets.client', 'client');
 
     // Aplicar filtros de cadenas (stringFilters)
     if (stringFilters && stringFilters.length > 0) {
@@ -96,9 +97,10 @@ export class SheetsService {
     // Ejecuta la consulta para obtener el total de elementos
     const totalItems = await queryBuilder.getCount();
 
-    if (sortBy && sortOrder) {
+    if (!sortBy || !sortOrder) {
+      console.log('Ordena?');
       const order = {};
-      order[`sheets.${sortBy}`] = sortOrder.toUpperCase();
+      order[`date`] = 'DESC';
       queryBuilder = queryBuilder.orderBy(order);
     }
 

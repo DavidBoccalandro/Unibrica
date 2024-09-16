@@ -1,5 +1,11 @@
 <!-- <app-table [dataSource]="tableData" [columns]="tableColumns" [clickableColumns]="clickableColumns"></app-table> -->
-
+<mat-toolbar color="primary" class="files-toolbar">
+  <span>Archivos</span>
+  <span class="example-spacer"></span>
+  <button mat-fab extended color="primary" (click)="openUploadModal()">
+    <mat-icon>upload</mat-icon> Subir archivo
+  </button>
+</mat-toolbar>
 <section class="table-container mat-elevation-z8" tabindex="0">
   <table mat-table [dataSource]="tableData">
     <ng-container *ngFor="let column of tableColumns" [matColumnDef]="column">
@@ -11,8 +17,16 @@
         (click)="elementClick({ column, value: getColumnValue(element, column) })"
         class="cell-center"
       >
-        <ng-container *ngIf="column === 'createdAt' || column === 'updatedAt' || column === 'dueDate' || column == 'date'; else otherColumns">
-          {{ getColumnValue(element, column) | date: 'dd/MM/yyyy' }}
+        <ng-container
+          *ngIf="
+            column === 'createdAt' ||
+              column === 'updatedAt' ||
+              column === 'dueDate' ||
+              column == 'date';
+            else otherColumns
+          "
+        >
+          {{ getColumnValue(element, column) | date : 'dd/MM/yyyy' }}
         </ng-container>
         <ng-template #otherColumns>
           {{ getColumnValue(element, column) }}
@@ -32,4 +46,9 @@
   </table>
 </section>
 
-<mat-paginator [length]="totalItems" [pageSizeOptions]="[10, 25, 50]" (page)="handleClick($event)" showFirstLastButtons></mat-paginator>
+<mat-paginator
+  [length]="totalItems"
+  [pageSizeOptions]="[10, 25, 50]"
+  (page)="handleClick($event)"
+  showFirstLastButtons
+></mat-paginator>

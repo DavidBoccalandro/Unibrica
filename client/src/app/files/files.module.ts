@@ -4,10 +4,11 @@ import { FilesComponent } from './components/files/files.component';
 import { RouterModule, Routes } from '@angular/router';
 import { StadisticsService } from '../stadistics/stadistics.service';
 import { MatTableModule } from '@angular/material/table';
-import { PaginationComponent } from '../shared/pagination/pagination.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
 import { FilesService } from './services/files.service';
+import { MatButtonModule } from '@angular/material/button';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 const routes: Routes = [
   { path: '', redirectTo: 'deudas', pathMatch: 'full' },
@@ -25,9 +26,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [
-    FilesComponent
-  ],
+  declarations: [FilesComponent],
   imports: [
     RouterModule.forChild(routes),
     CommonModule,
@@ -35,8 +34,10 @@ const routes: Routes = [
     // PaginationComponent,
     MatPaginatorModule,
     MatIconModule,
+    MatButtonModule,
+    MatToolbarModule,
   ],
   exports: [RouterModule],
-  providers: [StadisticsService, FilesService]
+  providers: [StadisticsService, FilesService],
 })
-export class FilesModule { }
+export class FilesModule {}

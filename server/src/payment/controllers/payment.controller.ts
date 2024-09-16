@@ -28,11 +28,7 @@ export class PaymentController {
     @Body('clientId') clientId: string
   ): Promise<any> {
     const [file, optionalFile] = files;
-    // Handle primary files
-    // const uploadPromises = files.map((file) =>
     await this.paymentService.uploadPaymentSheet(file, clientId, optionalFile);
-    // );
-    // await Promise.all(uploadPromises);
 
     return { message: 'Files processed and Excel file created.' };
   }
