@@ -7,6 +7,7 @@ import { MatTableModule } from '@angular/material/table';
 import { PaginationComponent } from '../shared/pagination/pagination.component';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
+import { FilesService } from './services/files.service';
 
 const routes: Routes = [
   { path: '', redirectTo: 'deudas', pathMatch: 'full' },
@@ -36,6 +37,6 @@ const routes: Routes = [
     MatIconModule,
   ],
   exports: [RouterModule],
-  providers: [StadisticsService]
+  providers: [StadisticsService, FilesService]
 })
 export class FilesModule { }

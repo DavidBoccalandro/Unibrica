@@ -9,6 +9,7 @@ import { Debt } from 'src/app/stadistics/components/debts/debts.interface';
 import { Payment } from 'src/app/stadistics/components/payments/payments/payments.component';
 import { Reversal } from 'src/app/stadistics/components/reversals/reversals.component';
 import { StatisticsParams2, StadisticsService } from 'src/app/stadistics/stadistics.service';
+import { FilesService } from '../../services/files.service';
 
 export interface File {
   date: Date;
@@ -22,7 +23,7 @@ export interface File {
 @Component({
   selector: 'app-files',
   templateUrl: './files.component.html',
-  styleUrls: ['./files.component.scss']
+  styleUrls: ['./files.component.scss'],
 })
 export class FilesComponent {
   files!: File[];
@@ -35,10 +36,7 @@ export class FilesComponent {
     // 'reversals',
     // 'clients'
   ];
-  tableColumnsAll: string[] = [
-    ...this.tableColumns,
-    'download'
-  ];
+  tableColumnsAll: string[] = [...this.tableColumns, 'download'];
   clickableColumns = new Set<string>([]);
   subscriptions: Subscription[] = [];
   params = new BehaviorSubject<StatisticsParams2>({
@@ -51,10 +49,13 @@ export class FilesComponent {
   dataSource!: MatTableDataSource<MatTableDataSourceInput>;
   columnNames = columnNamesMap;
 
-
   @ViewChild(MatPaginator, { static: true }) paginator!: MatPaginator;
 
-  constructor(private statisticsService: StadisticsService, private filterService: FilterService) {
+  constructor(
+    private statisticsService: StadisticsService,
+    private filterService: FilterService,
+    private filesService: FilesService
+  ) {
     this.$params.subscribe(() => this.fetchSheets());
 
     this.subscriptions.push(
@@ -62,7 +63,7 @@ export class FilesComponent {
         if (!value) {
           this.resetParams();
         } else {
-          const newParams = { ...this.params.getValue(), ...value,  offset: 0};
+          const newParams = { ...this.params.getValue(), ...value, offset: 0 };
           // this.paginator.pageIndex = 0;
           this.params.next(newParams);
         }
@@ -83,7 +84,7 @@ export class FilesComponent {
       .getAllSheets(this.params.getValue())
       .pipe(take(1))
       .subscribe((data) => {
-        console.log('Sheets: ', data)
+        console.log('Sheets: ', data);
         this.files = data.sheets;
         this.totalItems = data.totalItems;
         this.tableData = new MatTableDataSource<MatTableDataSourceInput>(this.files);
@@ -100,11 +101,32 @@ export class FilesComponent {
   }
 
   download(element: any) {
-    console.log('download: ', element)
+    let name = element.fileName
+    if(name.match(/\.[^/.]+$/)) {
+      name = name.replace(/\.[^/.]+$/, "");
+    }
+    this.filesService.downloadSheet(name).subscribe(
+      (data: Blob) => {
+        const blob = new Blob([data], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${name}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url); // Limpia la URL del blob
+      },
+      (error) => {
+        console.error('Error al descargar el archivo', error);
+      }
+    );
   }
 
-  elementClick (event: any): void {
-    console.log('dataSource: ', this.dataSource.data)
+  elementClick(event: any): void {
+    console.log('dataSource: ', this.dataSource.data);
     // if (!this.clickableColumns) return;
     // if(this.clickableColumns.has(event.column)) {
     //   this.elementClickEmitter.emit(event)

@@ -1,22 +1,38 @@
-import { Controller, Get, Param, Query, Res } from '@nestjs/common';
+import { Controller, Get, HttpException, HttpStatus, Param, Query, Res } from '@nestjs/common';
 import { join } from 'path';
 import { Response } from 'express';
 import { SheetsService } from '../services/sheets.service';
+import * as fs from 'fs';
 
 @Controller('sheets')
 export class SheetsController {
   constructor(private sheetsService: SheetsService) {}
 
   @Get('download/:filename')
-  downloadFile(@Param('filename') filename: string, @Res() res: Response) {
-    const filePath = join(__dirname, '..', '..', '..', 'uploads', filename + '.xlsx'); // Ruta del archivo
-    console.log('filePatch: ', filePath);
-    res.download(filePath, 'archivo.xlsx', (err) => {
-      if (err) {
-        console.error('Error en la descarga del archivo:', err);
-        res.status(500).send('Error al descargar el archivo');
+  async downloadFile(@Param('filename') filename: string, @Res() res: Response) {
+    try {
+      let filePath = join(__dirname, '..', '..', '..', 'uploads', `${filename}.xlsx`);
+      let filenameWithExtension = `${filename}.xlsx`;
+
+      // console.log('Ruta del archivo:', filePathXLSX);
+      if (!fs.existsSync(filePath)) {
+        filePath = join(__dirname, '..', '..', '..', 'uploads', `${filename}.xls`);
+        filenameWithExtension = `${filename}.xls`;
       }
-    });
+      if (!fs.existsSync(filePath)) {
+        throw new HttpException('Archivo no encontrado', HttpStatus.NOT_FOUND);
+      }
+
+      res.download(filePath, filenameWithExtension, (err) => {
+        if (err) {
+          console.error('Error al descargar el archivo:', err);
+          res.status(500).send('Error al descargar el archivo');
+        }
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      throw new HttpException('Error al procesar la descarga', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Get()
