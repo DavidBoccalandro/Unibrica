@@ -1,11 +1,9 @@
 import { StadisticsService } from './../../stadistics.service';
 import { Component, ViewChild } from '@angular/core';
-import { DEBTOR_TABLE_DATA_MOCK, Debtor } from './debtors.interface';
-import { BehaviorSubject, Subscription, debounceTime, take } from 'rxjs';
-import { Params } from '@angular/router';
+import { Debtor } from './debtors.interface';
+import { BehaviorSubject, Subscription, take } from 'rxjs';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { Debt } from '../debts/debts.interface';
 import { MatTableDataSourceInput } from 'src/app/shared/table/table.component';
 import { FilterService } from 'src/app/core/services/filter.service';
 

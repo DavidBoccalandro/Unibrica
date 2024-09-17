@@ -11,6 +11,13 @@ export class RepeatedDebtorService {
   ) {}
 
   async getAllRepeatedDebtors() {
-    return await this.repeatedDebtorRepository.find({ relations: { debtor: true, sheets: true } });
+    return await this.repeatedDebtorRepository.find({
+      relations: {
+        debtor: true,
+        sheets: {
+          client: true,
+        },
+      },
+    });
   }
 }

@@ -6,6 +6,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from 'src/enviroments/enviroment';
 import { Sheet } from 'src/app/shared/interfaces/sheet.interface';
 import { File } from '../components/files/files.component';
+import { RepeatedDebtor } from '../components/file-log/file-log.component';
 
 export interface ParamsWithFilters {
   limit: number;
@@ -18,6 +19,7 @@ export interface ParamsWithFilters {
 @Injectable()
 export class FilesService {
   private SheetsURL = `${environment.envVar.API_URL}/sheets`;
+  private RepDebtorURL = `${environment.envVar.API_URL}/repeated_debtors`;
 
   params$!: Observable<Params>;
 
@@ -44,6 +46,23 @@ export class FilesService {
       .set('dateFilters', JSON.stringify(params.dateFilters));
 
     return this.http.get<{ totalItems: number; sheets: File[] }>(this.SheetsURL, {
+      params: httpParams,
+      withCredentials: true,
+    });
+  }
+
+  getAllRepeatedDebtors(
+    params: ParamsWithFilters
+  // ): Observable<{ totalItems: number; repeatedDebtors: RepeatedDebtor[] }> {
+  ): Observable<RepeatedDebtor[]> {
+    let httpParams = new HttpParams()
+      .set('limit', params.limit.toString())
+      .set('offset', params.offset.toString())
+      .set('stringFilters', JSON.stringify(params.stringFilters))
+      .set('numericFilters', JSON.stringify(params.numericFilters))
+      .set('dateFilters', JSON.stringify(params.dateFilters));
+
+    return this.http.get<RepeatedDebtor[]>(this.RepDebtorURL + '/all', {
       params: httpParams,
       withCredentials: true,
     });

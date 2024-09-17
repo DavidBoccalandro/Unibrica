@@ -1,0 +1,43 @@
+:host {
+  width: 30vw;
+  height: min-content;
+}
+
+.files-toolbar {
+  padding: 8px 15px;
+  height: 66px;
+  font-size: 1.1rem;
+}
+
+.repeated-debtors-container,
+mat-expansion-panel-header {
+  display: flex;
+  // flex-direction: column;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 16px;
+}
+
+.repeated-debtor {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+
+  // .bold {
+  //   font-weight: 700;
+  // }
+
+  .repeated-debtor-name,
+  .repeated-debtor-dni {
+    width: 50%;
+  }
+}
+
+.mat-accordion-container {
+  padding: 16px;
+}
+
+.sheet-info {
+  padding: 10px;
+  border: 1px solid lightgrey;
+}

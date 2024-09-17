@@ -1,11 +1,23 @@
 :host {
-  margin: 30px;
+  margin: 10px;
+}
+
+.table-section {
   width: 60vw;
   border: 1px solid lightgray;
 }
 
+.files-layout {
+  display: flex;
+  justify-content: space-around;
+}
+
 .files-toolbar {
   padding: 8px 15px;
+
+  .toolbar-title {
+    font-size: 1.1rem;;
+  }
 }
 
 .table-container {
@@ -14,4 +26,23 @@
 
 .example-spacer {
   flex: 1 1 auto;
+}
+
+.table-section {
+  display: flex;
+  flex-direction: column;
+  height: 95vh;
+}
+
+.files-toolbar {
+  flex-shrink: 0;
+}
+
+.table-container {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+mat-paginator {
+  flex-shrink: 0;
 }

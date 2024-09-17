@@ -1,0 +1,43 @@
+<!-- <app-table [dataSource]="tableData" [columns]="tableColumns" [clickableColumns]="clickableColumns"></app-table> -->
+<mat-toolbar color="primary" class="files-toolbar">
+  <span>Deudores repetidos</span>
+  <span class="example-spacer"></span>
+  <!-- <button mat-fab extended color="primary" (click)="openUploadModal()">
+    <mat-icon>upload</mat-icon> Subir archivo
+  </button> -->
+</mat-toolbar>
+
+<section class="file-log-container" tabindex="0">
+  <!-- Mostrar deudores repetidos si existen -->
+  <div *ngIf="repeatedDebtors.length > 0" class="mat-accordion-container">
+    <mat-accordion>
+      <mat-expansion-panel *ngFor="let repdebtor of repeatedDebtors">
+        <mat-expansion-panel-header>
+          <div class="repeated-debtor">
+            <span class="repeated-debtor-name bold"
+              >{{ repdebtor.debtor.lastNames }}, {{ repdebtor.debtor.firstNames }}</span
+            >
+            <span class="repeated-debtor-dni bold">{{ repdebtor.debtor.dni }}</span>
+          </div>
+        </mat-expansion-panel-header>
+
+        <!-- Contenido del panel expandido con la información de sheets -->
+        <div *ngIf="repdebtor.sheets.length > 0">
+          <div class="sheet-info" *ngFor="let sheet of repdebtor.sheets">
+            <p><strong>Fecha:</strong> {{ sheet.date | date }}</p>
+            <p><strong>Cliente:</strong> {{ sheet.client?.name }}</p>
+            <p><strong>Archivo:</strong> {{ sheet.fileName }}</p>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+</section>
+
+<!--
+<mat-paginator
+  [length]="totalItems"
+  [pageSizeOptions]="[10, 25, 50]"
+  (page)="handleClick($event)"
+  showFirstLastButtons
+></mat-paginator> -->

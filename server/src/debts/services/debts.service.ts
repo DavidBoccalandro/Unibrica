@@ -164,9 +164,12 @@ export class DebtsService {
         const { filterBy, filterValue } = filter;
 
         if (filterBy === 'debtorLastname') {
-          queryBuilder = queryBuilder.andWhere(`LOWER(debtor.lastname) LIKE :filterValue${index}`, {
-            [`filterValue${index}`]: `%${filterValue.toLowerCase()}%`,
-          });
+          queryBuilder = queryBuilder.andWhere(
+            `LOWER(debtor.lastNames) LIKE :filterValue${index}`,
+            {
+              [`filterValue${index}`]: `%${filterValue.toLowerCase()}%`,
+            }
+          );
         } else if (filterBy === 'dni') {
           queryBuilder = queryBuilder.andWhere(`LOWER(debtor.dni) LIKE :filterValue${index}`, {
             [`filterValue${index}`]: `%${filterValue.toLowerCase()}%`,

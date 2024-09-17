@@ -9,6 +9,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { FilesService } from './services/files.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { FileLogComponent } from './components/file-log/file-log.component';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 const routes: Routes = [
   { path: '', redirectTo: 'deudas', pathMatch: 'full' },
@@ -26,7 +28,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [FilesComponent],
+  declarations: [FilesComponent, FileLogComponent],
   imports: [
     RouterModule.forChild(routes),
     CommonModule,
@@ -35,6 +37,7 @@ const routes: Routes = [
     MatIconModule,
     MatButtonModule,
     MatToolbarModule,
+    MatExpansionModule,
   ],
   exports: [RouterModule],
   providers: [StadisticsService, FilesService],
