@@ -1,13 +1,10 @@
 import {
-  Column,
   CreateDateColumn,
   DeleteDateColumn,
-  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { ClientEntity } from 'src/clients/entities/clients.entity';
 
 export abstract class BaseEntity {
   @PrimaryGeneratedColumn('uuid')

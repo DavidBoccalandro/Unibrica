@@ -8,22 +8,22 @@ export class RepeatedDebtorController {
   @Get('all')
   public async getAllRepeatedDebtors(
     @Query('limit') limit: number,
-    @Query('offset') offset: number,
-    @Query('stringFilters') stringFilters: string,
-    @Query('numericFilters') numericFilters: string,
-    @Query('dateFilters') dateFilters: string
+    @Query('offset') offset: number
+    // @Query('stringFilters') stringFilters: string,
+    // @Query('numericFilters') numericFilters: string,
+    // @Query('dateFilters') dateFilters: string
   ) {
-    let parsedStringFilters, parsedNumericFilters, parsedDateFilters;
-    if (stringFilters && stringFilters !== 'undefined') {
-      parsedStringFilters = JSON.parse(stringFilters);
-    }
-    if (numericFilters && numericFilters !== 'undefined') {
-      parsedNumericFilters = JSON.parse(numericFilters);
-    }
-    if (dateFilters && dateFilters !== 'undefined') {
-      parsedDateFilters = JSON.parse(dateFilters);
-    }
+    // let parsedStringFilters, parsedNumericFilters, parsedDateFilters;
+    // if (stringFilters && stringFilters !== 'undefined') {
+    //   parsedStringFilters = JSON.parse(stringFilters);
+    // }
+    // if (numericFilters && numericFilters !== 'undefined') {
+    //   parsedNumericFilters = JSON.parse(numericFilters);
+    // }
+    // if (dateFilters && dateFilters !== 'undefined') {
+    //   parsedDateFilters = JSON.parse(dateFilters);
+    // }
 
-    return this.repeatedDebtorRepository.getAllRepeatedDebtors();
+    return this.repeatedDebtorRepository.getAllRepeatedDebtors({ limit, offset });
   }
 }

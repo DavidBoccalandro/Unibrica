@@ -20,7 +20,7 @@ export class FileLogComponent {
 
   repeatedDebtors: RepeatedDebtor[] = [];
   params = new BehaviorSubject<StatisticsParams2>({
-    limit: 10,
+    limit: 20,
     offset: 0,
   });
   $params = this.params.asObservable();
@@ -34,10 +34,10 @@ export class FileLogComponent {
 
   getRepeatedDebtors() {
   this.filesService.getAllRepeatedDebtors(this.params.getValue()).pipe(take(1)).subscribe(
-    (data: RepeatedDebtor[]) => {
+    (data: { totalItems: number; repeatedDebtors: RepeatedDebtor[] }) => {
       console.log('Repeated Debtors: ', data);
-      // this.totalItems = data.totalItems;
-      this.repeatedDebtors = data;
+      this.totalItems = data.totalItems;
+      this.repeatedDebtors = data.repeatedDebtors;
     }
   )}
 

@@ -98,7 +98,6 @@ export class SheetsService {
     const totalItems = await queryBuilder.getCount();
 
     if (!sortBy || !sortOrder) {
-      console.log('Ordena?');
       const order = {};
       order[`date`] = 'DESC';
       queryBuilder = queryBuilder.orderBy(order);

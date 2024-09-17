@@ -53,8 +53,8 @@ export class FilesService {
 
   getAllRepeatedDebtors(
     params: ParamsWithFilters
-  // ): Observable<{ totalItems: number; repeatedDebtors: RepeatedDebtor[] }> {
-  ): Observable<RepeatedDebtor[]> {
+  ): Observable<{ totalItems: number; repeatedDebtors: RepeatedDebtor[] }> {
+  // ): Observable<RepeatedDebtor[]> {
     let httpParams = new HttpParams()
       .set('limit', params.limit.toString())
       .set('offset', params.offset.toString())
@@ -62,7 +62,7 @@ export class FilesService {
       .set('numericFilters', JSON.stringify(params.numericFilters))
       .set('dateFilters', JSON.stringify(params.dateFilters));
 
-    return this.http.get<RepeatedDebtor[]>(this.RepDebtorURL + '/all', {
+    return this.http.get<{ totalItems: number; repeatedDebtors: RepeatedDebtor[] }>(this.RepDebtorURL + '/all', {
       params: httpParams,
       withCredentials: true,
     });

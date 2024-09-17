@@ -1,7 +1,7 @@
 import { BaseEntity } from 'src/config/base.entity';
 import { DebtorEntity } from 'src/debts/entities/debtors.entity';
 import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
-import { Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne } from 'typeorm';
+import { Entity, JoinColumn, JoinTable, ManyToMany, OneToOne } from 'typeorm';
 
 @Entity({ name: 'repeated_debtors' })
 export class RepeatedDebtorEntity extends BaseEntity {
