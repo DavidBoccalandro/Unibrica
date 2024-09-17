@@ -1,9 +1,10 @@
 import { BaseEntity } from 'src/config/base.entity';
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
 import { DebtEntity } from '../../debts/entities/debts.entity';
 import { PaymentRecord } from 'src/payment/entities/payment.entity';
 import { ReversalRecord } from 'src/reversal/entities/reversal.entity';
 import { ClientEntity } from '../../clients/entities/clients.entity';
+import { RepeatedDebtorEntity } from 'src/repeated-debtor/entities/repeated-debtor.entity';
 
 @Entity({ name: 'sheets' })
 export class SheetsEntity extends BaseEntity {
@@ -24,4 +25,7 @@ export class SheetsEntity extends BaseEntity {
 
   @ManyToOne(() => ClientEntity, (client) => client.debts, { nullable: true })
   client: ClientEntity;
+
+  @ManyToMany(() => RepeatedDebtorEntity, (debtor) => debtor.sheets, { nullable: true })
+  repeatedDebtors: RepeatedDebtorEntity[];
 }

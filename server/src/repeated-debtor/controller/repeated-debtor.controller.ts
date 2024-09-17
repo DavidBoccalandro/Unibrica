@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { RepeatedDebtorService } from '../services/repeated-debtor.service';
 
-@Controller('repeated-debtors')
+@Controller('repeated_debtors')
 export class RepeatedDebtorController {
   constructor(private repeatedDebtorRepository: RepeatedDebtorService) {}
 

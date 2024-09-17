@@ -44,10 +44,9 @@ export class DebtsService {
         client
       );
 
-      for (let startRow = 1; startRow < excelData.length; startRow += blockSize) {
+      for (let startRow = 0; startRow <= excelData.length; startRow += blockSize) {
         const endRow = Math.min(startRow + blockSize, excelData.length);
         const blockData = excelData.slice(startRow, endRow);
-
         await this.processDebtSheet(blockData, client, sheet);
       }
 
@@ -69,13 +68,13 @@ export class DebtsService {
 
     const allDebtors = await this.debtorRepository.find();
     const debtorsMap = new Map(allDebtors.map((debtor) => [debtor.dni, debtor]));
-    // console.log('debtorsMap: ', debtorsMap);
 
     for (const row of excelData) {
       // Check if debt exists
       let debtor = debtorsMap.get(row['DNI'].toString());
       const bank = bankMap.get(row['bank']) ?? null;
 
+      // Si no existe deudor, lo crea
       if (!debtor && row['DNI']) {
         debtor = new DebtorEntity();
         debtor.dni = row['DNI'];
@@ -85,14 +84,30 @@ export class DebtsService {
         debtors.push(debtor);
         debtorsMap.set(row['DNI'], debtor);
       } else {
-        const repeatedDebtor = await this.repeatedDebtorRepository.findOne({
-          where: { debtor: debtor },
+        // Si existe el deudor, revisa si ya está registrado como deudor en el repositorio de deudores repetidos
+        // console.log('Buscando deudor repetido para el DNI:', debtor.dni);
+        let repeatedDebtor = await this.repeatedDebtorRepository.findOne({
+          where: { debtor: { dni: debtor.dni } },
+          relations: ['debtor', 'sheets'],
         });
+        // console.log('Resultado de la búsqueda:', repeatedDebtor);
+
+        // Si no lo encuentra, crea el repeatedDebtor y le asigna la hoja (sheet) que se está procesando
         if (!repeatedDebtor) {
-          await this.repeatedDebtorRepository.save({ debtor });
+          repeatedDebtor = this.repeatedDebtorRepository.create({ debtor, sheets: [] });
+          repeatedDebtor.sheets.push(sheet);
+          await this.repeatedDebtorRepository.save(repeatedDebtor);
         } else {
-          console.log('Se encontró deudor repetido');
-          await this.repeatedDebtorRepository.save({ ...repeatedDebtor });
+          // Si lo encuentra, añade la relación con la hoja (sheet)
+          if (!repeatedDebtor.sheets.some((existingSheet) => existingSheet.id === sheet.id)) {
+            // console.log('Sheet ID:', sheet.id);
+
+            // repeatedDebtor.sheets = sheets;
+            repeatedDebtor.sheets.push(sheet);
+            await this.repeatedDebtorRepository.save(repeatedDebtor);
+          } else {
+            console.log('La hoja ya está asociada al deudor repetido');
+          }
         }
       }
 
@@ -114,7 +129,7 @@ export class DebtsService {
       debt.branchCode = row['Sucursal'];
       debt.accountType = row['Tipo_Cuenta'];
       debt.account = row['Cuenta'];
-      debt.currency = row['Moneda'];
+      debt.currency = row['Moneda'].replace(/'/g, '');
       debt.idDebt = row['Id_debito'];
       debt.client = client;
       debt.debtor = debtor;
