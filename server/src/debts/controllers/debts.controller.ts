@@ -31,14 +31,20 @@ export class DebtsController {
   async uploadReversal(
     @UploadedFiles() files: Express.Multer.File[],
     @Body('clientId') clientId: string
-  ): Promise<string> {
-    if (!files || files.length === 0) {
-      throw new BadRequestException('No files uploaded');
-    }
-    const uploadPromises = files.map((file) => this.debtsService.uploadDebtSheet(file, clientId));
-    await Promise.all(uploadPromises);
+  ): Promise<any> {
+    try {
+      if (!files || files.length === 0) {
+        throw new BadRequestException('No files uploaded');
+      }
+      const uploadPromises = files.map((file) => this.debtsService.uploadDebtSheet(file, clientId));
+      await Promise.all(uploadPromises);
 
-    return 'All debt sheets uploaded successfully, and they are being processed.';
+      return {
+        message: 'All debt sheets uploaded successfully, and they are being processed.',
+      };
+    } catch (error) {
+      throw new Error('Error uploading debt sheet: ' + error.message);
+    }
   }
 
   @Get('all')

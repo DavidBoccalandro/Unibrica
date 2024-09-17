@@ -19,7 +19,8 @@ export class RepeatedDebtorService {
     let queryBuilder = this.repeatedDebtorRepository
       .createQueryBuilder('repeated_debtors')
       .leftJoinAndSelect('repeated_debtors.debtor', 'debtor')
-      .leftJoinAndSelect('repeated_debtors.sheets', 'clients');
+      .leftJoinAndSelect('repeated_debtors.sheets', 'sheets')
+      .leftJoinAndSelect('sheets.client', 'client');
     // .leftJoinAndSelect('sheets.bank', 'bank')
     // .leftJoinAndSelect('sheets.sheet', 'sheet')
 

@@ -85,7 +85,7 @@ export class PaymentService {
         const installmentNumber = parseInt(line.substring(85, 87).trim(), 10);
         const debitStatus = line.substring(87, 88).trim();
         const chargedAmount = parseFloat(line.substring(108, 119).trim()) / 100;
-        const remainingDebt = debtAmount - chargedAmount;
+        const remainingDebt = +(debtAmount - chargedAmount).toFixed(2);
         const rejectCode = sdaDataMap.get(bankAccountNumber);
         const rejectText = rejectionCodes[rejectCode];
 

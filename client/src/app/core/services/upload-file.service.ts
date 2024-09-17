@@ -15,7 +15,7 @@ export class UploadFileService {
   private uploadingSubject = new BehaviorSubject<boolean>(false);
   public uploading$ = this.uploadingSubject.asObservable();
 
-  private uploadSuccessSubject = new BehaviorSubject<boolean>(false);
+  uploadSuccessSubject = new BehaviorSubject<boolean>(false);
   public uploadSuccess$ = this.uploadSuccessSubject.asObservable();
 
   constructor(private http: HttpClient) {}
@@ -27,7 +27,7 @@ export class UploadFileService {
     bankId: string,
     fileType: 'cobros' | 'deudas' | 'reversas',
     optionalFile?: FileList
-  ): Observable<any> {
+  ): void {
     this.uploadingSubject.next(true);
 
     const formData: FormData = new FormData();
@@ -45,20 +45,19 @@ export class UploadFileService {
       }
     }
 
-    let postUpload = this.http.post<any>(this.UploadFileUrls[fileType], formData);
-
-    postUpload.subscribe(
-      (response) => {
-        console.log('Respuesta del servidor:', response);
+    this.http.post<any>(this.UploadFileUrls[fileType], formData).subscribe({
+      next: (response) => {
         this.uploadSuccessSubject.next(true);
         this.uploadingSubject.next(false);
       },
-      () => {
+      error: (error) => {
         this.uploadSuccessSubject.next(false);
         this.uploadingSubject.next(false);
       }
-    );
+    });
+  }
 
-    return postUpload;
+  resetUploadSuccessSubject() {
+    this.uploadSuccessSubject.next(false);
   }
 }

@@ -38,7 +38,7 @@ const MaterialModules = [
   selector: 'app-upload-file-modal',
   standalone: true,
   imports: [CommonModule, ...MaterialModules, ReactiveFormsModule, FormsModule],
-  providers: [ExcelService, UploadFileService, FilesService],
+  providers: [ExcelService, FilesService],
   templateUrl: './upload-file-modal.component.html',
   styleUrls: ['./upload-file-modal.component.scss'],
 })
@@ -129,7 +129,7 @@ export class UploadFileModalComponent implements OnInit {
   onUploadFiles(): void {
     const client = this.clients.find((client) => client.name === this.form.value['client']!);
 
-    this.uploadFileService.postUploadDebtSheet(
+    const response = this.uploadFileService.postUploadDebtSheet(
       this.files!,
       'e1cac08c-145b-469b-ae9d-c1c76d3ff001',
       client?.clientId ? client : null,
@@ -139,6 +139,7 @@ export class UploadFileModalComponent implements OnInit {
     );
     this.files = null;
     this.form.reset();
+    this.dialogRef.close(response);
   }
 
   checkIfFileIsRepeated(): void {

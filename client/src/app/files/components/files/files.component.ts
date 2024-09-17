@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Subscription, BehaviorSubject, take } from 'rxjs';
@@ -12,6 +12,7 @@ import { StatisticsParams2, StadisticsService } from 'src/app/stadistics/stadist
 import { FilesService } from '../../services/files.service';
 import { MatDialog } from '@angular/material/dialog';
 import { UploadFileModalComponent } from 'src/app/shared/modal/upload-file-modal.component';
+import { UploadFileService } from 'src/app/core/services/upload-file.service';
 
 export interface File {
   date: Date;
@@ -27,7 +28,7 @@ export interface File {
   templateUrl: './files.component.html',
   styleUrls: ['./files.component.scss'],
 })
-export class FilesComponent {
+export class FilesComponent implements OnDestroy {
   files!: File[];
   tableData!: MatTableDataSource<MatTableDataSourceInput>;
   tableColumns: string[] = [
@@ -37,7 +38,7 @@ export class FilesComponent {
     // 'payments',
     // 'reversals',
     // 'clients',
-    'client.name'
+    'client.name',
   ];
   tableColumnsAll: string[] = [...this.tableColumns, 'download'];
   clickableColumns = new Set<string>([]);
@@ -58,7 +59,8 @@ export class FilesComponent {
     private statisticsService: StadisticsService,
     private filterService: FilterService,
     private filesService: FilesService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private uploadFileService: UploadFileService
   ) {
     this.$params.subscribe(() => this.fetchSheets());
 
@@ -70,6 +72,14 @@ export class FilesComponent {
           const newParams = { ...this.params.getValue(), ...value, offset: 0 };
           // this.paginator.pageIndex = 0;
           this.params.next(newParams);
+        }
+      })
+    );
+
+    this.subscriptions.push(
+      this.uploadFileService.uploadSuccess$.subscribe((data) => {
+        if (data) {
+          this.fetchSheets();
         }
       })
     );
@@ -108,14 +118,14 @@ export class FilesComponent {
     const dialogRef = this.dialog.open(UploadFileModalComponent);
 
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(`Dialog result: ${result}`);
+      // console.log('after close: ', result)
     });
   }
 
   download(element: any) {
-    let name = element.fileName
-    if(name.match(/\.[^/.]+$/)) {
-      name = name.replace(/\.[^/.]+$/, "");
+    let name = element.fileName;
+    if (name.match(/\.[^/.]+$/)) {
+      name = name.replace(/\.[^/.]+$/, '');
     }
     this.filesService.downloadSheet(name).subscribe(
       (data: Blob) => {
