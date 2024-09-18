@@ -10,6 +10,7 @@ import { DebtorEntity } from '../entities/debtors.entity';
 import { findOrCreateSheet } from 'src/reversal/utils/reversal.util';
 import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDto';
 import { RepeatedDebtorEntity } from 'src/repeated-debtor/entities/repeated-debtor.entity';
+import { generateDebtorStatistics } from '../utils/generateDebtorStatistics.utils';
 
 @Injectable()
 export class DebtsService {
@@ -69,22 +70,25 @@ export class DebtsService {
     const allDebtors = await this.debtorRepository.find();
     const debtorsMap = new Map(allDebtors.map((debtor) => [debtor.dni, debtor]));
 
+    const debtorStatisticsArray = [];
+
     for (const row of excelData) {
-      // Check if debt exists
+      //% Check if debt exists
       let debtor = debtorsMap.get(row['DNI'].toString());
       const bank = bankMap.get(row['bank']) ?? null;
 
-      // Si no existe deudor, lo crea
+      //% Si no existe deudor, lo crea
       if (!debtor && row['DNI']) {
         debtor = new DebtorEntity();
         debtor.dni = row['DNI'];
         const splitName = row['NOMBRE Y APELLIDO'].split(' ');
         debtor.firstNames = splitName.slice(1).join(' ');
         debtor.lastNames = splitName[0];
+        debtor.sheet = sheet;
         debtors.push(debtor);
         debtorsMap.set(row['DNI'], debtor);
       } else {
-        // Si existe el deudor, revisa si ya está registrado como deudor en el repositorio de deudores repetidos
+        //% Si existe el deudor, revisa si ya está registrado como deudor en el repositorio de deudores repetidos
         // console.log('Buscando deudor repetido para el DNI:', debtor.dni);
         let repeatedDebtor = await this.repeatedDebtorRepository.findOne({
           where: { debtor: { dni: debtor.dni } },
@@ -92,23 +96,26 @@ export class DebtsService {
         });
         // console.log('Resultado de la búsqueda:', repeatedDebtor);
 
-        // Si no lo encuentra, crea el repeatedDebtor y le asigna la hoja (sheet) que se está procesando
+        //% Si no lo encuentra, crea el repeatedDebtor y le asigna la hoja (sheet) que se está procesando
         if (!repeatedDebtor) {
-          repeatedDebtor = this.repeatedDebtorRepository.create({ debtor, sheets: [] });
+          repeatedDebtor = this.repeatedDebtorRepository.create({ debtor, sheets: [debtor.sheet] });
           repeatedDebtor.sheets.push(sheet);
           await this.repeatedDebtorRepository.save(repeatedDebtor);
         } else {
-          // Si lo encuentra, añade la relación con la hoja (sheet)
+          //% Si lo encuentra, añade la relación con la hoja (sheet)
           if (!repeatedDebtor.sheets.some((existingSheet) => existingSheet.id === sheet.id)) {
             // console.log('Sheet ID:', sheet.id);
 
-            // repeatedDebtor.sheets = sheets;
             repeatedDebtor.sheets.push(sheet);
             await this.repeatedDebtorRepository.save(repeatedDebtor);
           } else {
             console.log('La hoja ya está asociada al deudor repetido');
           }
         }
+
+        const debtorStatistics = await generateDebtorStatistics(debtor, this.debtRepository);
+        // console.log('Debtor statistics:', JSON.stringify(debtorStatistics));
+        debtorStatisticsArray.push(debtorStatistics);
       }
 
       // Create a new debt

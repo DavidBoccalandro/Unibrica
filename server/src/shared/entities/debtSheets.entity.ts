@@ -5,6 +5,7 @@ import { PaymentRecord } from 'src/payment/entities/payment.entity';
 import { ReversalRecord } from 'src/reversal/entities/reversal.entity';
 import { ClientEntity } from '../../clients/entities/clients.entity';
 import { RepeatedDebtorEntity } from 'src/repeated-debtor/entities/repeated-debtor.entity';
+import { DebtorEntity } from 'src/debts/entities/debtors.entity';
 
 @Entity({ name: 'sheets' })
 export class SheetsEntity extends BaseEntity {
@@ -25,6 +26,9 @@ export class SheetsEntity extends BaseEntity {
 
   @ManyToOne(() => ClientEntity, (client) => client.debts)
   client: ClientEntity;
+
+  @OneToMany(() => DebtorEntity, (debtor) => debtor.sheet, { nullable: true })
+  debtors: DebtorEntity[];
 
   @ManyToMany(() => RepeatedDebtorEntity, (debtor) => debtor.sheets, { nullable: true })
   repeatedDebtors: RepeatedDebtorEntity[];

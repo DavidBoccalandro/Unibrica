@@ -10,7 +10,6 @@ import { multerConfig } from 'src/config/multer.config';
 import { UsersModule } from 'src/users/users.module';
 import { ClientsModule } from 'src/clients/clients.module';
 import { BanksModule } from 'src/banks/banks.module';
-import { RepeatedDebtEntity } from './entities/repeatedDebts.entity';
 import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
 import { RepeatedDebtorEntity } from 'src/repeated-debtor/entities/repeated-debtor.entity';
 
@@ -22,7 +21,6 @@ import { RepeatedDebtorEntity } from 'src/repeated-debtor/entities/repeated-debt
       DebtorEntity,
       DebtEntity,
       SheetsEntity,
-      RepeatedDebtEntity,
       RepeatedDebtorEntity,
     ]),
     UsersModule,
