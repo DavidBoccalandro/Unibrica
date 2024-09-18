@@ -47,10 +47,12 @@ export class UploadFileService {
 
     this.http.post<any>(this.UploadFileUrls[fileType], formData).subscribe({
       next: (response) => {
+        console.log('Exito!', response)
         this.uploadSuccessSubject.next(true);
         this.uploadingSubject.next(false);
       },
       error: (error) => {
+        console.log('Fail!', error)
         this.uploadSuccessSubject.next(false);
         this.uploadingSubject.next(false);
       }
