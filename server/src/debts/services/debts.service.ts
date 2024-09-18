@@ -11,6 +11,8 @@ import { findOrCreateSheet } from 'src/reversal/utils/reversal.util';
 import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDto';
 import { RepeatedDebtorEntity } from 'src/repeated-debtor/entities/repeated-debtor.entity';
 import { generateDebtorStatistics } from '../utils/generateDebtorStatistics.utils';
+import { DebtorStatistics } from '../utils/debtorStatistics.interface';
+import { generateExcelWithStatistics } from '../utils/generateDebtExcel';
 
 @Injectable()
 export class DebtsService {
@@ -48,7 +50,7 @@ export class DebtsService {
       for (let startRow = 0; startRow <= excelData.length; startRow += blockSize) {
         const endRow = Math.min(startRow + blockSize, excelData.length);
         const blockData = excelData.slice(startRow, endRow);
-        await this.processDebtSheet(blockData, client, sheet);
+        await this.processDebtSheet(blockData, client, sheet, file.originalname);
       }
 
       return 'Debt sheet uploaded successfully, and it is being processed.';
@@ -60,7 +62,12 @@ export class DebtsService {
   /*
    * Function to process de file
    */
-  public async processDebtSheet(excelData: any, client: ClientEntity, sheet: SheetsEntity) {
+  public async processDebtSheet(
+    excelData: any,
+    client: ClientEntity,
+    sheet: SheetsEntity,
+    fileName: string
+  ) {
     const debts: DebtEntity[] = [];
     const debtors: DebtorEntity[] = [];
 
@@ -70,7 +77,7 @@ export class DebtsService {
     const allDebtors = await this.debtorRepository.find();
     const debtorsMap = new Map(allDebtors.map((debtor) => [debtor.dni, debtor]));
 
-    const debtorStatisticsArray = [];
+    const debtorStatisticsMap = new Map<string, DebtorStatistics>();
 
     for (const row of excelData) {
       //% Check if debt exists
@@ -115,7 +122,7 @@ export class DebtsService {
 
         const debtorStatistics = await generateDebtorStatistics(debtor, this.debtRepository);
         // console.log('Debtor statistics:', JSON.stringify(debtorStatistics));
-        debtorStatisticsArray.push(debtorStatistics);
+        debtorStatisticsMap.set(debtor.id, debtorStatistics);
       }
 
       // Create a new debt
@@ -150,6 +157,10 @@ export class DebtsService {
     try {
       await this.debtorRepository.save(debtors);
       await this.debtRepository.save(debts);
+
+      // Generar el archivo Excel con estadísticas
+      await generateExcelWithStatistics(debts, debtorStatisticsMap, fileName);
+      console.log('Se generó el Excel modificado');
     } catch (error) {
       console.error('Error saving entities:', error);
       throw new Error('Error processing debt sheet: ' + error.message);

@@ -1,14 +1,13 @@
 import { Between, Repository } from 'typeorm';
 import { DebtorEntity } from '../entities/debtors.entity';
-import { DebtorStatistics } from './debtorStatistics.interface';
 import { DebtEntity } from '../entities/debts.entity';
+import { DebtorStatistics } from './debtorStatistics.interface';
 
 export async function generateDebtorStatistics(
   debtor: DebtorEntity,
   debtRepository: Repository<DebtEntity>
-) {
+): Promise<DebtorStatistics> {
   // Consultar la cantidad de préstamos en el último mes y año
-  const debtorStatisticsArray: DebtorStatistics[] = [];
   const currentDate = new Date();
   const lastMonthDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
   const lastYearDate = new Date(currentDate.getFullYear() - 1, 0, 1);
@@ -44,6 +43,7 @@ export async function generateDebtorStatistics(
     if (!clientLoansMap.has(clientName)) {
       clientLoansMap.set(clientName, 0);
     }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     clientLoansMap.set(clientName, clientLoansMap.get(clientName)! + 1);
   });
 
@@ -53,7 +53,6 @@ export async function generateDebtorStatistics(
     loans,
   }));
 
-  // Guardar estadísticas del deudor
   return {
     debtor,
     statistics: {
