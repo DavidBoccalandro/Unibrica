@@ -11,7 +11,6 @@ import { findOrCreateSheet } from 'src/reversal/utils/reversal.util';
 import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDto';
 import { RepeatedDebtorEntity } from 'src/repeated-debtor/entities/repeated-debtor.entity';
 import { generateDebtorStatistics } from '../utils/generateDebtorStatistics.utils';
-import { DebtorStatistics } from '../utils/debtorStatistics.interface';
 import { generateExcelWithStatistics } from '../utils/generateDebtExcel';
 
 @Injectable()
@@ -74,10 +73,10 @@ export class DebtsService {
     const allBanks = await this.bankRepository.find();
     const bankMap = new Map(allBanks.map((bank) => [bank.bankId, bank]));
 
-    const allDebtors = await this.debtorRepository.find();
+    const allDebtors = await this.debtorRepository.find({ relations: ['sheet'] });
     const debtorsMap = new Map(allDebtors.map((debtor) => [debtor.dni, debtor]));
 
-    const debtorStatisticsMap = new Map<string, DebtorStatistics>();
+    const debtorIds: string[] = [];
 
     for (const row of excelData) {
       //% Check if debt exists
@@ -120,9 +119,7 @@ export class DebtsService {
           }
         }
 
-        const debtorStatistics = await generateDebtorStatistics(debtor, this.debtRepository);
-        // console.log('Debtor statistics:', JSON.stringify(debtorStatistics));
-        debtorStatisticsMap.set(debtor.id, debtorStatistics);
+        debtorIds.push(debtor.id);
       }
 
       // Create a new debt
@@ -158,8 +155,10 @@ export class DebtsService {
       await this.debtorRepository.save(debtors);
       await this.debtRepository.save(debts);
 
-      // Generar el archivo Excel con estadísticas
-      await generateExcelWithStatistics(debts, debtorStatisticsMap, fileName);
+      //% Genera las estadísticas de los deudores
+      const debtorStatistics = await generateDebtorStatistics(debtorIds, this.debtRepository);
+      //% Generar el archivo Excel con estadísticas
+      await generateExcelWithStatistics(debts, debtorStatistics, fileName);
       console.log('Se generó el Excel modificado');
     } catch (error) {
       console.error('Error saving entities:', error);
