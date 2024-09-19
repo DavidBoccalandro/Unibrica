@@ -88,7 +88,6 @@ export class PaymentsComponent {
 
     this.subscriptions.push(
       this.filterService.generateExcel$.subscribe((data) => {
-        console.log('generateExcel: ', data)
         if(data) {
           this.generateExcel();
         }

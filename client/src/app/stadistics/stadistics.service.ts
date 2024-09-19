@@ -139,6 +139,22 @@ export class StadisticsService {
     });
   }
 
+  getAllReversalsWithoutPagination(
+    params: StatisticsParams2
+  ): Observable<{ totalItems: number; reversals: Reversal[] }> {
+    let httpParams = new HttpParams()
+      .set('limit', '')
+      .set('offset', '')
+      .set('stringFilters', JSON.stringify(params.stringFilters))
+      .set('numericFilters', JSON.stringify(params.numericFilters))
+      .set('dateFilters', JSON.stringify(params.dateFilters));
+
+    return this.http.get<{ totalItems: number; reversals: Reversal[] }>(this.ReversalURL, {
+      params: httpParams,
+      withCredentials: true,
+    });
+  }
+
   navigateWithQueryParams(pageInfo: PageEvent, filters: FilterValues, route: string): void {
     const queryParams: any = {
       pageIndex: pageInfo.pageIndex || 1,

@@ -6,7 +6,6 @@ import { saveAs } from 'file-saver';
 export async function generatePaymentExcel(payments: Payment[]) {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Pagos');
-  console.log('payments en generatePaymentExcel: ', payments)
 
   // Definir las columnas del archivo Excel
   worksheet.columns = [
@@ -140,8 +139,6 @@ export async function generatePaymentExcel(payments: Payment[]) {
   // Estilizar encabezados
   worksheet.getRow(1).font = { bold: true };
 
-
-  console.log('Ahora te creo el Excel!')
   // Generar el archivo Excel en formato blob
   workbook.xlsx.writeBuffer().then((buffer) => {
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });

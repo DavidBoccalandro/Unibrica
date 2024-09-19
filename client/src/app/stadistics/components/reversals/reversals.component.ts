@@ -5,6 +5,7 @@ import { Subscription, BehaviorSubject, debounceTime, take } from 'rxjs';
 import { FilterService } from 'src/app/core/services/filter.service';
 import { MatTableDataSourceInput } from 'src/app/shared/table/table.component';
 import { StatisticsParams, StadisticsService } from '../../stadistics.service';
+import { generateReversalExcel } from '../payments/utils/generateReversalExcel.util';
 
 export interface Reversal {
   id: number;
@@ -15,8 +16,8 @@ export interface Reversal {
   branchCode: number;
   accountType: number;
   accountNumber: string;
-  currentID: string;
-  debitID: string;
+  currentId: string;
+  debitId: string;
   movementFunction: string;
   rejectionCode: string;
   dueDate: Date;
@@ -75,6 +76,14 @@ export class ReversalsComponent {
         }
       })
     )
+
+    this.subscriptions.push(
+      this.filterService.generateExcel$.subscribe((data) => {
+        if(data) {
+          this.generateExcel();
+        }
+      })
+    );
   }
 
   resetParams() {
@@ -104,6 +113,18 @@ export class ReversalsComponent {
       limit: page.pageSize,
       offset: page.pageIndex * page.pageSize,
     });
+  }
+
+  generateExcel() {
+    this.statisticsService
+      .getAllReversalsWithoutPagination(this.params.getValue())
+      .pipe(take(1))
+      .subscribe((data) => {
+        const allReversals = data.reversals;
+        generateReversalExcel(allReversals);
+      });
+
+    this.filterService.resetExportToExcel();
   }
 
   ngOnDestroy(): void {
