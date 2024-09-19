@@ -40,7 +40,7 @@ export class FilesComponent implements OnDestroy {
     // 'clients',
     'client.name',
   ];
-  tableColumnsAll: string[] = [...this.tableColumns, 'download'];
+  tableColumnsAll: string[] = [...this.tableColumns, 'originalFile', 'modifiedFile'];
   clickableColumns = new Set<string>([]);
   subscriptions: Subscription[] = [];
   params = new BehaviorSubject<StatisticsParams2>({
@@ -122,10 +122,14 @@ export class FilesComponent implements OnDestroy {
     });
   }
 
-  download(element: any) {
+  download(element: any, option?: string) {
+    console.log('Element', element);
     let name = element.fileName;
     if (name.match(/\.[^/.]+$/)) {
       name = name.replace(/\.[^/.]+$/, '');
+    }
+    if(option && option === 'modificado') {
+      name = name + '- Modificado';
     }
     this.filesService.downloadSheet(name).subscribe(
       (data: Blob) => {

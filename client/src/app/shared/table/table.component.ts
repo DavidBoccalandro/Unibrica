@@ -65,6 +65,8 @@ export const columnNamesMap: { [key: string]: string } = {
   filename: 'Nombre archivo',
   date: 'Fecha de archivo',
   fileName: 'Nombre de archivo',
+  originalFile: 'Archivo original',
+  modifiedFile: 'Archivo modificado',
   'debtor.dni': 'DNI',
   'sheet.date': 'Fecha Archivo',
   'bank.bankId': 'Banco',
