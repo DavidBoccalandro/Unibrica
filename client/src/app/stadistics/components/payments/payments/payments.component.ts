@@ -1,11 +1,12 @@
 import { Component, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-import { BehaviorSubject, debounceTime, Subscription, take } from 'rxjs';
+import { BehaviorSubject, Subscription, take } from 'rxjs';
 import { MatTableDataSourceInput } from 'src/app/shared/table/table.component';
 import { StadisticsService, StatisticsParams2 } from 'src/app/stadistics/stadistics.service';
 import { FilterService } from '../../../../core/services/filter.service';
 import { Sheet } from 'src/app/shared/interfaces/sheet.interface';
+import { generatePaymentExcel } from '../utils/generatePaymentExcel.util';
 
 export interface Payment {
   id: number;
@@ -26,6 +27,8 @@ export interface Payment {
   chargedAmount: number;
   remainingDebt: number;
   sheet: Sheet;
+  rejectCode?: string;
+  rejectText?: string;
 }
 
 @Component({
@@ -55,7 +58,7 @@ export class PaymentsComponent {
     'chargedAmount',
     'remainingDebt',
     'rejectCode',
-    'rejectText'
+    'rejectText',
   ];
   clickableColumns = new Set<string>([this.tableColumns[0]]);
   subscriptions: Subscription[] = [];
@@ -76,9 +79,18 @@ export class PaymentsComponent {
         if (!value) {
           this.resetParams();
         } else {
-          const newParams = { ...this.params.getValue(), ...value,  offset: 0};
+          const newParams = { ...this.params.getValue(), ...value, offset: 0 };
           // this.paginator.pageIndex = 0;
           this.params.next(newParams);
+        }
+      })
+    );
+
+    this.subscriptions.push(
+      this.filterService.generateExcel$.subscribe((data) => {
+        console.log('generateExcel: ', data)
+        if(data) {
+          this.generateExcel();
         }
       })
     );
@@ -111,6 +123,18 @@ export class PaymentsComponent {
       limit: page.pageSize,
       offset: page.pageIndex * page.pageSize,
     });
+  }
+
+  generateExcel() {
+    this.statisticsService
+      .getAllPaymentsWithoutPagination(this.params.getValue())
+      .pipe(take(1))
+      .subscribe((data) => {
+        const allPayments = data.payments;
+        generatePaymentExcel(allPayments);
+      });
+
+    this.filterService.resetExportToExcel();
   }
 
   ngOnDestroy(): void {

@@ -11,6 +11,7 @@ export interface FilterParams {
   providedIn: 'root',
 })
 export class FilterService {
+
   // private searchValueSubject = new BehaviorSubject<string>('');
   // searchValue$: Observable<string> = this.searchValueSubject.asObservable();
 
@@ -32,6 +33,9 @@ export class FilterService {
   private filterFormSubject = new BehaviorSubject<any>('');
   filterForm$: Observable<any> = this.filterFormSubject.asObservable();
 
+  private generateExcelSubject = new BehaviorSubject<boolean>(false);
+  generateExcel$: Observable<boolean> = this.generateExcelSubject.asObservable();
+
   constructor() {}
 
   updateSearchField(field: string): void {
@@ -44,5 +48,13 @@ export class FilterService {
 
   updateFilterForm(filterForm: FormArray<any>) {
     this.filterFormSubject.next(filterForm)
+  }
+
+  exportToExcel() {
+    this.generateExcelSubject.next(true);
+  }
+
+  resetExportToExcel() {
+    this.generateExcelSubject.next(false);
   }
 }

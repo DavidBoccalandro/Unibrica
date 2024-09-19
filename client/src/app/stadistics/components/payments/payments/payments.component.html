@@ -1,2 +1,22 @@
-<app-table [dataSource]="tableData" [columns]="tableColumns" [clickableColumns]="clickableColumns"></app-table>
-<mat-paginator [length]="totalItems" [pageSizeOptions]="[10, 25, 50]" (page)="handleClick($event)" showFirstLastButtons></mat-paginator>
+<div class="table-container">
+  <!-- Tabla de pagos -->
+  <app-table [dataSource]="tableData" [columns]="tableColumns" [clickableColumns]="clickableColumns"></app-table>
+
+  <!-- Paginador -->
+  <mat-paginator
+    [length]="totalItems"
+    [pageSizeOptions]="[10, 25, 50]"
+    (page)="handleClick($event)"
+    showFirstLastButtons
+  ></mat-paginator>
+
+  <!-- Botón flotante para exportar a Excel -->
+  <!-- <button
+    mat-fab
+    class="fab-bottom-left"
+    aria-label="Export to Excel"
+    (click)="generateExcel()"
+  >
+    <mat-icon>file_download</mat-icon>
+  </button> -->
+</div>

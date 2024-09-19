@@ -12,9 +12,6 @@
     </button>
   </nav>
   <mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
-  <div class="filters" [class.shown]="filtersShown" hidden="true">
-    <app-filter [currentRoute]="currentRoute"></app-filter>
-  </div>
   <div class="filters" class="modal" [class.hidden]="!filtersShown" >
     <app-filter-modal [currentRoute]="currentRoute"></app-filter-modal>
   </div>

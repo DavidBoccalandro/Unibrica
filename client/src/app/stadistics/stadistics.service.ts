@@ -87,20 +87,6 @@ export class StadisticsService {
       .set('numericFilters', JSON.stringify(params.numericFilters))
       .set('dateFilters', JSON.stringify(params.dateFilters));
 
-    // if (params.startDate) {
-    //   httpParams = httpParams.set('startDate', params.startDate);
-    // }
-
-    // if (params.endDate) {
-    //   const adjustedEndDate = new Date(params.endDate);
-    //   adjustedEndDate.setHours(23, 59, 59, 999);
-    //   httpParams = httpParams.set('endDate', adjustedEndDate.toISOString());
-    // }
-
-    // if (params.date) {
-    //   httpParams = httpParams.set('date', params.date);
-    // }
-
     return this.http.get<{ totalItems: number; payments: Payment[] }>(this.PaymentsUrl, {
       params: httpParams,
       withCredentials: true,
@@ -111,11 +97,11 @@ export class StadisticsService {
     params: StatisticsParams2
   ): Observable<{ totalItems: number; reversals: Reversal[] }> {
     let httpParams = new HttpParams()
-    .set('limit', params.limit.toString())
-    .set('offset', params.offset.toString())
-    .set('stringFilters', JSON.stringify(params.stringFilters))
-    .set('numericFilters', JSON.stringify(params.numericFilters))
-    .set('dateFilters', JSON.stringify(params.dateFilters));
+      .set('limit', params.limit.toString())
+      .set('offset', params.offset.toString())
+      .set('stringFilters', JSON.stringify(params.stringFilters))
+      .set('numericFilters', JSON.stringify(params.numericFilters))
+      .set('dateFilters', JSON.stringify(params.dateFilters));
 
     return this.http.get<{ totalItems: number; reversals: Reversal[] }>(this.ReversalURL, {
       params: httpParams,
@@ -123,17 +109,31 @@ export class StadisticsService {
     });
   }
 
-  getAllSheets(
-    params: StatisticsParams2
-  ): Observable<{ totalItems: number; sheets: File[] }> {
+  getAllSheets(params: StatisticsParams2): Observable<{ totalItems: number; sheets: File[] }> {
     let httpParams = new HttpParams()
-    .set('limit', params.limit.toString())
-    .set('offset', params.offset.toString())
-    .set('stringFilters', JSON.stringify(params.stringFilters))
-    .set('numericFilters', JSON.stringify(params.numericFilters))
-    .set('dateFilters', JSON.stringify(params.dateFilters));
+      .set('limit', params.limit.toString())
+      .set('offset', params.offset.toString())
+      .set('stringFilters', JSON.stringify(params.stringFilters))
+      .set('numericFilters', JSON.stringify(params.numericFilters))
+      .set('dateFilters', JSON.stringify(params.dateFilters));
 
     return this.http.get<{ totalItems: number; sheets: File[] }>(this.SheetsURL, {
+      params: httpParams,
+      withCredentials: true,
+    });
+  }
+
+  getAllPaymentsWithoutPagination(
+    params: StatisticsParams2
+  ): Observable<{ totalItems: number; payments: Payment[] }> {
+    let httpParams = new HttpParams()
+      .set('limit', '')
+      .set('offset', '')
+      .set('stringFilters', JSON.stringify(params.stringFilters))
+      .set('numericFilters', JSON.stringify(params.numericFilters))
+      .set('dateFilters', JSON.stringify(params.dateFilters));
+
+    return this.http.get<{ totalItems: number; payments: Payment[] }>(this.PaymentsUrl, {
       params: httpParams,
       withCredentials: true,
     });

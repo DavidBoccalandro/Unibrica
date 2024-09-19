@@ -240,4 +240,12 @@ export class FilterModalComponent implements OnDestroy {
     )?.type;
     return filterType!;
   }
+
+  exportToExcel() {
+    this.filterService.exportToExcel();
+  }
+
+  close(): void {
+    this.dialogRef.close();
+  }
 }

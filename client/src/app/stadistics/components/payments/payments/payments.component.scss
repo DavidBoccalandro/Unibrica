@@ -1,0 +1,12 @@
+.table-container {
+  position: relative;
+}
+
+.fab-bottom-left {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 1000; /* Asegúrate de que el botón esté por encima de otros elementos */
+  background-color: #3f51b5; /* Color opcional */
+  color: white;
+}
