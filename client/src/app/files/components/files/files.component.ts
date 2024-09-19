@@ -17,6 +17,7 @@ import { UploadFileService } from 'src/app/core/services/upload-file.service';
 export interface File {
   date: Date;
   fileName: string;
+  type?: string;
   debts?: Debt[];
   payments?: Payment[];
   reversals?: Reversal[];

@@ -15,6 +15,9 @@ export class SheetsEntity extends BaseEntity {
   @Column()
   fileName: string;
 
+  @Column({ nullable: true })
+  type: string;
+
   @OneToMany(() => DebtEntity, (debt) => debt.sheet, { nullable: true })
   debts: DebtEntity[];
 

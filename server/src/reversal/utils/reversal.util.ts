@@ -22,6 +22,7 @@ export async function findOrCreateSheet(
       fileName: originalFileName,
       date,
       client,
+      type: fileType,
     });
     await sheetRepository.save(sheet);
   }
