@@ -1,0 +1,80 @@
+<div [formGroup]="filtersForm" class="filter-modal-container">
+  <div class="filter-selector">
+    <mat-form-field
+      subscriptSizing="dynamic"
+      id="file-type-form-field"
+      appearance="outline"
+      class="file-type-form-field"
+      floatLabel="always"
+    >
+      <mat-label>Campo a buscar</mat-label>
+      <mat-select (selectionChange)="changeSearchField($event)">
+        <mat-option *ngFor="let option of selectOptions[currentRoute]" [value]="option.label">{{
+          option.label
+        }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-mini-fab (click)="addFilter()">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+
+  <ng-container formArrayName="filters">
+    <ng-container *ngFor="let filter of filtersControl; let i = index">
+      <div class="filter-container" [formGroup]="filter">
+        <mat-form-field appearance="outline" color="primary" class="input-form-field">
+          <input type="text" matInput formControlName="name" readonly />
+        </mat-form-field>
+
+        <!-- Campo para el operador, solo para filtros numéricos -->
+        <ng-container *ngIf="filterType(filter) === 'numeric'">
+          <mat-form-field
+            appearance="outline"
+            color="primary"
+            class="input-form-field operator-select"
+          >
+            <mat-label>Operador</mat-label>
+            <mat-select formControlName="operator">
+              <mat-option value=">"> > </mat-option>
+              <mat-option value="<"> < </mat-option>
+              <mat-option value="="> = </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </ng-container>
+
+        <!-- Campo para el valor del filtro -->
+        <ng-container *ngIf="filterType(filter) !== 'date'">
+          <mat-form-field appearance="outline" color="primary" class="input-form-field">
+            <input type="text" matInput formControlName="value" />
+          </mat-form-field>
+        </ng-container>
+
+        <!-- Filtro por fechas -->
+        <mat-form-field
+          subscriptSizing="dynamic"
+          appearance="outline"
+          class="range-picker-form input-form-field"
+          *ngIf="filterType(filter) === 'date'"
+        >
+          <mat-label>Rango de búsqueda</mat-label>
+          <mat-date-range-input [rangePicker]="dateRangePicker">
+            <input matStartDate placeholder="Fecha de inicio" formControlName="start" />
+            <input matEndDate placeholder="Fecha de fin" formControlName="end" />
+          </mat-date-range-input>
+          <mat-datepicker-toggle matIconSuffix [for]="dateRangePicker"></mat-datepicker-toggle>
+          <mat-date-range-picker #dateRangePicker></mat-date-range-picker>
+        </mat-form-field>
+
+        <button mat-mini-fab class="delete-filter-button" (click)="removeFilter(i)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <div class="buttons">
+    <button mat-stroked-button color="warn" (click)="resetFilters()">Reset</button>
+    <button mat-flat-button color="primary" (click)="filtrar()">Filtrar</button>
+  </div>
+</div>

@@ -3,8 +3,9 @@ import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { BehaviorSubject, debounceTime, Subscription, take } from 'rxjs';
 import { MatTableDataSourceInput } from 'src/app/shared/table/table.component';
-import { StadisticsService, StatisticsParams } from 'src/app/stadistics/stadistics.service';
+import { StadisticsService, StatisticsParams2 } from 'src/app/stadistics/stadistics.service';
 import { FilterService } from '../../../../core/services/filter.service';
+import { Sheet } from 'src/app/shared/interfaces/sheet.interface';
 
 export interface Payment {
   id: number;
@@ -21,7 +22,10 @@ export interface Payment {
   debitSequence: number;
   installmentNumber: number;
   debitStatus: string;
+  debtAmount: number;
   chargedAmount: number;
+  remainingDebt: number;
+  sheet: Sheet;
 }
 
 @Component({
@@ -36,23 +40,25 @@ export class PaymentsComponent {
     // 'id',
     // 'recordType',
     'agreementNumber',
-    'creditCompany',
+    // 'creditCompany',
     'companyAccountNumber',
     'bankAccountNumber',
     'debitDate',
-    'bank',
-    'customerAccountType',
+    'sheet.date',
+    'bank.bankId',
+    // 'customerAccountType',
     'branchCode',
-    'debitSequence',
-    'installmentNumber',
+    // 'debitSequence',
+    // 'installmentNumber',
     'debitStatus',
     'debtAmount',
     'chargedAmount',
+    'remainingDebt',
   ];
   clickableColumns = new Set<string>([this.tableColumns[0]]);
   subscriptions: Subscription[] = [];
-  params = new BehaviorSubject<StatisticsParams>({
-    limit: 5,
+  params = new BehaviorSubject<StatisticsParams2>({
+    limit: 10,
     offset: 0,
   });
   $params = this.params.asObservable();
@@ -64,51 +70,21 @@ export class PaymentsComponent {
     this.$params.subscribe(() => this.fetchPayments());
 
     this.subscriptions.push(
-      this.filterService.searchValue$.pipe(debounceTime(500)).subscribe((searchValue) => {
-        const newParams = { ...this.params.getValue(), filterValue: searchValue };
-        this.params.next(newParams);
-        this.resetParams();
-        this.fetchPayments();
-      })
-    );
-
-    this.subscriptions.push(
-      this.filterService.searchField$.subscribe((value) => {
-        const newParams = { ...this.params.getValue(), filterBy: value };
-        this.params.next(newParams);
-        this.fetchPayments();
-      })
-    );
-
-    this.subscriptions.push(
-      this.filterService.rangeStart$.subscribe((startDate) => {
-        // const newParams = { ...this.params.getValue(), startDate, date: 'createdAt' };
-        const newParams = {
-          ...this.params.getValue(),
-          date: 'createdAt',
-          startDate: startDate ? startDate.toISOString() : undefined,
-        };
-        this.params.next(newParams);
-        this.resetParams();
-      })
-    );
-
-    this.subscriptions.push(
-      this.filterService.rangeEnd$.subscribe((endDate) => {
-        const newParams = {
-          ...this.params.getValue(),
-          date: 'createdAt',
-          endDate: endDate ? endDate.toISOString() : undefined  // Convertir a string
-        };
-        this.params.next(newParams);
-        this.resetParams();
+      this.filterService.filters$.subscribe((value) => {
+        if (!value) {
+          this.resetParams();
+        } else {
+          const newParams = { ...this.params.getValue(), ...value };
+          this.params.next(newParams);
+        }
       })
     );
   }
+
   resetParams() {
-    if(this.paginator) {
+    if (this.paginator) {
       const currentPageSize = this.paginator?.pageSize ?? 10;
-      this.params.next({ ...this.params.getValue(), offset: 0, limit: currentPageSize });
+      this.params.next({ offset: 0, limit: 10 });
       this.paginator.pageIndex = 0;
     }
   }
@@ -118,6 +94,7 @@ export class PaymentsComponent {
       .getAllPayments(this.params.getValue())
       .pipe(take(1))
       .subscribe((data) => {
+        // console.log('PAYMENTS: ', data)
         this.payments = data.payments;
         this.totalItems = data.totalItems;
         this.tableData = new MatTableDataSource<MatTableDataSourceInput>(this.payments);

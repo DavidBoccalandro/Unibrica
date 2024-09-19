@@ -28,10 +28,10 @@ export class ReversalRecord extends BaseEntity {
   accountNumber: string;
 
   @Column()
-  currentID: string;
+  currentId: string;
 
   @Column({ type: 'varchar', length: 15 })
-  debitID: string;
+  debitId: string;
 
   @Column({ type: 'varchar', length: 2 })
   movementFunction: string;

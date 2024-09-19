@@ -1,0 +1,73 @@
+.filter-modal-container {
+  width: 600px;
+  padding: 25px;
+
+  input {
+    text-align: center;
+  }
+
+  .operator-select {
+    width: 130px;
+  }
+}
+
+.filter-selector {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.file-type-form-field {
+  width: 100%;
+  margin-top: 0.4em;
+
+  mat-select {
+    height: 2.5em;
+    margin-top: 1em;
+  }
+}
+
+.filter-container {
+  display: flex;
+  gap: 20px;
+}
+
+.input-form-field {
+  line-height: 2rem;
+  padding-top: 5px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  button {
+    padding: 20px;
+    font-size: 17px;
+  }
+}
+
+.range-picker-form{
+  width: 300px;
+  padding-bottom: 20px;
+
+
+  mat-date-range-input{
+    display: flex;
+    flex-direction: column;
+    font-size: small;
+    margin-top: 17px;
+    height: 2em;
+  }
+}
+
+.delete-filter-button {
+  // align-self: center;
+  margin-top: 5px;
+}
+
+mat-select {
+  text-align: center;
+}

@@ -33,6 +33,20 @@
   max-height: calc(56px*4);
 }
 
+.hidden {
+  display: none;
+}
+.modal {
+  position: absolute;
+  min-width: 600px;
+  right: 2.4vw;
+  top: 10vh;
+  z-index: 5;
+  background-color: white;
+  padding: 25px;
+  border: 2px lightgray solid;
+}
+
 .statistics-container {
   display: flex;
   flex-direction: column;

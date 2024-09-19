@@ -23,7 +23,6 @@ export interface PaginationQueryDto {
   startDate: Date;
   endDate: Date;
 }
-
 @Controller('debts')
 export class DebtsController {
   constructor(private readonly debtsService: DebtsService) {}
@@ -41,7 +40,30 @@ export class DebtsController {
   }
 
   @Get('all')
-  public async getAllDebts(@Query() paginationQuery: PaginationQueryDto) {
-    return await this.debtsService.getAllDebts(paginationQuery);
+  public async getAllDebts(
+    @Query('limit') limit: number,
+    @Query('offset') offset: number,
+    @Query('stringFilters') stringFilters: string,
+    @Query('numericFilters') numericFilters: string,
+    @Query('dateFilters') dateFilters: string
+  ) {
+    let parsedStringFilters, parsedNumericFilters, parsedDateFilters;
+    if (stringFilters && stringFilters !== 'undefined') {
+      parsedStringFilters = JSON.parse(stringFilters);
+    }
+    if (numericFilters && numericFilters !== 'undefined') {
+      parsedNumericFilters = JSON.parse(numericFilters);
+    }
+    if (dateFilters && dateFilters !== 'undefined') {
+      parsedDateFilters = JSON.parse(dateFilters);
+    }
+
+    return this.debtsService.getAllDebts({
+      limit,
+      offset,
+      stringFilters: parsedStringFilters,
+      numericFilters: parsedNumericFilters,
+      dateFilters: parsedDateFilters,
+    });
   }
 }

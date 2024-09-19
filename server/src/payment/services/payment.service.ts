@@ -5,12 +5,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { PaymentRecord } from '../entities/payment.entity';
 import { BankEntity } from 'src/banks/entities/banks.entity';
-import { PaginationQueryDto } from 'src/debts/controllers/debts.controller';
 import * as XLSX from 'xlsx';
 import { DebtEntity } from 'src/debts/entities/debts.entity';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
 import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
 import { findOrCreateSheet } from 'src/reversal/utils/reversal.util';
+import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDto';
 
 @Injectable()
 export class PaymentService {
@@ -31,11 +31,7 @@ export class PaymentService {
     private sheetRepository: Repository<SheetsEntity>
   ) {}
 
-  async uploadPaymentSheet(
-    file: Express.Multer.File,
-    clientId: string,
-    clientName: string
-  ): Promise<PaymentRecord[]> {
+  async uploadPaymentSheet(file: Express.Multer.File, clientId: string): Promise<PaymentRecord[]> {
     if (!file) {
       throw new Error('No file provided');
     }
@@ -78,6 +74,7 @@ export class PaymentService {
         const installmentNumber = parseInt(line.substring(85, 87).trim(), 10);
         const debitStatus = line.substring(87, 88).trim();
         const chargedAmount = parseFloat(line.substring(108, 119).trim()) / 100;
+        const remainingDebt = debtAmount - chargedAmount;
 
         let bank = bankMap.get(bankCode);
 
@@ -141,6 +138,7 @@ export class PaymentService {
           installmentNumber,
           debitStatus,
           chargedAmount,
+          remainingDebt,
           debt,
           client,
           sheet,
@@ -161,31 +159,91 @@ export class PaymentService {
     return processedData;
   }
 
-  async findAll(
-    paginationQuery: PaginationQueryDto
+  async getAllPayments(
+    paginationQuery: PaginationFilterQueryDto
   ): Promise<{ payments: PaymentRecord[]; totalItems: number }> {
-    const { limit, offset, sortBy, sortOrder, filterBy, filterValue, date, startDate, endDate } =
+    const { limit, offset, sortBy, sortOrder, stringFilters, numericFilters, dateFilters } =
       paginationQuery;
     let queryBuilder = this.paymentRecordRepository
       .createQueryBuilder('payment_records')
-      .leftJoinAndSelect('payment_records.bank', 'bank');
+      .leftJoinAndSelect('payment_records.bank', 'bank')
+      .leftJoinAndSelect('payment_records.sheet', 'sheet')
+      .leftJoinAndSelect('payment_records.client', 'client');
 
-    if (filterBy && ['companyAccountNumber', 'bankAccountNumber'].includes(filterBy)) {
-      const lowerFilterValue = filterValue.toLowerCase();
-      queryBuilder = queryBuilder.where(`LOWER(payment_records.${filterBy}) LIKE :filterValue`, {
-        filterValue: `%${lowerFilterValue}%`,
+    // Aplicar filtros de cadenas (stringFilters)
+    if (stringFilters && stringFilters.length > 0) {
+      stringFilters.forEach((filter) => {
+        const { filterBy, filterValue } = filter;
+        console.log('filterBy: ', filterBy);
+        // console.log('filterValue type: ', typeof filterValue);
+        if (filterBy === 'clientName') {
+          queryBuilder = queryBuilder.andWhere(`LOWER(client.name) LIKE :filterValue`, {
+            filterValue: `%${filterValue.toLowerCase()}%`,
+          });
+        } else {
+          queryBuilder = queryBuilder.andWhere(
+            `LOWER(payment_records.${filterBy}) LIKE :filterValue`,
+            { filterValue: `%${filterValue.toLowerCase()}%` }
+          );
+        }
       });
     }
 
-    if (startDate && endDate) {
-      if (date && ['createdAt', 'updatedAt', 'dueDate'].includes(date)) {
-        queryBuilder = queryBuilder.andWhere(
-          `payment_records.${date} >= :startDate AND payment_records.${date} <= :endDate`,
-          { startDate, endDate }
-        );
-      } else {
-        throw new BadRequestException('Invalid date field specified for filtering');
-      }
+    // Aplicar filtros numéricos (numericFilters)
+    if (numericFilters && numericFilters.length > 0) {
+      numericFilters.forEach((filter, index) => {
+        const { filterBy, operator, filterValue } = filter;
+        const value = Number(filterValue);
+
+        if (operator === '=' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} = :value${index}`, {
+            [`value${index}`]: value,
+          });
+        } else if (operator === '<' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} < :value${index}`, {
+            [`value${index}`]: value,
+          });
+        } else if (operator === '>' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} > :value${index}`, {
+            [`value${index}`]: value,
+          });
+        } else if (operator === '<=' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} <= :value${index}`, {
+            [`value${index}`]: value,
+          });
+        } else if (operator === '>=' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} >= :value${index}`, {
+            [`value${index}`]: value,
+          });
+        }
+      });
+    }
+
+    // Aplicar filtros de fechas (dateFilters)
+    if (dateFilters && dateFilters.length > 0) {
+      dateFilters.forEach((filter, index) => {
+        const { filterBy, startDate, endDate } = filter;
+
+        if (filterBy === 'fileDate' && startDate && endDate) {
+          queryBuilder = queryBuilder.andWhere(
+            `sheet.date BETWEEN :startDate${index} AND :endDate${index}`,
+            {
+              [`startDate${index}`]: startDate,
+              [`endDate${index}`]: endDate,
+            }
+          );
+        } else if (startDate && endDate && filterBy) {
+          queryBuilder = queryBuilder.andWhere(
+            `payment_records.${filterBy} BETWEEN :startDate${index} AND :endDate${index}`,
+            {
+              [`startDate${index}`]: startDate,
+              [`endDate${index}`]: endDate,
+            }
+          );
+        } else {
+          throw new BadRequestException('Invalid date range or field for filtering');
+        }
+      });
     }
 
     // Ejecuta la consulta para obtener el total de elementos

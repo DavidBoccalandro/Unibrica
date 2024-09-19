@@ -16,7 +16,7 @@ import { FilterService } from 'src/app/core/services/filter.service';
 })
 export class DebtsComponent implements OnDestroy {
   tableData!: MatTableDataSource<MatTableDataSourceInput>;
-  tableColumns: string[] = ['idDebt', 'createdAt', 'updatedAt', 'dueDate', 'amount'];
+  tableColumns: string[] = ['account', 'debtor.dni', 'idDebt', 'sheet.date', 'client.name', 'dueDate', 'branchCode', 'amount'];
   clickableColumns = new Set<string>();
   subscriptions: Subscription[] = [];
   debts: Debt[] = [];
@@ -32,46 +32,18 @@ export class DebtsComponent implements OnDestroy {
   constructor(private statisticsService: StadisticsService, private filterService: FilterService) {}
 
   ngOnInit(): void {
-    this.subscriptions.push(this.$params.subscribe(() => this.fetchDebts()))
-    this.subscriptions.push(this.filterService.searchValue$.pipe(debounceTime(500)).subscribe( searchValue => {
-      const newParams = { ...this.params.getValue(), filterValue: searchValue };
-      this.params.next(newParams);
-      this.fetchDebts()
-    }))
-    this.subscriptions.push(this.filterService.searchField$.subscribe( value => {
-      const newParams = { ...this.params.getValue(), filterBy: value };
-      this.params.next(newParams);
-      this.fetchDebts()
-      this.resetParams()
-    }))
+    this.$params.subscribe(() => this.fetchDebts());
 
     this.subscriptions.push(
-      this.filterService.rangeStart$.subscribe((startDate) => {
-        const newParams = {
-          ...this.params.getValue(),
-          date: 'createdAt',
-          startDate: startDate ? startDate.toISOString() : undefined,
-        };
-        this.params.next(newParams);
-        this.resetParams();
+      this.filterService.filters$.subscribe((value) => {
+        if(!value) {
+          this.resetParams()
+        } else {
+          const newParams = {...this.params.getValue(), ...value}
+          this.params.next(newParams);
+        }
       })
-    );
-
-    this.subscriptions.push(
-      this.filterService.rangeEnd$.subscribe((endDate) => {
-        const newParams = {
-          ...this.params.getValue(),
-          date: 'createdAt',
-          endDate: endDate ? endDate.toISOString() : undefined
-        };
-        this.params.next(newParams);
-        this.resetParams();
-      })
-    );
-
-    if (this.paginator && this.debts.length === 0) {
-      this.fetchDebts();
-    }
+    )
   }
 
   handleClick(page: PageEvent) {
@@ -91,6 +63,7 @@ export class DebtsComponent implements OnDestroy {
       .getAllDebts(this.params.getValue())
       .pipe(take(1))
       .subscribe((data) => {
+        // console.log('Debts: ', data)
         this.debts = data.debts;
         this.totalItems = data.totalItems;
         this.tableData = new MatTableDataSource<MatTableDataSourceInput>(this.debts);
@@ -101,7 +74,7 @@ export class DebtsComponent implements OnDestroy {
   resetParams() {
     if(this.paginator) {
       const currentPageSize = this.paginator?.pageSize ?? 10;
-      this.params.next({ ...this.params.getValue(), offset: 0, limit: currentPageSize });
+      this.params.next({offset: 0, limit: currentPageSize });
       this.paginator.pageIndex = 0;
     }
   }

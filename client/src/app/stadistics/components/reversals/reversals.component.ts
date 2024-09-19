@@ -37,22 +37,24 @@ export class ReversalsComponent {
     // 'recordType',
     'agreementNumber',
     // 'serviceNumber',
-    'companyNumber',
-    'bank',
+    // 'companyNumber',
+    'bank.bankId',
     'branchCode',
-    'accountType',
+    // 'accountType',
     'accountNumber',
-    'currentID',
-    'debitID',
+    'currentId',
+    'debitId',
     // 'movementFunction',
     // 'rejectionCode',
+    'client.name',
+    'sheet.date',
     'dueDate',
-    'debitAmount'
+    'debitAmount',
   ];
   clickableColumns = new Set<string>([this.tableColumns[0]]);
   subscriptions: Subscription[] = [];
   params = new BehaviorSubject<StatisticsParams>({
-    limit: 5,
+    limit: 10,
     offset: 0,
   });
   $params = this.params.asObservable();
@@ -64,51 +66,21 @@ export class ReversalsComponent {
     this.$params.subscribe(() => this.fetchReversals());
 
     this.subscriptions.push(
-      this.filterService.searchValue$.pipe(debounceTime(500)).subscribe((searchValue) => {
-        const newParams = { ...this.params.getValue(), filterValue: searchValue };
-        this.params.next(newParams);
-        this.resetParams();
-        this.fetchReversals();
+      this.filterService.filters$.subscribe((value) => {
+        if(!value) {
+          this.resetParams()
+        } else {
+          const newParams = {...this.params.getValue(), ...value, offset: 0}
+          this.params.next(newParams);
+        }
       })
-    );
-
-    this.subscriptions.push(
-      this.filterService.searchField$.subscribe((value) => {
-        const newParams = { ...this.params.getValue(), filterBy: value };
-        this.params.next(newParams);
-        this.fetchReversals();
-      })
-    );
-
-    this.subscriptions.push(
-      this.filterService.rangeStart$.subscribe((startDate) => {
-        // const newParams = { ...this.params.getValue(), startDate, date: 'createdAt' };
-        const newParams = {
-          ...this.params.getValue(),
-          date: 'createdAt',
-          startDate: startDate ? startDate.toISOString() : undefined,
-        };
-        this.params.next(newParams);
-        this.resetParams();
-      })
-    );
-
-    this.subscriptions.push(
-      this.filterService.rangeEnd$.subscribe((endDate) => {
-        const newParams = {
-          ...this.params.getValue(),
-          date: 'createdAt',
-          endDate: endDate ? endDate.toISOString() : undefined  // Convertir a string
-        };
-        this.params.next(newParams);
-        this.resetParams();
-      })
-    );
+    )
   }
+
   resetParams() {
     if(this.paginator) {
       const currentPageSize = this.paginator?.pageSize ?? 10;
-      this.params.next({ ...this.params.getValue(), offset: 0, limit: currentPageSize });
+      this.params.next({offset: 0, limit: currentPageSize });
       this.paginator.pageIndex = 0;
     }
   }

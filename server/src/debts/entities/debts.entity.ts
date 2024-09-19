@@ -13,7 +13,7 @@ export class DebtEntity extends BaseEntity implements IDebt {
   bank: BankEntity;
 
   @Column({ type: 'int' })
-  branch: number;
+  branchCode: number;
 
   @Column({ type: 'int' })
   accountType: number;

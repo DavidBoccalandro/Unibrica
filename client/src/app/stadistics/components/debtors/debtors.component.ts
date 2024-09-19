@@ -34,17 +34,6 @@ export class DebtorsComponent {
   ngOnInit(): void {
     this.$params.subscribe(() => this.fetchDebts())
 
-    this.subscriptions.push(this.filterService.searchValue$.pipe(debounceTime(500)).subscribe( searchValue => {
-      const newParams = { ...this.params.getValue(), filterValue: searchValue };
-      this.params.next(newParams);
-      this.fetchDebts()
-    }))
-    this.subscriptions.push(this.filterService.searchField$.subscribe( value => {
-      const newParams = { ...this.params.getValue(), filterBy: value };
-      this.params.next(newParams);
-      this.fetchDebts()
-    }))
-
     if (this.paginator && this.debtors?.length === 0) {
       this.fetchDebts();
     }

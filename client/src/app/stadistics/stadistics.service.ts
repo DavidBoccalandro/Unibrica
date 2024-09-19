@@ -20,6 +20,14 @@ export interface StatisticsParams {
   endDate?: string;
 }
 
+export interface StatisticsParams2 {
+  limit: number;
+  offset: number;
+  stringFilters?: { filterBy: string; filterValue: string }[];
+  numericFilters?: { filterBy: string; operator: string; filterValue: number }[];
+  dateFilters?: { filterBy: string; startDate: Date; endDate: Date }[];
+}
+
 @Injectable()
 export class StadisticsService {
   private DebtsUrl = `${environment.envVar.API_URL}/debts`;
@@ -42,26 +50,13 @@ export class StadisticsService {
     return this.params$;
   }
 
-  getAllDebts(params: StatisticsParams): Observable<any> {
+  getAllDebts(params: StatisticsParams2): Observable<any> {
     let httpParams = new HttpParams()
       .set('limit', params.limit.toString())
       .set('offset', params.offset.toString())
-      .set('filterBy', params.filterBy ?? 'debt_ID')
-      .set('filterValue', params.filterValue ?? '');
-
-    if (params.startDate) {
-      httpParams = httpParams.set('startDate', params.startDate);
-    }
-
-    if (params.endDate) {
-      const adjustedEndDate = new Date(params.endDate);
-      adjustedEndDate.setHours(23, 59, 59, 999);
-      httpParams = httpParams.set('endDate', adjustedEndDate.toISOString());
-    }
-
-    if (params.date) {
-      httpParams = httpParams.set('date', params.date);
-    }
+      .set('stringFilters', JSON.stringify(params.stringFilters))
+      .set('numericFilters', JSON.stringify(params.numericFilters))
+      .set('dateFilters', JSON.stringify(params.dateFilters));
 
     return this.http.get<any>(this.DebtsUrl + '/all', {
       params: httpParams,
@@ -81,27 +76,28 @@ export class StadisticsService {
   }
 
   getAllPayments(
-    params: StatisticsParams
+    params: StatisticsParams2
   ): Observable<{ totalItems: number; payments: Payment[] }> {
     let httpParams = new HttpParams()
       .set('limit', params.limit.toString())
       .set('offset', params.offset.toString())
-      .set('filterBy', params.filterBy ?? 'firstNames')
-      .set('filterValue', params.filterValue ?? '');
+      .set('stringFilters', JSON.stringify(params.stringFilters))
+      .set('numericFilters', JSON.stringify(params.numericFilters))
+      .set('dateFilters', JSON.stringify(params.dateFilters));
 
-    if (params.startDate) {
-      httpParams = httpParams.set('startDate', params.startDate);
-    }
+    // if (params.startDate) {
+    //   httpParams = httpParams.set('startDate', params.startDate);
+    // }
 
-    if (params.endDate) {
-      const adjustedEndDate = new Date(params.endDate);
-      adjustedEndDate.setHours(23, 59, 59, 999);
-      httpParams = httpParams.set('endDate', adjustedEndDate.toISOString());
-    }
+    // if (params.endDate) {
+    //   const adjustedEndDate = new Date(params.endDate);
+    //   adjustedEndDate.setHours(23, 59, 59, 999);
+    //   httpParams = httpParams.set('endDate', adjustedEndDate.toISOString());
+    // }
 
-    if (params.date) {
-      httpParams = httpParams.set('date', params.date);
-    }
+    // if (params.date) {
+    //   httpParams = httpParams.set('date', params.date);
+    // }
 
     return this.http.get<{ totalItems: number; payments: Payment[] }>(this.PaymentsUrl, {
       params: httpParams,
@@ -110,27 +106,14 @@ export class StadisticsService {
   }
 
   getAllReversals(
-    params: StatisticsParams
+    params: StatisticsParams2
   ): Observable<{ totalItems: number; reversals: Reversal[] }> {
     let httpParams = new HttpParams()
-      .set('limit', params.limit.toString())
-      .set('offset', params.offset.toString())
-      .set('filterBy', params.filterBy ?? 'serviceNumber')
-      .set('filterValue', params.filterValue ?? '');
-
-    if (params.startDate) {
-      httpParams = httpParams.set('startDate', params.startDate);
-    }
-
-    if (params.endDate) {
-      const adjustedEndDate = new Date(params.endDate);
-      adjustedEndDate.setHours(23, 59, 59, 999);
-      httpParams = httpParams.set('endDate', adjustedEndDate.toISOString());
-    }
-
-    if (params.date) {
-      httpParams = httpParams.set('date', params.date);
-    }
+    .set('limit', params.limit.toString())
+    .set('offset', params.offset.toString())
+    .set('stringFilters', JSON.stringify(params.stringFilters))
+    .set('numericFilters', JSON.stringify(params.numericFilters))
+    .set('dateFilters', JSON.stringify(params.dateFilters));
 
     return this.http.get<{ totalItems: number; reversals: Reversal[] }>(this.ReversalURL, {
       params: httpParams,

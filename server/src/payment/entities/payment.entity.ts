@@ -49,6 +49,9 @@ export class PaymentRecord extends BaseEntity {
   @Column({ type: 'float' })
   chargedAmount: number;
 
+  @Column({ type: 'float' })
+  remainingDebt: number;
+
   @ManyToOne(() => DebtEntity, (debt) => debt.payments, { nullable: true })
   debt: DebtEntity;
 

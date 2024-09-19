@@ -4,11 +4,11 @@ import { Repository } from 'typeorm';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { BankEntity } from '../../banks/entities/banks.entity';
 import { DebtEntity } from '../entities/debts.entity';
-import { PaginationQueryDto } from '../controllers/debts.controller';
 import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
 import { DebtorEntity } from '../entities/debtors.entity';
 import { findOrCreateSheet } from 'src/reversal/utils/reversal.util';
+import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDto';
 
 @Injectable()
 export class DebtsService {
@@ -93,7 +93,7 @@ export class DebtsService {
       debt.dueDate = dueDate;
 
       // Set additional properties
-      debt.branch = row['Sucursal'];
+      debt.branchCode = row['Sucursal'];
       debt.accountType = row['Tipo_Cuenta'];
       debt.account = row['Cuenta'];
       debt.currency = row['Moneda'];
@@ -116,27 +116,98 @@ export class DebtsService {
     }
   }
 
-  async getAllDebts(paginationQuery: PaginationQueryDto) {
-    const { limit, offset, sortBy, sortOrder, filterBy, filterValue, date, startDate, endDate } =
+  async getAllDebts(paginationQuery: PaginationFilterQueryDto) {
+    const { limit, offset, sortBy, sortOrder, stringFilters, numericFilters, dateFilters } =
       paginationQuery;
-    let queryBuilder = this.debtRepository.createQueryBuilder('debts');
+    let queryBuilder = this.debtRepository
+      .createQueryBuilder('debts')
+      .leftJoinAndSelect('debts.debtor', 'debtor')
+      .leftJoinAndSelect('debts.client', 'client')
+      .leftJoinAndSelect('debts.sheet', 'sheet');
 
-    if (filterBy && ['idDebt'].includes(filterBy)) {
-      const lowerFilterValue = filterValue.toLowerCase();
-      queryBuilder = queryBuilder.where(`LOWER(debts.${filterBy}) LIKE :filterValue`, {
-        filterValue: `%${lowerFilterValue}%`,
+    // Aplicar filtros de cadenas (stringFilters)
+    if (stringFilters && stringFilters.length > 0) {
+      stringFilters.forEach((filter, index) => {
+        const { filterBy, filterValue } = filter;
+
+        if (filterBy === 'debtorLastname') {
+          queryBuilder = queryBuilder.andWhere(`LOWER(debtor.lastname) LIKE :filterValue${index}`, {
+            [`filterValue${index}`]: `%${filterValue.toLowerCase()}%`,
+          });
+        } else if (filterBy === 'dni') {
+          queryBuilder = queryBuilder.andWhere(`LOWER(debtor.dni) LIKE :filterValue${index}`, {
+            [`filterValue${index}`]: `%${filterValue.toLowerCase()}%`,
+          });
+        } else if (filterBy === 'clientName') {
+          queryBuilder = queryBuilder.andWhere(`LOWER(client.name) LIKE :filterValue${index}`, {
+            [`filterValue${index}`]: `%${filterValue.toLowerCase()}%`,
+          });
+        } else {
+          queryBuilder = queryBuilder.andWhere(
+            `LOWER(debts.${filterBy}) LIKE :filterValue${index}`,
+            {
+              [`filterValue${index}`]: `%${filterValue.toLowerCase()}%`,
+            }
+          );
+        }
       });
     }
 
-    if (startDate && endDate) {
-      if (date && ['createdAt', 'updatedAt', 'dueDate'].includes(date)) {
-        queryBuilder = queryBuilder.andWhere(
-          `debts.${date} >= :startDate AND debt.${date} <= :endDate`,
-          { startDate, endDate }
-        );
-      } else {
-        throw new BadRequestException('Invalid date field specified for filtering');
-      }
+    // Aplicar filtros numéricos (numericFilters)
+    if (numericFilters && numericFilters.length > 0) {
+      numericFilters.forEach((filter, index) => {
+        const { filterBy, operator, filterValue } = filter;
+        const value = Number(filterValue);
+
+        if (operator === '=' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`debts.${filterBy} = :value${index}`, {
+            [`value${index}`]: value,
+          });
+        } else if (operator === '<' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`debts.${filterBy} < :value${index}`, {
+            [`value${index}`]: value,
+          });
+        } else if (operator === '>' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`debts.${filterBy} > :value${index}`, {
+            [`value${index}`]: value,
+          });
+        } else if (operator === '<=' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`debts.${filterBy} <= :value${index}`, {
+            [`value${index}`]: value,
+          });
+        } else if (operator === '>=' && !isNaN(value)) {
+          queryBuilder = queryBuilder.andWhere(`debts.${filterBy} >= :value${index}`, {
+            [`value${index}`]: value,
+          });
+        }
+      });
+    }
+
+    // Aplicar filtros de fechas (dateFilters)
+    if (dateFilters && dateFilters.length > 0) {
+      dateFilters.forEach((filter, index) => {
+        const { filterBy, startDate, endDate } = filter;
+
+        if (filterBy === 'fileDate' && startDate && endDate) {
+          queryBuilder = queryBuilder.andWhere(
+            `sheet.date BETWEEN :startDate${index} AND :endDate${index}`,
+            {
+              [`startDate${index}`]: startDate,
+              [`endDate${index}`]: endDate,
+            }
+          );
+        } else if (startDate && endDate && filterBy) {
+          queryBuilder = queryBuilder.andWhere(
+            `debts.${filterBy} BETWEEN :startDate${index} AND :endDate${index}`,
+            {
+              [`startDate${index}`]: startDate,
+              [`endDate${index}`]: endDate,
+            }
+          );
+        } else {
+          throw new BadRequestException('Invalid date range or field for filtering');
+        }
+      });
     }
 
     const totalItems = await queryBuilder.getCount();
