@@ -33,9 +33,9 @@ export class RepeatedDebtorService {
       queryBuilder = queryBuilder.orderBy(order);
     }
 
-    if (limit) {
-      queryBuilder = queryBuilder.limit(limit).offset(offset ?? 0);
-    }
+    // if (limit) {
+    //   queryBuilder = queryBuilder.limit(limit).offset(offset ?? 0);
+    // }
 
     const repeatedDebtors = await queryBuilder.getMany();
 

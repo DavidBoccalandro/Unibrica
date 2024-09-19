@@ -74,7 +74,7 @@ export class SheetsService {
 
         if (filterBy === 'fileDate' && startDate && endDate) {
           queryBuilder = queryBuilder.andWhere(
-            `sheet.date BETWEEN :startDate${index} AND :endDate${index}`,
+            `sheets.date BETWEEN :startDate${index} AND :endDate${index}`,
             {
               [`startDate${index}`]: startDate,
               [`endDate${index}`]: endDate,
@@ -99,7 +99,7 @@ export class SheetsService {
 
     if (!sortBy || !sortOrder) {
       const order = {};
-      order[`date`] = 'DESC';
+      order[`sheets.created_at`] = 'DESC';
       queryBuilder = queryBuilder.orderBy(order);
     }
 
