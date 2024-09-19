@@ -13,6 +13,7 @@ import { findOrCreateSheet } from 'src/reversal/utils/reversal.util';
 import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDto';
 import { rejectionCodes } from '../utils/rejectionCodes';
 import { processSdaLines } from '../utils/processSda';
+import { generatePaymentExcel } from '../utils/generatePaymentExcel.util';
 
 @Injectable()
 export class PaymentService {
@@ -84,10 +85,15 @@ export class PaymentService {
         const debitSequence = parseInt(line.substring(83, 85).trim(), 10);
         const installmentNumber = parseInt(line.substring(85, 87).trim(), 10);
         const debitStatus = line.substring(87, 88).trim();
-        const chargedAmount = parseFloat(line.substring(108, 119).trim()) / 100;
-        const remainingDebt = +(debtAmount - chargedAmount).toFixed(2);
+        let chargedAmount = parseFloat(line.substring(108, 119).trim()) / 100;
         const rejectCode = sdaDataMap.get(bankAccountNumber);
         const rejectText = rejectionCodes[rejectCode];
+
+        //% debitStatus: E ==> Error; debitStatus: R ==> Rechazado
+        if (debitStatus !== 'P') {
+          chargedAmount = 0;
+        }
+        const remainingDebt = +(debtAmount - chargedAmount).toFixed(2);
 
         let bank = bankMap.get(bankCode);
 
@@ -171,6 +177,8 @@ export class PaymentService {
     console.log(`Excel file created at: ${filePath}`);
 
     await this.paymentRecordRepository.save(processedData);
+
+    generatePaymentExcel(processedData, originalFileName);
     return processedData;
   }
 

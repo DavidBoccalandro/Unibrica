@@ -46,7 +46,7 @@ export const columnNamesMap: { [key: string]: string } = {
   installmentNumber: 'N° cuota',
   debitStatus: 'Estado de débito',
   chargedAmount: 'Monto cobrado',
-  debtAmount: 'Monto deuda',
+  debtAmount: 'Imp de movimiento',
   serviceNumber: 'N° de servicio',
   companyNumber: 'N° de empresa',
   accountType: 'Tipo de cuenta',
