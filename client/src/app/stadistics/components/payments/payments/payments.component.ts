@@ -8,6 +8,7 @@ import { FilterService } from '../../../../core/services/filter.service';
 import { Sheet } from 'src/app/shared/interfaces/sheet.interface';
 import { generatePaymentExcel } from '../utils/generatePaymentExcel.util';
 import { FilterInExcel } from 'src/app/shared/interfaces/filterInExcel.interface';
+import { Client } from '../../clients/clients.interfaces';
 
 export interface Payment {
   id: number;
@@ -28,6 +29,7 @@ export interface Payment {
   chargedAmount: number;
   remainingDebt: number;
   sheet: Sheet;
+  client?: Client;
   rejectCode?: string;
   rejectText?: string;
 }

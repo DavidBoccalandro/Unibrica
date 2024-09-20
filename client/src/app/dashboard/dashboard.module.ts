@@ -6,6 +6,12 @@ import { DashboardComponent } from './dashboard.component';
 import { DashboardService } from './dashboard.service';
 import { CalendarModule } from '../calendar/calendar.module';
 import { MatButtonModule } from '@angular/material/button';
+import { ReactiveFormsModule } from '@angular/forms';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatNativeDateModule } from '@angular/material/core';
+import { StadisticsService } from '../stadistics/stadistics.service';
 
 @NgModule({
   declarations: [DashboardComponent],
@@ -15,7 +21,12 @@ import { MatButtonModule } from '@angular/material/button';
     ChartsModule,
     CalendarModule,
     MatButtonModule,
+    ReactiveFormsModule,
+    MatDatepickerModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatNativeDateModule,
   ],
-  providers: [DashboardService],
+  providers: [DashboardService, StadisticsService],
 })
 export class DashboardModule {}

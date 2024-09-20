@@ -11,6 +11,11 @@ import { UploadFileModalComponent } from '../shared/modal/upload-file-modal.comp
 import { DashboardService } from './dashboard.service';
 import { CalendarEvent } from 'angular-calendar';
 import { ClientModalComponent } from '../shared/modal/clients/client-modal/client-modal.component';
+import { StadisticsService, StatisticsParams2 } from '../stadistics/stadistics.service';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { Client } from '../stadistics/components/clients/clients.interfaces';
+import { Payment } from '../stadistics/components/payments/payments/payments.component';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,35 +24,184 @@ import { ClientModalComponent } from '../shared/modal/clients/client-modal/clien
 })
 export class DashboardComponent implements OnInit {
   lineChartData: LineChartData[] = [];
-  lineChartLabels!: XYLabels;
-  pieChartData!: PieChartData;
-  pieAdvancedChartData!: PieAdvancedChartData;
-  verticalBarChartData!: VerticalBarChartData;
+  lineChartLabels: XYLabels = {
+    xAxisLabel: 'Fecha',
+    yAxisLabel: 'Monto Total',
+    title: 'Clientes',
+  };
+  // pieChartData!: PieChartData;
+  // pieAdvancedChartData!: PieAdvancedChartData;
+  // verticalBarChartData!: VerticalBarChartData;
 
-  tusEventos: CalendarEvent[] = []; // Define tus eventos aquí
-  tuFecha: Date = new Date(); // Define tu fecha aquí
+  paymentData: Payment[] = []; // To store the payments data
+  clients: Client[] = [];
+  dashboardForm!: FormGroup;
+  view: [number, number] = [1000, 500];
 
-  constructor(public dialog: MatDialog, private dashboardService: DashboardService) {}
+  constructor(
+    public dialog: MatDialog,
+    private dashboardService: DashboardService,
+    private statisticService: StadisticsService,
+    private fb: FormBuilder
+  ) {
+    this.dashboardForm = this.fb.group({
+      lineChartForm: this.fb.group({
+        selectedClientId: [null],
+        start: [null],
+        end: [null],
+      }),
+    });
+  }
 
   ngOnInit(): void {
-    this.dashboardService.getLineChartDataWithLabels().subscribe((dataWithLabels) => {
-      this.lineChartData = dataWithLabels.data;
-      this.lineChartLabels = dataWithLabels.labels;
-    });
+    this.statisticService
+      .getAllClients()
+      .pipe(take(1))
+      .subscribe((clients) => {
+        this.clients = clients;
+        const lineChartForm = this.dashboardForm.get('lineChartForm');
+        const currentDate = new Date();
 
-    this.dashboardService.getPieChartData().subscribe((data) => {
-      this.pieChartData = data;
-    });
+        // Setear fechas en el formulario
+        lineChartForm
+          ?.get('start')
+          ?.setValue(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+        lineChartForm?.get('end')?.setValue(currentDate);
 
-    this.dashboardService.getPieAdvancedChartData().subscribe((data) => {
-      this.pieAdvancedChartData = data;
-    });
+        // Cargar los pagos de todos los clientes
+        this.loadPaymentsForAllClients();
+      });
+  }
 
-    this.dashboardService.getVerticalBarChartData().subscribe((data) => {
-      this.verticalBarChartData = data;
-    });
+  loadPaymentsForAllClients(): void {
+    const { start, end } = this.dashboardForm.get('lineChartForm')!.value;
+    if (start && end) {
+      const filter: StatisticsParams2 = {
+        limit: 0,
+        offset: 0,
+        dateFilters: [
+          {
+            filterBy: 'fileDate',
+            startDate: start,
+            endDate: end,
+          },
+        ],
+      };
 
-    this.loadCalendarEvents(); // Carga los eventos del calendario
+      // Obtener pagos de todos los clientes
+      this.statisticService.getAllPaymentsWithoutPagination(filter).subscribe((data) => {
+        // console.log('payments: ', data.payments);
+        this.processPaymentDataForAllClients(data.payments);
+      });
+    }
+  }
+
+  processPaymentDataForAllClients(data: any[]): void {
+    const { start, end } = this.dashboardForm.get('lineChartForm')!.value;
+
+    // Generar todas las fechas entre el rango
+    const allDates = this.generateDateRange(new Date(start), new Date(end));
+
+    // Agrupar pagos por cliente y fecha
+    const groupedData: { [key: string]: { [date: string]: number } } = data.reduce(
+      (acc: { [key: string]: { [date: string]: number } }, payment) => {
+        const clientId = payment.client.clientId;
+        const date = new Date(payment.debitDate).toDateString();
+
+        if (!acc[clientId]) {
+          acc[clientId] = {};
+        }
+
+        if (!acc[clientId][date]) {
+          acc[clientId][date] = 0;
+        }
+
+        acc[clientId][date] += payment.chargedAmount;
+        return acc;
+      },
+      {}
+    );
+
+    // Crear datos para el gráfico llenando con 0 los días sin registros
+    this.lineChartData = Object.keys(groupedData).map((clientId) => {
+      const seriesData = allDates.map((date: string) => ({
+        name: date,
+        value: groupedData[clientId][date] || 0, // Si no hay registro, poner 0
+      }));
+
+      return {
+        name:
+          this.clients.find((client) => client.clientId === Number(clientId))?.name ||
+          `Cliente ${clientId}`,
+        series: seriesData,
+      };
+    });
+  }
+
+  loadPayments(): void {
+    const { selectedClientId, start, end } = this.dashboardForm.get('lineChartForm')!.value;
+
+    if (selectedClientId && start && end) {
+      const filter: StatisticsParams2 = {
+        limit: 0,
+        offset: 0,
+        numericFilters: [
+          {
+            filterBy: 'clientId',
+            filterValue: selectedClientId,
+            operator: '=',
+          },
+        ],
+        dateFilters: [
+          {
+            filterBy: 'fileDate',
+            startDate: start,
+            endDate: end,
+          },
+        ],
+      };
+
+      this.statisticService.getAllPaymentsWithoutPagination(filter).subscribe((data) => {
+        this.processPaymentData(data.payments);
+      });
+    }
+  }
+
+  processPaymentData(data: any[]): void {
+    const groupedData: { [key: string]: number } = data.reduce(
+      (acc: { [key: string]: number }, payment) => {
+        const date = new Date(payment.debitDate).toDateString();
+        if (!acc[date]) {
+          acc[date] = 0;
+        }
+        acc[date] += payment.chargedAmount;
+        return acc;
+      },
+      {}
+    );
+
+    // Formatear lineChartData según la interfaz LineChartData
+    this.lineChartData = [
+      {
+        name: 'Pagos Totales', // Puedes cambiar esto según tus necesidades
+        series: Object.keys(groupedData).map((date) => ({
+          name: date,
+          value: groupedData[date],
+        })),
+      },
+    ];
+  }
+
+  generateDateRange(start: Date, end: Date): string[] {
+    const dateArray: string[] = [];
+    let currentDate = new Date(start);
+
+    while (currentDate <= end) {
+      dateArray.push(new Date(currentDate).toDateString());
+      currentDate.setDate(currentDate.getDate() + 1); // Avanzar un día
+    }
+
+    return dateArray;
   }
 
   openDialog(): void {
@@ -61,10 +215,10 @@ export class DashboardComponent implements OnInit {
   openClientModal(client = null): void {
     const dialogRef = this.dialog.open(ClientModalComponent, {
       width: '400px',
-      data: { client }
+      data: { client },
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         if (client) {
           // Lógica para editar el cliente existente
@@ -74,12 +228,6 @@ export class DashboardComponent implements OnInit {
           console.log('Nuevo cliente creado', result);
         }
       }
-    });
-  }
-
-  loadCalendarEvents() {
-    this.dashboardService.getCalendarEvents().subscribe((events) => {
-      this.tusEventos = events; // Asigna los eventos al arreglo
     });
   }
 }

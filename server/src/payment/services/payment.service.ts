@@ -197,7 +197,7 @@ export class PaymentService {
     if (stringFilters && stringFilters.length > 0) {
       stringFilters.forEach((filter) => {
         const { filterBy, filterValue } = filter;
-        console.log('filterBy: ', filterBy);
+        // console.log('filterBy: ', filterBy);
         // console.log('filterValue type: ', typeof filterValue);
         if (filterBy === 'clientName') {
           queryBuilder = queryBuilder.andWhere(`LOWER(client.name) LIKE :filterValue`, {
@@ -218,26 +218,32 @@ export class PaymentService {
         const { filterBy, operator, filterValue } = filter;
         const value = Number(filterValue);
 
-        if (operator === '=' && !isNaN(value)) {
-          queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} = :value${index}`, {
+        if (filterBy === 'clientId') {
+          queryBuilder = queryBuilder.andWhere(`client.clientId = :value${index}`, {
             [`value${index}`]: value,
           });
-        } else if (operator === '<' && !isNaN(value)) {
-          queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} < :value${index}`, {
-            [`value${index}`]: value,
-          });
-        } else if (operator === '>' && !isNaN(value)) {
-          queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} > :value${index}`, {
-            [`value${index}`]: value,
-          });
-        } else if (operator === '<=' && !isNaN(value)) {
-          queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} <= :value${index}`, {
-            [`value${index}`]: value,
-          });
-        } else if (operator === '>=' && !isNaN(value)) {
-          queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} >= :value${index}`, {
-            [`value${index}`]: value,
-          });
+        } else {
+          if (operator === '=' && !isNaN(value)) {
+            queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} = :value${index}`, {
+              [`value${index}`]: value,
+            });
+          } else if (operator === '<' && !isNaN(value)) {
+            queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} < :value${index}`, {
+              [`value${index}`]: value,
+            });
+          } else if (operator === '>' && !isNaN(value)) {
+            queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} > :value${index}`, {
+              [`value${index}`]: value,
+            });
+          } else if (operator === '<=' && !isNaN(value)) {
+            queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} <= :value${index}`, {
+              [`value${index}`]: value,
+            });
+          } else if (operator === '>=' && !isNaN(value)) {
+            queryBuilder = queryBuilder.andWhere(`payment_records.${filterBy} >= :value${index}`, {
+              [`value${index}`]: value,
+            });
+          }
         }
       });
     }

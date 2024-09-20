@@ -1,4 +1,4 @@
-<div class="dashboard-container">
+<div class="dashboard-container" [formGroup]="dashboardForm">
   <div class="dashboard-header">
     <h2>Dashboard</h2>
     <div class="buttons">
@@ -6,34 +6,32 @@
       <button mat-raised-button color="primary" (click)="openDialog()">Subir Archivo</button>
     </div>
   </div>
-  <div class="charts-container">
+  <div class="charts-container" formGroupName="lineChartForm">
     <div class="chart-wrapper">
-      <app-pie-chart
-        [data]="pieChartData.data"
-        [view]="pieChartData.view"
-        [colorScheme]="pieChartData.colorScheme"
-      ></app-pie-chart>
+      <div class="controls">
+        <mat-form-field>
+          <mat-label>Cliente</mat-label>
+          <mat-select formControlName="selectedClientId">
+            <mat-option *ngFor="let client of clients" [value]="client.clientId">
+              {{ client.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Rango de búsqueda</mat-label>
+          <mat-date-range-input [rangePicker]="dateRangePicker">
+            <input matStartDate placeholder="Fecha de inicio" formControlName="start" />
+            <input matEndDate placeholder="Fecha de fin" formControlName="end" />
+          </mat-date-range-input>
+          <mat-datepicker-toggle matIconSuffix [for]="dateRangePicker"></mat-datepicker-toggle>
+          <mat-date-range-picker #dateRangePicker></mat-date-range-picker>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="loadPayments()">Cargar Pagos</button>
+      </div>
+
+      <app-line-chart [data]="lineChartData" [labels]="lineChartLabels" [view]="view"></app-line-chart>
     </div>
-    <div class="chart-wrapper">
-      <app-line-chart [data]="lineChartData" [labels]="lineChartLabels"> </app-line-chart>
-    </div>
-    <div class="chart-wrapper">
-      <app-pie-advanced-chart
-        [data]="pieAdvancedChartData.data"
-        [view]="pieAdvancedChartData.view"
-        [colorScheme]="pieAdvancedChartData.colorScheme"
-      ></app-pie-advanced-chart>
-    </div>
-    <div class="chart-wrapper">
-      <app-vertical-bar-chart
-        [data]="verticalBarChartData.data"
-        [labels]="verticalBarChartData.labels"
-        [view]="verticalBarChartData.view"
-        [colorScheme]="verticalBarChartData.colorScheme"
-      ></app-vertical-bar-chart>
-    </div>
-  </div>
-  <div class="calendar-container">
-    <app-calendar [events]="tusEventos" [viewDate]="tuFecha"></app-calendar>
   </div>
 </div>
