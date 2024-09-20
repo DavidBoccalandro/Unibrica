@@ -78,9 +78,9 @@ export class ReversalsComponent {
     )
 
     this.subscriptions.push(
-      this.filterService.generateExcel$.subscribe((data) => {
-        if(data) {
-          this.generateExcel();
+      this.filterService.filterDescriptions$.subscribe((data) => {
+        if(data !== null) {
+          this.generateExcel(data);
         }
       })
     );
@@ -99,7 +99,6 @@ export class ReversalsComponent {
       .getAllReversals(this.params.getValue())
       .pipe(take(1))
       .subscribe((data) => {
-        console.log('REVERSAL', data)
         this.reversals = data.reversals;
         this.totalItems = data.totalItems;
         this.tableData = new MatTableDataSource<MatTableDataSourceInput>(this.reversals);
@@ -115,13 +114,13 @@ export class ReversalsComponent {
     });
   }
 
-  generateExcel() {
+  generateExcel(filters: {name: string, value: string | number, operator?: string}[]) {
     this.statisticsService
       .getAllReversalsWithoutPagination(this.params.getValue())
       .pipe(take(1))
       .subscribe((data) => {
         const allReversals = data.reversals;
-        generateReversalExcel(allReversals);
+        generateReversalExcel(allReversals, filters);
       });
 
     this.filterService.resetExportToExcel();

@@ -213,12 +213,6 @@ export class FilterModalComponent implements OnDestroy {
           };
         });
 
-      // console.log('Filtros final: ', {
-      //   stringFilters: stringFilterData,
-      //   numericFilters: numericFilterData,
-      //   dateFilters: dateFilterData,
-      // });
-
       this.filterService.updateFilters({
         stringFilters: stringFilterData,
         numericFilters: numericFilterData,
@@ -242,7 +236,7 @@ export class FilterModalComponent implements OnDestroy {
   }
 
   exportToExcel() {
-    this.filterService.exportToExcel();
+    this.filterService.exportToExcel(this.filtersForm.value.filters);
   }
 
   close(): void {

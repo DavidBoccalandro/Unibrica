@@ -36,6 +36,9 @@ export class FilterService {
   private generateExcelSubject = new BehaviorSubject<boolean>(false);
   generateExcel$: Observable<boolean> = this.generateExcelSubject.asObservable();
 
+  private filterDescriptionsSubject = new BehaviorSubject<{name: string, value: string | number, operator?: string}[] | null>(null);
+  filterDescriptions$: Observable<{name: string, value: string | number, operator?: string}[] | null> = this.filterDescriptionsSubject.asObservable();
+
   constructor() {}
 
   updateSearchField(field: string): void {
@@ -50,11 +53,13 @@ export class FilterService {
     this.filterFormSubject.next(filterForm)
   }
 
-  exportToExcel() {
+  exportToExcel(filters: {name: string, value: string | number, operator?: string}[]) {
     this.generateExcelSubject.next(true);
+    this.filterDescriptionsSubject.next(filters)
   }
 
   resetExportToExcel() {
     this.generateExcelSubject.next(false);
+    this.filterDescriptionsSubject.next(null)
   }
 }
