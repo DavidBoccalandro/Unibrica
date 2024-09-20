@@ -27,7 +27,6 @@ import { ReversalsComponent } from './components/reversals/reversals.component';
 import { FilterModalComponent } from './components/filter-modal/filter-modal.component';
 import { MatInputModule } from '@angular/material/input';
 import { OverlayModule } from '@angular/cdk/overlay';
-import { MatDialogModule } from '@angular/material/dialog';
 
 const MaterialModules = [
   MatTabsModule,
@@ -39,7 +38,6 @@ const MaterialModules = [
   MatButtonModule,
   MatPaginatorModule,
   MatInputModule,
-  MatDialogModule,
   OverlayModule,
 ];
 

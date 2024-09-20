@@ -18,7 +18,7 @@ export class AuthGuard implements CanActivate {
     const httpOnlyCookie = req.headers['cookie'];
 
     if (!httpOnlyCookie) {
-      throw new UnauthorizedException('Invalid token');
+      throw new UnauthorizedException('Ha expirado la sesión');
     }
 
     const token = httpOnlyCookie.replace('access_token=', '');

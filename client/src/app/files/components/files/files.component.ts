@@ -129,7 +129,7 @@ export class FilesComponent implements OnDestroy {
     if (name.match(/\.[^/.]+$/)) {
       name = name.replace(/\.[^/.]+$/, '');
     }
-    if(option && option === 'modificado') {
+    if (option && option === 'modificado') {
       name = name + '- Modificado';
     }
     this.filesService.downloadSheet(name).subscribe(

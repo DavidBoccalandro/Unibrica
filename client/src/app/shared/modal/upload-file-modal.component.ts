@@ -89,7 +89,7 @@ export class UploadFileModalComponent implements OnInit {
         this.snackBar.emitNotification(
           'La información se está procesando. Por favor espere unos minutos a que finalice la carga en la base de datos.',
           'info',
-          500
+          1500
         );
       }
     });

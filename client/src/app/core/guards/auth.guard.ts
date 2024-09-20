@@ -1,9 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { AuthService } from '../authentication/auth.service';
-import { Store } from '@ngrx/store';
-import { AuthState } from '../authentication/auth.interfaces';
-import { NotificationsService } from '../services/notifications.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,7 +7,6 @@ import { NotificationsService } from '../services/notifications.service';
 export class AuthGuard {
   constructor(
     private authService: AuthService,
-    notificationsService: NotificationsService
   ) {}
 
   canActivate(): boolean {
