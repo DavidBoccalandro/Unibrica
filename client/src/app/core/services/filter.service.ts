@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { FormArray, FormGroup } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { FilterInExcel } from 'src/app/shared/interfaces/filterInExcel.interface';
 
 export interface FilterParams {
   stringFilters?: { filterBy: string; filterValue: string }[];
@@ -37,7 +38,7 @@ export class FilterService {
   generateExcel$: Observable<boolean> = this.generateExcelSubject.asObservable();
 
   private filterDescriptionsSubject = new BehaviorSubject<{name: string, value: string | number, operator?: string}[] | null>(null);
-  filterDescriptions$: Observable<{name: string, value: string | number, operator?: string}[] | null> = this.filterDescriptionsSubject.asObservable();
+  filterDescriptions$: Observable<FilterInExcel[] | null> = this.filterDescriptionsSubject.asObservable();
 
   constructor() {}
 
@@ -53,7 +54,7 @@ export class FilterService {
     this.filterFormSubject.next(filterForm)
   }
 
-  exportToExcel(filters: {name: string, value: string | number, operator?: string}[]) {
+  exportToExcel(filters: FilterInExcel[]) {
     this.generateExcelSubject.next(true);
     this.filterDescriptionsSubject.next(filters)
   }

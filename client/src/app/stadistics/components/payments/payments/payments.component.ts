@@ -7,6 +7,7 @@ import { StadisticsService, StatisticsParams2 } from 'src/app/stadistics/stadist
 import { FilterService } from '../../../../core/services/filter.service';
 import { Sheet } from 'src/app/shared/interfaces/sheet.interface';
 import { generatePaymentExcel } from '../utils/generatePaymentExcel.util';
+import { FilterInExcel } from 'src/app/shared/interfaces/filterInExcel.interface';
 
 export interface Payment {
   id: number;
@@ -87,9 +88,9 @@ export class PaymentsComponent {
     );
 
     this.subscriptions.push(
-      this.filterService.generateExcel$.subscribe((data) => {
-        if(data) {
-          this.generateExcel();
+      this.filterService.filterDescriptions$.subscribe((data) => {
+        if(data !== null) {
+          this.generateExcel(data);
         }
       })
     );
@@ -124,13 +125,13 @@ export class PaymentsComponent {
     });
   }
 
-  generateExcel() {
+  generateExcel(filters: FilterInExcel[]) {
     this.statisticsService
       .getAllPaymentsWithoutPagination(this.params.getValue())
       .pipe(take(1))
       .subscribe((data) => {
         const allPayments = data.payments;
-        generatePaymentExcel(allPayments);
+        generatePaymentExcel(allPayments, filters);
       });
 
     this.filterService.resetExportToExcel();

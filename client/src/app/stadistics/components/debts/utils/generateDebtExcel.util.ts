@@ -39,7 +39,7 @@ export async function generateDebtExcel(
     {
       header: 'Sucursal',
       key: 'branchCode',
-      width: 8,
+      width: 20,
     },
     // { header: 'Tipo de cuenta', key: 'accountType', width: 20 },
     {
