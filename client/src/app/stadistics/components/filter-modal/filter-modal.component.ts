@@ -1,7 +1,7 @@
 import { Component, Input, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
-import { NavigationEnd, Router } from '@angular/router';
+import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { filter, take } from 'rxjs';
 import { FilterService } from 'src/app/core/services/filter.service';
 import { HostListener } from '@angular/core';
@@ -91,7 +91,7 @@ export class FilterModalComponent implements OnDestroy {
 
   ngOnInit(): void {
     this.currentRoute = this.router.url.split('/')[2].split('?')[0];
-    this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
+    this.router.events.pipe(filter((event) => (event instanceof NavigationStart))).subscribe(() => {
       this.resetFilters();
     });
     this.filterService.filterForm$.pipe(take(1)).subscribe((filters) => {
