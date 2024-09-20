@@ -4,7 +4,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter, take } from 'rxjs';
 import { FilterService } from 'src/app/core/services/filter.service';
-
+import { HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-filter-modal',
@@ -44,6 +44,7 @@ export class FilterModalComponent implements OnDestroy {
       { value: 'bankAccountNumber', label: 'N° de cuenta', type: 'string' },
       { value: 'debitStatus', label: 'Estado de débito', type: 'string' },
       { value: 'clientName', label: 'Cliente', type: 'string' },
+      { value: 'rejectCode', label: 'Código de rechazo', type: 'string' },
       { value: 'agreementNumber', label: 'N° de convenio', type: 'numeric' },
       { value: 'branchCode', label: 'Sucursal', type: 'numeric' },
       { value: 'chargedAmount', label: 'Monto cobrado', type: 'numeric' },
@@ -70,7 +71,7 @@ export class FilterModalComponent implements OnDestroy {
     public dialogRef: MatDialogRef<FilterModalComponent>,
     private filterService: FilterService,
     private fb: FormBuilder,
-    private router: Router,
+    private router: Router
   ) {
     // this.currentRoute = data.currentRoute;
     this.filtersForm = this.fb.group({
@@ -78,8 +79,14 @@ export class FilterModalComponent implements OnDestroy {
     });
   }
 
+  @HostListener('document:keydown.enter', ['$event'])
+  handleKeydown(event: KeyboardEvent): void {
+    event.preventDefault();
+    this.filtrar();
+  }
+
   ngOnDestroy(): void {
-    this.filterService.updateFilterForm(this.filters)
+    this.filterService.updateFilterForm(this.filters);
   }
 
   ngOnInit(): void {
@@ -88,7 +95,7 @@ export class FilterModalComponent implements OnDestroy {
       this.resetFilters();
     });
     this.filterService.filterForm$.pipe(take(1)).subscribe((filters) => {
-      if(filters.controls?.length > 0) {
+      if (filters.controls?.length > 0) {
         this.setFiltersToForm(filters);
       }
     });
@@ -133,7 +140,7 @@ export class FilterModalComponent implements OnDestroy {
   setFiltersToForm(filters: FormArray) {
     const filtersArray = this.filtersForm.get('filters') as FormArray;
 
-    if(filters) {
+    if (filters) {
       filtersArray.clear();
       filters.controls.forEach((filter) => {
         this.filters.push(filter);
@@ -156,10 +163,10 @@ export class FilterModalComponent implements OnDestroy {
     // while (this.filters.length !== 0) {
     //   this.filters.removeAt(0);
     // }
-    this.filters.clear()
+    this.filters.clear();
     this.selectedFilter = { value: '', label: '', type: '' };
     this.filterService.updateFilters(null);
-    this.filterService.updateFilterForm(this.fb.array([]))
+    this.filterService.updateFilterForm(this.fb.array([]));
   }
 
   filtrar(): void {

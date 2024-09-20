@@ -7,25 +7,34 @@ import {
   Patch,
   Delete,
   UseInterceptors,
-  UploadedFile,
   Query,
+  UploadedFiles,
+  UploadedFile,
 } from '@nestjs/common';
 import { PaymentRecord } from '../entities/payment.entity';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { PaymentService } from '../services/payment.service';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('payment')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadPaymentSheet(
-    @UploadedFile() file: Express.Multer.File,
+  @UseInterceptors(FilesInterceptor('files'))
+  async uploadReversal(
+    @UploadedFiles() files: Express.Multer.File[],
     @Body('clientId') clientId: string
   ): Promise<any> {
-    await this.paymentService.uploadPaymentSheet(file, clientId);
-    return { message: 'File processed and Excel file created.' };
+    const [file, optionalFile] = files;
+    // Handle primary files
+    // const uploadPromises = files.map((file) =>
+    await this.paymentService.uploadPaymentSheet(file, clientId, optionalFile);
+    // );
+    // await Promise.all(uploadPromises);
+
+    return { message: 'Files processed and Excel file created.' };
   }
 
   @Get()

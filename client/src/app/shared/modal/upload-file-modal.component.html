@@ -1,23 +1,5 @@
 <h1 mat-dialog-title>Subir Archivo</h1>
 <mat-dialog-content [formGroup]="form" #inputForm color="primary">
-  <!-- <mat-form-field
-    id="file-type-form-field"
-    appearance="outline"
-    class="file-type-form-field"
-    floatLabel="always"
-  >
-    <mat-label>Clientes</mat-label>
-    <mat-select formControlName="client">
-      <mat-option
-        *ngFor="let client of clients"
-        [value]="client.name"
-        (onSelectionChange)="selectedClientId = client.id"
-      >
-        {{ client.name }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field> -->
-
   <mat-form-field
     id="file-type-form-field"
     appearance="outline"
@@ -31,7 +13,7 @@
         [value]="client.name"
         (onSelectionChange)="selectedClientId = client.clientId.toString()"
       >
-      {{ client.clientId }} - {{ client.name }}
+        {{ client.clientId }} - {{ client.name }}
       </mat-option>
     </mat-select>
   </mat-form-field>
@@ -43,7 +25,7 @@
     floatLabel="always"
   >
     <mat-label>Archivo</mat-label>
-    <mat-select formControlName="fileType">
+    <mat-select formControlName="fileType" (selectionChange)="fileTypeSelected($event)">
       <mat-option value="deudas" default>Liquidaciones (Deudas por cobrar)</mat-option>
       <mat-option value="cobros">PAGBA (Cobros realizados)</mat-option>
       <mat-option value="reversas">Bajas y reversas</mat-option>
@@ -61,24 +43,45 @@
     hidden
     type="file"
     [accept]="fileAccept"
-    (change)="onSelectedFiles($event)"
+    (change)="onSelectedFiles($event, 'main')"
     #fileInput
-    [multiple]="multipleFilesAccepted"
+    [multiple]="form.get('multipleFilesAccepted')?.value"
   />
+  <div class="file-form-field" *ngIf="isPagbaSelected">
+    <p *ngIf="filesLabel">{{ filesLabel }}</p>
+    <button mat-button (click)="fileInput.click()">
+      <mat-icon matIconPrefix matTooltip="Choose file(s)..."> attach_file</mat-icon>
+      Seleccionar SDA correspondiente
+    </button>
+  </div>
+  <input
+    hidden
+    type="file"
+    [accept]="fileAccept"
+    (change)="onSelectedFiles($event, 'secondary')"
+    #fileInput
+    [multiple]="form.get('multipleFilesAccepted')?.value"
+  />
+  <div class="file-type-form-field toggle-container">
+    <mat-slide-toggle formControlName="multipleFilesAccepted" color="primary">
+      Permitir múltiples archivos
+    </mat-slide-toggle>
+  </div>
+
+  <mat-dialog-actions>
+    <button mat-stroked-button color="warn" (click)="onCloseClick()">Cerrar</button>
+    <button mat-mini-fab (click)="downloadExcel()" [disabled]="!(uploadSuccess$ | async)">
+      <mat-icon>download</mat-icon>
+    </button>
+    <button
+      mat-flat-button
+      color="primary"
+      type="button"
+      form="inputForm"
+      (click)="onUploadFiles()"
+      [disabled]="!files || !form.valid"
+    >
+      Enviar
+    </button>
+  </mat-dialog-actions>
 </mat-dialog-content>
-<mat-dialog-actions>
-  <button mat-stroked-button color="warn" (click)="onCloseClick()">Cerrar</button>
-  <button mat-mini-fab (click)="downloadExcel()" [disabled]="!(uploadSuccess$ | async)">
-    <mat-icon>download</mat-icon>
-  </button>
-  <button
-    mat-flat-button
-    color="primary"
-    type="button"
-    form="inputForm"
-    (click)="onUploadFiles()"
-    [disabled]="!files || !form.valid"
-  >
-    Enviar
-  </button>
-</mat-dialog-actions>

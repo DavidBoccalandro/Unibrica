@@ -5,6 +5,7 @@ import {
   FormBuilder,
   FormControl,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -14,6 +15,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { BanksService } from 'src/app/core/services/banks.service';
 import { ClientsService } from 'src/app/core/services/clients.service';
 import { ExcelService } from 'src/app/core/services/excel.service';
@@ -28,12 +30,13 @@ const MaterialModules = [
   MatSelectModule,
   MatInputModule,
   MatIconModule,
+  MatSlideToggleModule
 ];
 
 @Component({
   selector: 'app-upload-file-modal',
   standalone: true,
-  imports: [CommonModule, ...MaterialModules, ReactiveFormsModule],
+  imports: [CommonModule, ...MaterialModules, ReactiveFormsModule, FormsModule],
   providers: [ExcelService, UploadFileService],
   templateUrl: './upload-file-modal.component.html',
   styleUrls: ['./upload-file-modal.component.scss'],
@@ -42,13 +45,14 @@ export class UploadFileModalComponent implements OnInit {
   @Input() fileAccept = '.lis,.xlsx,.xls,.csv,.txt';
   form!: FormGroup;
   files!: FileList | null;
-  multipleFilesAccepted = false;
+  optionalFiles!: FileList | null;
   clients: Client[] = [];
   banks: any[] = [];
   selectedClientId!: string;
   selectedBankId!: string;
   userId!: string;
   fileSelected: string = '';
+  isPagbaSelected = false;
 
   uploading$ = this.uploadFileService.uploading$;
   uploadSuccess$ = this.uploadFileService.uploadSuccess$;
@@ -64,7 +68,8 @@ export class UploadFileModalComponent implements OnInit {
   ) {
     this.form = this.fb.group({
       client: ['', [Validators.required]],
-      fileType: ['cobros', [Validators.required]],
+      fileType: ['', [Validators.required]],
+      multipleFilesAccepted: [false]
     });
   }
 
@@ -85,9 +90,13 @@ export class UploadFileModalComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  onSelectedFiles(event: any): void {
-    this.files = event.target.files ?? null;
-    this.fileSelected = this.files![0].name.substring(0, this.files![0].name.length - 4);
+  onSelectedFiles(event: any, type: string): void {
+    if(type === 'main') {
+      this.files = event.target.files ?? null;
+      this.fileSelected = this.files![0].name.substring(0, this.files![0].name.length - 4);
+    } else {
+      this.optionalFiles = event.target.files ?? null;
+    }
   }
 
   get filesLabel(): string {
@@ -110,7 +119,8 @@ export class UploadFileModalComponent implements OnInit {
       'e1cac08c-145b-469b-ae9d-c1c76d3ff001',
       client?.clientId ? client : null,
       this.selectedBankId,
-      this.form.value['fileType']
+      this.form.value['fileType'],
+      this.optionalFiles ?? undefined,
     );
     this.files = null;
     this.form.reset();
@@ -120,6 +130,15 @@ export class UploadFileModalComponent implements OnInit {
     this.clientService.getClients().subscribe((clients) => {
       this.clients = clients;
     });
+  }
+
+  fileTypeSelected(option: any) {
+    // console.log('option.value:', option.value)
+    if(option.value === 'cobros') {
+      this.isPagbaSelected = true
+    } else {
+      this.isPagbaSelected = false
+    }
   }
 
   downloadExcel() {
