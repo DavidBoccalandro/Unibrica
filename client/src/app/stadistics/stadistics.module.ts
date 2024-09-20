@@ -27,6 +27,7 @@ import { ReversalsComponent } from './components/reversals/reversals.component';
 import { FilterModalComponent } from './components/filter-modal/filter-modal.component';
 import { MatInputModule } from '@angular/material/input';
 import { OverlayModule } from '@angular/cdk/overlay';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
 const MaterialModules = [
   MatTabsModule,
@@ -39,6 +40,7 @@ const MaterialModules = [
   MatPaginatorModule,
   MatInputModule,
   OverlayModule,
+  MatDialogModule
 ];
 
 @NgModule({
@@ -50,8 +52,7 @@ const MaterialModules = [
     FilterComponent,
     FilterModalComponent,
     PaymentsComponent,
-    ReversalsComponent,
-    FilterModalComponent,
+    ReversalsComponent
   ],
   imports: [
     TableComponent,
@@ -64,7 +65,11 @@ const MaterialModules = [
     ...MaterialModules,
   ],
   providers: [
-    StadisticsService
+    StadisticsService,
+    {
+      provide: MatDialogRef,
+      useValue: {}
+    },
   ]
 })
 export class StadisticsModule {}

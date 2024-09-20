@@ -31,7 +31,8 @@ const MaterialModules = [
   MatSelectModule,
   MatInputModule,
   MatIconModule,
-  MatSlideToggleModule
+  MatSlideToggleModule,
+  MatDialogModule,
 ];
 
 @Component({

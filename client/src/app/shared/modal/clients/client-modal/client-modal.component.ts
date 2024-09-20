@@ -18,6 +18,7 @@ const MaterialModules = [
   MatSelectModule,
   MatInputModule,
   MatIconModule,
+  MatDialogModule
 ];
 
 @Component({

@@ -10,6 +10,7 @@ import { Client } from './components/clients/clients.interfaces';
 import { Payment } from './components/payments/payments/payments.component';
 import { Reversal } from './components/reversals/reversals.component';
 import { File } from '../files/components/files/files.component';
+import { Debt } from './components/debts/debts.interface';
 
 export interface StatisticsParams {
   limit: number;
@@ -150,6 +151,22 @@ export class StadisticsService {
       .set('dateFilters', JSON.stringify(params.dateFilters));
 
     return this.http.get<{ totalItems: number; reversals: Reversal[] }>(this.ReversalURL, {
+      params: httpParams,
+      withCredentials: true,
+    });
+  }
+
+  getAllDebtsWithoutPagination(
+    params: StatisticsParams2
+  ): Observable<{ totalItems: number; debts: Debt[] }> {
+    let httpParams = new HttpParams()
+      .set('limit', '')
+      .set('offset', '')
+      .set('stringFilters', JSON.stringify(params.stringFilters))
+      .set('numericFilters', JSON.stringify(params.numericFilters))
+      .set('dateFilters', JSON.stringify(params.dateFilters));
+
+    return this.http.get<{ totalItems: number; debts: Debt[] }>(this.DebtsUrl + '/all', {
       params: httpParams,
       withCredentials: true,
     });

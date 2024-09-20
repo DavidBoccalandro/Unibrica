@@ -180,7 +180,7 @@ export class DebtsService {
       stringFilters.forEach((filter, index) => {
         const { filterBy, filterValue } = filter;
 
-        if (filterBy === 'debtorLastname') {
+        if (filterBy === 'lastNames') {
           queryBuilder = queryBuilder.andWhere(
             `LOWER(debtor.lastNames) LIKE :filterValue${index}`,
             {
