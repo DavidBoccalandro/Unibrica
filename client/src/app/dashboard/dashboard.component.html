@@ -2,6 +2,7 @@
   <div class="dashboard-header">
     <h2>Dashboard</h2>
     <div class="buttons">
+      <button mat-raised-button color="primary" (click)="generatePagba()">Generar PAGBA</button>
       <button mat-raised-button color="primary" (click)="openClientModal()">Clientes</button>
       <button mat-raised-button color="primary" (click)="openDialog()">Subir Archivo</button>
     </div>
@@ -31,7 +32,8 @@
         <button mat-raised-button color="primary" (click)="loadPayments()">Cargar Pagos</button>
       </div>
 
-      <app-line-chart [data]="lineChartData" [labels]="lineChartLabels" [view]="view"></app-line-chart>
+      <!-- <app-line-chart [data]="lineChartData" [labels]="lineChartLabels" [view]="view"></app-line-chart> -->
+      <canvas  id="MyChart" width="1400">{{ chart }}</canvas>
     </div>
   </div>
 </div>

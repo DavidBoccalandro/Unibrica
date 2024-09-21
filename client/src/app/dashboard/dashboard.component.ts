@@ -16,14 +16,26 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { Client } from '../stadistics/components/clients/clients.interfaces';
 import { Payment } from '../stadistics/components/payments/payments/payments.component';
 import { take } from 'rxjs';
+import { Chart, ChartType } from 'chart.js/auto';
+import { LisFileService } from '../shared/utils/generateMockPagba';
 
+interface ChartData {
+  labels: string[]; // Asumiendo que labels es un array de strings
+  datasets: {
+    label: string;
+    data: number[];
+    fill: boolean;
+    borderColor: string;
+    tension: number;
+  }[];
+}
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
-  lineChartData: LineChartData[] = [];
+  lineChartData: any[] = [];
   lineChartLabels: XYLabels = {
     xAxisLabel: 'Fecha',
     yAxisLabel: 'Monto Total',
@@ -37,12 +49,14 @@ export class DashboardComponent implements OnInit {
   clients: Client[] = [];
   dashboardForm!: FormGroup;
   view: [number, number] = [1000, 500];
+  chart!: Chart;
 
   constructor(
     public dialog: MatDialog,
     private dashboardService: DashboardService,
     private statisticService: StadisticsService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private generatePagbaService: LisFileService
   ) {
     this.dashboardForm = this.fb.group({
       lineChartForm: this.fb.group({
@@ -122,20 +136,50 @@ export class DashboardComponent implements OnInit {
       {}
     );
 
-    // Crear datos para el gráfico llenando con 0 los días sin registros
-    this.lineChartData = Object.keys(groupedData).map((clientId) => {
-      const seriesData = allDates.map((date: string) => ({
-        name: date,
-        value: groupedData[clientId][date] || 0, // Si no hay registro, poner 0
-      }));
+    const chartData: ChartData = {
+      labels: allDates,
+      datasets: Object.keys(groupedData).map((clientId, index) => {
+        const dataValues = allDates.map((date: string) => groupedData[clientId][date] || 0); // Llenar con 0 los días sin registros
 
-      return {
-        name:
-          this.clients.find((client) => client.clientId === Number(clientId))?.name ||
-          `Cliente ${clientId}`,
-        series: seriesData,
-      };
-    });
+        return {
+          label:
+            this.clients.find((client) => client.clientId === Number(clientId))?.name ||
+            `Cliente ${clientId}`,
+          data: dataValues,
+          fill: false,
+          borderColor: this.getColorForClient(index), // Función para asignar colores
+          tension: 0.1, // Ajusta la tensión de la línea
+        };
+      }),
+    };
+
+    console.log('chartData: ', chartData)
+
+    // Asigna el chartData a tu variable correspondiente
+    this.chart = new Chart("MyChart", {
+      type: 'line' as ChartType, //this denotes tha type of chart
+      data: chartData, // Asegúrate de que tu variable esté definida correctamente
+      options: {
+        scales: {
+          x: {
+            ticks: {
+              autoSkip: true, // Esto permite que se omitan etiquetas automáticamente
+              maxTicksLimit: 5 // Establece el número máximo de etiquetas
+            }
+          }
+        }
+      }
+    })
+  }
+
+  // Función para generar un color para cada cliente (puedes definir tu lógica)
+  getColorForClient(index: number): string {
+    const colors = [
+      '#ff8c80',
+      '#b5ff80',
+      '#8cf6fa',
+    ];
+    return colors[index];
   }
 
   loadPayments(): void {
@@ -229,5 +273,9 @@ export class DashboardComponent implements OnInit {
         }
       }
     });
+  }
+
+  generatePagba() {
+    this.generatePagbaService.downloadLisFile(10)
   }
 }
