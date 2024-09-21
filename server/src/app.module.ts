@@ -18,6 +18,7 @@ import { PaymentModule } from './payment/payment.module';
 import { ReversalModule } from './reversal/reversal.module';
 import { SheetsModule } from './sheets/sheets.module';
 import { RepeatedDebtorModule } from './repeated-debtor/repeated-debtor.module';
+import { StatisticsModule } from './statistics/statistics.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { RepeatedDebtorModule } from './repeated-debtor/repeated-debtor.module';
     ReversalModule,
     SheetsModule,
     RepeatedDebtorModule,
+    StatisticsModule,
   ],
   providers: [],
   controllers: [],
