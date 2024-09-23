@@ -1,31 +1,38 @@
 <div class="dashboard-container" [formGroup]="dashboardForm">
-  <div class="charts-container" formGroupName="lineChartForm">
+  <ng-container class="charts-container" formGroupName="lineChartForm">
     <div class="chart-wrapper">
-      <div class="controls">
-        <mat-form-field>
-          <mat-label>Cliente</mat-label>
-          <mat-select formControlName="selectedClientId">
-            <mat-option *ngFor="let client of clients" [value]="client.clientId">
-              {{ client.name }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+      <div class="left-side">
+        <h4>Pagos por cliente</h4>
+        <div class="controls">
+          <mat-form-field>
+            <mat-label>Cliente</mat-label>
+            <mat-select formControlName="selectedClientId">
+              <mat-option *ngFor="let client of clients" [value]="client.clientId">
+                {{ client.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Rango de búsqueda</mat-label>
-          <mat-date-range-input [rangePicker]="dateRangePicker">
-            <input matStartDate placeholder="Fecha de inicio" formControlName="start" />
-            <input matEndDate placeholder="Fecha de fin" formControlName="end" />
-          </mat-date-range-input>
-          <mat-datepicker-toggle matIconSuffix [for]="dateRangePicker"></mat-datepicker-toggle>
-          <mat-date-range-picker #dateRangePicker></mat-date-range-picker>
-        </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Rango de búsqueda</mat-label>
+            <mat-date-range-input [rangePicker]="dateRangePicker">
+              <input matStartDate placeholder="Fecha de inicio" formControlName="start" />
+              <input matEndDate placeholder="Fecha de fin" formControlName="end" />
+            </mat-date-range-input>
+            <mat-datepicker-toggle matIconSuffix [for]="dateRangePicker"></mat-datepicker-toggle>
+            <mat-date-range-picker #dateRangePicker></mat-date-range-picker>
+          </mat-form-field>
 
-        <button mat-raised-button color="primary" (click)="loadPaymentsForAllClients()">Cargar Pagos</button>
+          <button mat-raised-button color="primary" (click)="loadPaymentsForAllClients()">
+            Cargar Pagos
+          </button>
+        </div>
       </div>
 
       <!-- <app-line-chart [data]="lineChartData" [labels]="lineChartLabels" [view]="view"></app-line-chart> -->
-      <canvas  id="MyChart" width="1200">{{ chart }}</canvas>
+      <div class="right-side">
+        <canvas id="MyChart" width="1300px">{{ chart }}</canvas>
+      </div>
     </div>
-  </div>
+  </ng-container>
 </div>

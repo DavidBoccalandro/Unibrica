@@ -82,7 +82,7 @@ export class LineChartPaymentsClientsComponent {
     const today = this.dashboardForm.get('lineChartForm')!.value.end ?? new Date();
     const start =
       this.dashboardForm.get('lineChartForm')!.value.start ??
-      new Date(today.getFullYear(), today.getMonth() - 1, today.getDay());
+      new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
 
     const statisticsParam = { startDate: start, endDate: today };
     this.statisticService.getStatisticsOfMonth(statisticsParam).subscribe((data) => {
@@ -98,7 +98,7 @@ export class LineChartPaymentsClientsComponent {
               x: {
                 ticks: {
                   autoSkip: true, // Esto permite que se omitan etiquetas automáticamente
-                  maxTicksLimit: 10, // Establece el número máximo de etiquetas
+                  maxTicksLimit: 5, // Establece el número máximo de etiquetas
                 },
               },
             },
