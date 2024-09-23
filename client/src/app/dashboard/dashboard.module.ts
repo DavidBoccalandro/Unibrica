@@ -12,9 +12,11 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatNativeDateModule } from '@angular/material/core';
 import { StadisticsService } from '../stadistics/stadistics.service';
+import { LineChartPaymentsClientsComponent } from './components/line-chart-payments-clients/line-chart-payments-clients.component';
+import { ChartsSelectorComponent } from './components/charts-selector/charts-selector.component';
 
 @NgModule({
-  declarations: [DashboardComponent],
+  declarations: [DashboardComponent, LineChartPaymentsClientsComponent, ChartsSelectorComponent],
   imports: [
     CommonModule,
     DashboardRoutingModule,

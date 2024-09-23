@@ -1,0 +1,9 @@
+<div class="graphs-container">
+  <div class="graphs-grid">
+    <div *ngFor="let graph of graphs" class="graph-card" (click)="navigateToGraph(graph.route)">
+      <h3>{{ graph.title }}</h3>
+      <img [src]="graph.imageUrl" alt="{{ graph.title }}" />
+      <p>{{ graph.description }}</p>
+    </div>
+  </div>
+</div>
