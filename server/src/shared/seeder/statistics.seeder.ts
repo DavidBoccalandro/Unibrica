@@ -28,9 +28,10 @@ async function seedDatabase() {
 
   // Crear hojas y estadísticas ficticias
   for (const client of clients) {
-    for (let i = 0; i < 25; i++) {
+    //! Ajustar la cantidad de stadistics que se generarán por client
+    for (let i = 0; i < 100; i++) {
       const date = faker.date
-        .between({ from: '2024-08-01', to: '2024-09-30' })
+        .between({ from: '2023-09-01', to: '2024-09-30' }) //! Ajustar la fecha de los sheets
         .toISOString()
         .split('T')[0];
 
@@ -62,6 +63,7 @@ async function seedDatabase() {
         // Añadir la fecha al conjunto de fechas
         datesSet.add(date);
       }
+      console.log('Se repitió la fecha: ', date, datesSet);
     }
   }
 

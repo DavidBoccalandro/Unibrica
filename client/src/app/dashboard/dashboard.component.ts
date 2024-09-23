@@ -10,10 +10,7 @@ import {
 import { UploadFileModalComponent } from '../shared/modal/upload-file-modal.component';
 import { DashboardService } from './dashboard.service';
 import { ClientModalComponent } from '../shared/modal/clients/client-modal/client-modal.component';
-import {
-  StadisticsService,
-  StatisticsResponse,
-} from '../stadistics/stadistics.service';
+import { StadisticsService, StatisticsResponse } from '../stadistics/stadistics.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Client } from '../stadistics/components/clients/clients.interfaces';
 import { Payment } from '../stadistics/components/payments/payments/payments.component';
@@ -85,18 +82,19 @@ export class DashboardComponent implements OnInit {
         // Cargar los pagos de todos los clientes
         this.loadPaymentsForAllClients();
       });
-    }
+  }
 
-    loadPaymentsForAllClients(): void {
-    const today = new Date();
-    const start = new Date(today.getFullYear(), today.getMonth() - 1, today.getDay())
-    // const end = new Date(start.getFullYear(), start.getMonth() - 1, start.getDay())
-    // const { start, end } = this.dashboardForm.get('lineChartForm')!.value;
+  loadPaymentsForAllClients(): void {
+    const today = this.dashboardForm.get('lineChartForm')!.value.end ?? new Date();
+    const start =
+      this.dashboardForm.get('lineChartForm')!.value.start ??
+      new Date(today.getFullYear(), today.getMonth() - 1, today.getDay());
 
     const statisticsParam = { startDate: start, endDate: today };
     this.statisticService.getStatisticsOfMonth(statisticsParam).subscribe((data) => {
-      if(data.length > 0) {
+      if (data.length > 0) {
         const chartData = this.adaptStatisticsToChartData(data);
+        if (this.chart) this.chart.destroy();
         this.chart = new Chart('MyChart', {
           type: 'line' as ChartType, //this denotes tha type of chart
           data: chartData, // Asegúrate de que tu variable esté definida correctamente
@@ -105,7 +103,7 @@ export class DashboardComponent implements OnInit {
               x: {
                 ticks: {
                   autoSkip: true, // Esto permite que se omitan etiquetas automáticamente
-                  maxTicksLimit: 5, // Establece el número máximo de etiquetas
+                  maxTicksLimit: 10, // Establece el número máximo de etiquetas
                 },
               },
             },
