@@ -25,7 +25,7 @@ interface ChartData {
 @Component({
   selector: 'app-line-chart-payments-clients',
   templateUrl: './line-chart-payments-clients.component.html',
-  styleUrls: ['./line-chart-payments-clients.component.scss']
+  styleUrls: ['./line-chart-payments-clients.component.scss'],
 })
 export class LineChartPaymentsClientsComponent {
   lineChartData: any[] = [];
@@ -89,7 +89,7 @@ export class LineChartPaymentsClientsComponent {
       if (data.length > 0) {
         const chartData = this.adaptStatisticsToChartData(data);
         if (this.chart) this.chart.destroy();
-        console.log('Antes de crear el Chart')
+        console.log('Antes de crear el Chart');
         this.chart = new Chart('MyChart', {
           type: 'line' as ChartType, //this denotes tha type of chart
           data: chartData, // Asegúrate de que tu variable esté definida correctamente
@@ -109,12 +109,29 @@ export class LineChartPaymentsClientsComponent {
   }
 
   adaptStatisticsToChartData(response: StatisticsResponse[]): ChartData {
+    const totalLine = new Map<string, number>();
+
+    response.forEach((stat) => {
+      Object.keys(stat.statistics).forEach((day) => {
+        const value = Number(stat.statistics[day]);
+        if (totalLine.has(day)) {
+          totalLine.set(day, totalLine.get(day)! + value);
+        } else {
+          totalLine.set(day, value);
+        }
+      });
+    });
+
+    const totalStatistics = Object.fromEntries(totalLine);
+    const finalStatistics = [...response, { clientName: 'Total', statistics: totalStatistics }];
+
+    const labels = Object.keys(response[0].statistics);
     return {
-      labels: Object.keys(response[0].statistics),
-      datasets: response.map((stat, index) => {
+      labels: labels,
+      datasets: finalStatistics.map((stat, index) => {
         return {
           label: stat.clientName,
-          data: Object.values(stat.statistics).map(Number),
+          data: labels.map((day) => Number(stat.statistics[day])), // Asegurarse de mapear las fechas correctamente
           fill: false,
           borderColor: this.getColorForClient(index),
           tension: 0.2,
@@ -137,7 +154,7 @@ export class LineChartPaymentsClientsComponent {
 
   // Función para generar un color para cada cliente (puedes definir tu lógica)
   getColorForClient(index: number): string {
-    const colors = ['#bb8fce', '#85c1e9', '#73c6b6'];
+    const colors = ['#bb8fce', '#85c1e9', '#73c6b6', '#f5b7b1'];
     return colors[index];
   }
 
