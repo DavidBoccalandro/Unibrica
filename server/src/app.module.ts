@@ -19,6 +19,8 @@ import { ReversalModule } from './reversal/reversal.module';
 import { SheetsModule } from './sheets/sheets.module';
 import { RepeatedDebtorModule } from './repeated-debtor/repeated-debtor.module';
 import { StatisticsModule } from './statistics/statistics.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ErrorInterceptor } from './shared/interceptors/errorInterceptor';
 
 @Module({
   imports: [
@@ -45,7 +47,12 @@ import { StatisticsModule } from './statistics/statistics.module';
     RepeatedDebtorModule,
     StatisticsModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ErrorInterceptor,
+    },
+  ],
   controllers: [],
 })
 export class AppModule {}

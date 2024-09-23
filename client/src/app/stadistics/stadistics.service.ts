@@ -30,6 +30,13 @@ export interface StatisticsParams2 {
   dateFilters?: { filterBy: string; startDate: Date; endDate: Date }[];
 }
 
+export interface StatisticsResponse {
+  clientName: string;
+  statistics: {
+    [key: string]: string;
+  };
+}
+
 @Injectable()
 export class StadisticsService {
   private DebtsUrl = `${environment.envVar.API_URL}/debts`;
@@ -38,6 +45,7 @@ export class StadisticsService {
   private PaymentsUrl = `${environment.envVar.API_URL}/payment`;
   private ReversalURL = `${environment.envVar.API_URL}/reversal`;
   private SheetsURL = `${environment.envVar.API_URL}/sheets`;
+  private StatisticsURL = `${environment.envVar.API_URL}/statistics`;
 
   params$!: Observable<Params>;
 
@@ -171,6 +179,32 @@ export class StadisticsService {
       withCredentials: true,
     });
   }
+
+  getStatisticsOfMonth(params: { startDate: Date; endDate: Date }): Observable<StatisticsResponse[]> {
+    const { startDate, endDate } = params;
+    let httpParams = new HttpParams()
+      .set('startDate', startDate.toISOString())
+      .set('endDate', endDate.toISOString());
+    const url = `${this.StatisticsURL}/monthly`;
+    return this.http.get<StatisticsResponse[]>(url, { withCredentials: true, params: httpParams });
+  }
+
+  // getPaymentsByClientAndDateRange(
+  //   params: StatisticsParams2
+  // ): Observable<any> {
+  //   let httpParams = new HttpParams()
+  //   .set('stringFilters', JSON.stringify(params.stringFilters))
+  //   .set('numericFilters', JSON.stringify(params.numericFilters))
+  //   .set('dateFilters', JSON.stringify(params.dateFilters));
+
+  // return this.http.get<{ totalItems: number; payments: Payment[] }>(this.PaymentsUrl, {
+  //   params: httpParams,
+  //   withCredentials: true,
+  // });
+  //   return this.http.get(this.paymentURL, {
+  //     params: { startDate, endDate },
+  //   });
+  // }
 
   navigateWithQueryParams(pageInfo: PageEvent, filters: FilterValues, route: string): void {
     const queryParams: any = {

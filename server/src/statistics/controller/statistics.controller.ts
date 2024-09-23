@@ -5,6 +5,17 @@ import { StatisticsService } from '../services/statistics.service';
 export class StatisticsController {
   constructor(private readonly statisticsService: StatisticsService) {}
 
+  @Get('monthly')
+  async getMonthlyStatistics(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string
+  ) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    return await this.statisticsService.getMonthlyStatistics(start, end);
+  }
+
   @Get(':clientId')
   async getStatistics(
     @Param('clientId') clientId: string,

@@ -12,6 +12,7 @@
     "start:dev": "cross-env NODE_ENV=develop nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "npx @nestjs/cli build && node dist/main",
+    "seed": "cross-env NODE_ENV=development npm run build && node dist/shared/seeder/statistics.seeder.js",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
