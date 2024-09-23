@@ -14,6 +14,7 @@ import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDt
 import { rejectionCodes } from '../utils/rejectionCodes';
 import { processSdaLines } from '../utils/processSda';
 import { generatePaymentExcel } from '../utils/generatePaymentExcel.util';
+import { StatisticsEntity } from 'src/statistics/entities/statistic.entity';
 
 @Injectable()
 export class PaymentService {
@@ -31,7 +32,10 @@ export class PaymentService {
     private clientRepository: Repository<ClientEntity>,
 
     @InjectRepository(SheetsEntity)
-    private sheetRepository: Repository<SheetsEntity>
+    private sheetRepository: Repository<SheetsEntity>,
+
+    @InjectRepository(StatisticsEntity)
+    private readonly statisticsRepository: Repository<StatisticsEntity>
   ) {}
 
   async uploadPaymentSheet(
@@ -64,6 +68,8 @@ export class PaymentService {
 
     const sdaDataMap = processSdaLines(optionalFile);
 
+    let totalDebitAmount = 0;
+
     for (const line of lines) {
       try {
         const recordType = parseInt(line.substring(0, 1).trim(), 10);
@@ -94,6 +100,10 @@ export class PaymentService {
           chargedAmount = 0;
         }
         const remainingDebt = +(debtAmount - chargedAmount).toFixed(2);
+        if (!isNaN(debtAmount)) {
+          totalDebitAmount += chargedAmount;
+        }
+        console.log('Total debit amount: ', totalDebitAmount, debtAmount);
 
         let bank = bankMap.get(bankCode);
 
@@ -172,7 +182,16 @@ export class PaymentService {
       }
     }
 
-    // Crear archivo Excel
+    //% Creamos las estadísticas
+    const newStat = this.statisticsRepository.create({
+      client,
+      sheet,
+      date: sheet.date,
+      totalDebitAmount,
+    });
+    await this.statisticsRepository.save(newStat);
+
+    //% Creamos archivo Excel
     const filePath = await this.createExcelFile(processedData, originalFileName);
     console.log(`Excel file created at: ${filePath}`);
 

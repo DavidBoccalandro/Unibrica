@@ -7,10 +7,18 @@ import { PaymentRecord } from './entities/payment.entity';
 import { DebtEntity } from 'src/debts/entities/debts.entity';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
 import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
+import { StatisticsEntity } from 'src/statistics/entities/statistic.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([BankEntity, PaymentRecord, DebtEntity, ClientEntity, SheetsEntity]),
+    TypeOrmModule.forFeature([
+      BankEntity,
+      PaymentRecord,
+      DebtEntity,
+      ClientEntity,
+      SheetsEntity,
+      StatisticsEntity,
+    ]),
   ],
   providers: [PaymentService],
   controllers: [PaymentController],

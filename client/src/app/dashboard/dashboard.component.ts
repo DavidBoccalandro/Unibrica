@@ -119,7 +119,7 @@ export class DashboardComponent implements OnInit {
     // Agrupar pagos por cliente y fecha
     const groupedData: { [key: string]: { [date: string]: number } } = data.reduce(
       (acc: { [key: string]: { [date: string]: number } }, payment) => {
-        const clientId = payment.client.clientId;
+        const clientId = payment.client?.clientId;
         const date = new Date(payment.debitDate).toDateString();
 
         if (!acc[clientId]) {
