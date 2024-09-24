@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Color, ScaleType } from '@swimlane/ngx-charts';
 import { StadisticsService, StatisticsResponse } from 'src/app/stadistics/stadistics.service';
 
@@ -30,20 +31,33 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
     domain: ['#CC0000', '#1E4666', '#AAAAAA'],
   };
 
-  constructor(private statisticService: StadisticsService) {}
+  dashboardForm!: FormGroup;
+
+  constructor(
+    private statisticService: StadisticsService,
+    private fb: FormBuilder
+  ) {
+    this.dashboardForm = this.fb.group({
+      stackedBarsChartForm: this.fb.group({
+        // selectedClientId: [null],
+        start: [null],
+        end: [null],
+      }),
+    });
+  }
 
   ngOnInit(): void {
     this.loadPaymentsForAllClients();
   }
 
   loadPaymentsForAllClients(): void {
-    // const today = this.dashboardForm.get('lineChartForm')!.value.end ?? new Date();
-    // const start =
-    //   this.dashboardForm.get('lineChartForm')!.value.start ??
-    //   new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+    const today = this.dashboardForm.get('stackedBarsChartForm')!.value.end ?? new Date();
+    const start =
+      this.dashboardForm.get('stackedBarsChartForm')!.value.start ??
+      new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
 
-    const today = new Date();
-    const start = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+    // const today = new Date();
+    // const start = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
 
     const statisticsParam = { startDate: start, endDate: today };
     this.statisticService.getStatisticsOfMonth(statisticsParam).subscribe((data) => {

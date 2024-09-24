@@ -1,16 +1,68 @@
-<ngx-charts-bar-vertical-stacked
-  [view]="view"
-  [scheme]="colorScheme"
-  [results]="data"
-  [gradient]="gradient"
-  [xAxis]="showXAxis"
-  [yAxis]="showYAxis"
-  [legend]="showLegend"
-  [showXAxisLabel]="showXAxisLabel"
-  [showYAxisLabel]="showYAxisLabel"
-  [xAxisLabel]="xAxisLabel"
-  [yAxisLabel]="yAxisLabel"
-  [animations]="animations"
-  [yScaleMax]="maxValue"
-  [barPadding]="60">
-</ngx-charts-bar-vertical-stacked>
+<div class="dashboard-container" [formGroup]="dashboardForm">
+  <h3>Eficiencia de cobro</h3>
+  <ng-container class="charts-container" formGroupName="stackedBarsChartForm">
+    <div class="chart-wrapper">
+      <div class="left-side">
+        <div class="subtitle">
+          <h4>
+            Período:
+          </h4>
+          <div *ngIf="dashboardForm.get('stackedBarsChartForm.start')?.value; else noDate">
+            <h4 >
+              {{ dashboardForm.get('stackedBarsChartForm.start')?.value | date : 'dd/MM/yyyy' }} hasta
+              {{ dashboardForm.get('stackedBarsChartForm.end')?.value | date : 'dd/MM/yyyy' }}
+            </h4>
+          </div>
+          <ng-template #noDate>
+            <h4>Último mes</h4>
+          </ng-template>
+        </div>
+        <div class="controls">
+          <!-- <mat-form-field>
+            <mat-label>Cliente</mat-label>
+            <mat-select formControlName="selectedClientId">
+              <mat-option *ngFor="let client of clients" [value]="client.clientId">
+                {{ client.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field> -->
+
+          <mat-form-field appearance="outline">
+            <mat-label>Rango de búsqueda</mat-label>
+            <mat-date-range-input [rangePicker]="dateRangePicker">
+              <input matStartDate placeholder="Fecha de inicio" formControlName="start" />
+              <input matEndDate placeholder="Fecha de fin" formControlName="end" />
+            </mat-date-range-input>
+            <mat-datepicker-toggle matIconSuffix [for]="dateRangePicker"></mat-datepicker-toggle>
+            <mat-date-range-picker #dateRangePicker></mat-date-range-picker>
+          </mat-form-field>
+
+          <button mat-raised-button color="primary" (click)="loadPaymentsForAllClients()">
+            Cargar Pagos
+          </button>
+        </div>
+      </div>
+
+      <!-- <app-line-chart [data]="lineChartData" [labels]="lineChartLabels" [view]="view"></app-line-chart> -->
+      <div class="right-side">
+        <ngx-charts-bar-vertical-stacked
+          [view]="view"
+          [scheme]="colorScheme"
+          [results]="data"
+          [gradient]="gradient"
+          [xAxis]="showXAxis"
+          [yAxis]="showYAxis"
+          [legend]="showLegend"
+          [showXAxisLabel]="showXAxisLabel"
+          [showYAxisLabel]="showYAxisLabel"
+          [xAxisLabel]="xAxisLabel"
+          [yAxisLabel]="yAxisLabel"
+          [animations]="animations"
+          [yScaleMax]="maxValue"
+          [barPadding]="60"
+        >
+        </ngx-charts-bar-vertical-stacked>
+      </div>
+    </div>
+  </ng-container>
+</div>

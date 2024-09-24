@@ -29,9 +29,11 @@ async function seedDatabase() {
   // Crear hojas y estadísticas ficticias
   for (const client of clients) {
     //! Ajustar la cantidad de stadistics que se generarán por client
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 120; i++) {
       const date = faker.date
-        .between({ from: '2024-08-01', to: '2024-09-30' }) //! Ajustar la fecha de los sheets
+        //! Ajustar la fecha de los sheets
+        // .between({ from: '2024-08-01', to: '2024-09-30' }) // último mes
+        .between({ from: '2023-08-01', to: '2024-09-30' }) // último año
         .toISOString()
         .split('T')[0];
 
