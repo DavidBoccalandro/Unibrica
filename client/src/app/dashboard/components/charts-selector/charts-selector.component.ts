@@ -16,10 +16,10 @@ export class ChartsSelectorComponent {
       route: '/dashboard/line-chart'
     },
     {
-      title: 'Gráfico 2',
-      imageUrl: '../../../../assets/media/SITIO-EN-CONSTRUCCION.jpg',
-      description: 'Descripción del gráfico 2',
-      route: '/grafico2'
+      title: 'Efectividad de cobro',
+      imageUrl: '../../../../assets/media/stacked-bars.jpg',
+      description: 'Representa el monto de los pagos realizados y no realizados dando una clara muestra de la efectividad de cobro',
+      route: '/dashboard/stacked-chart'
     },
     {
       title: 'Gráfico 3',
