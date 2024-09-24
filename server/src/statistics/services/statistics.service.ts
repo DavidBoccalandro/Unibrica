@@ -51,9 +51,9 @@ export class StatisticsService {
       const clientStats = clientStatisticsMap.get(clientName);
       // Inicializar los valores en 0 si no existen
       clientStats.statistics.totalDebitAmount[date] =
-        (clientStats.statistics.totalDebitAmount[date] || 0) + stat.totalDebitAmount;
+        (clientStats.statistics.totalDebitAmount[date] || 0) + +stat.totalDebitAmount;
       clientStats.statistics.totalRemainingDebt[date] =
-        (clientStats.statistics.totalRemainingDebt[date] || 0) + stat.totalRemainingDebt;
+        (clientStats.statistics.totalRemainingDebt[date] || 0) + +stat.totalRemainingDebt;
     });
 
     // Generar un rango de fechas

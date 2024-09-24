@@ -15,6 +15,7 @@ import { StadisticsService } from '../stadistics/stadistics.service';
 import { LineChartPaymentsClientsComponent } from './components/line-chart-payments-clients/line-chart-payments-clients.component';
 import { ChartsSelectorComponent } from './components/charts-selector/charts-selector.component';
 import { EfficiencyRecoveryChartComponent } from './components/efficiency-recovery-chart/efficiency-recovery-chart.component';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { EfficiencyRecoveryChartComponent } from './components/efficiency-recove
     MatFormFieldModule,
     MatSelectModule,
     MatNativeDateModule,
+    NgxChartsModule
   ],
   providers: [DashboardService, StadisticsService],
 })

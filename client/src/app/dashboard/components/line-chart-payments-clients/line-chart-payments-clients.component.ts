@@ -113,7 +113,7 @@ export class LineChartPaymentsClientsComponent {
 
     response.forEach((stat) => {
       Object.keys(stat.statistics).forEach((day) => {
-        const value = Number(stat.statistics[day]);
+        const value = Number(stat.statistics.totalDebitAmount[day]);
         if (totalLine.has(day)) {
           totalLine.set(day, totalLine.get(day)! + value);
         } else {
@@ -123,7 +123,7 @@ export class LineChartPaymentsClientsComponent {
     });
 
     const totalStatistics = Object.fromEntries(totalLine);
-    const finalStatistics = [...response, { clientName: 'Total', statistics: totalStatistics }];
+    const finalStatistics = [...response, { clientName: 'Total', statistics: { totalDebitAmount: totalStatistics } }];
 
     const labels = Object.keys(response[0].statistics);
     return {
@@ -131,7 +131,7 @@ export class LineChartPaymentsClientsComponent {
       datasets: finalStatistics.map((stat, index) => {
         return {
           label: stat.clientName,
-          data: labels.map((day) => Number(stat.statistics[day])), // Asegurarse de mapear las fechas correctamente
+          data: labels.map((day: string) => Number(stat.statistics.totalDebitAmount[day])), // Asegurarse de mapear las fechas correctamente
           fill: false,
           borderColor: this.getColorForClient(index),
           tension: 0.2,

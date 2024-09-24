@@ -33,9 +33,15 @@ export interface StatisticsParams2 {
 export interface StatisticsResponse {
   clientName: string;
   statistics: {
-    [key: string]: string;
+    totalDebitAmount: {
+      [key: string]: number;
+    };
+    totalRemainingDebt: {
+      [key: string]: number;
+    };
   };
 }
+
 
 @Injectable()
 export class StadisticsService {
@@ -187,6 +193,15 @@ export class StadisticsService {
       .set('endDate', endDate.toISOString());
     const url = `${this.StatisticsURL}/monthly`;
     return this.http.get<StatisticsResponse[]>(url, { withCredentials: true, params: httpParams });
+  }
+
+  getEfficiencyRecovery(params: { startDate: Date; endDate: Date }): Observable<any> {
+    const { startDate, endDate } = params;
+    let httpParams = new HttpParams()
+      .set('startDate', startDate.toISOString())
+      .set('endDate', endDate.toISOString());
+    const url = `${this.StatisticsURL}/monthly`;
+    return this.http.get<any>(url, { withCredentials: true, params: httpParams });
   }
 
   // getPaymentsByClientAndDateRange(
