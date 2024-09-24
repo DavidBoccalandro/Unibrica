@@ -69,6 +69,7 @@ export class PaymentService {
     const sdaDataMap = processSdaLines(optionalFile);
 
     let totalDebitAmount = 0;
+    let totalRemainingDebt = 0;
 
     for (const line of lines) {
       try {
@@ -100,10 +101,13 @@ export class PaymentService {
           chargedAmount = 0;
         }
         const remainingDebt = +(debtAmount - chargedAmount).toFixed(2);
+        if (!isNaN(remainingDebt)) {
+          totalRemainingDebt += remainingDebt;
+        }
         if (!isNaN(debtAmount)) {
           totalDebitAmount += chargedAmount;
         }
-        console.log('Total debit amount: ', totalDebitAmount, debtAmount);
+        // console.log('Total debit amount: ', totalDebitAmount, debtAmount);
 
         let bank = bankMap.get(bankCode);
 
@@ -188,6 +192,7 @@ export class PaymentService {
       sheet,
       date: sheet.date,
       totalDebitAmount,
+      totalRemainingDebt,
     });
     await this.statisticsRepository.save(newStat);
 

@@ -42,24 +42,42 @@ export class StatisticsService {
       const date = stat.date.toISOString().split('T')[0]; // Convertir la fecha a formato YYYY-MM-DD
 
       if (!clientStatisticsMap.has(clientName)) {
-        clientStatisticsMap.set(clientName, { clientName, statistics: {} });
+        clientStatisticsMap.set(clientName, {
+          clientName,
+          statistics: { totalDebitAmount: {}, totalRemainingDebt: {} },
+        });
       }
 
       const clientStats = clientStatisticsMap.get(clientName);
-      clientStats.statistics[date] = (clientStats.statistics[date] || 0) + stat.totalDebitAmount;
+      // Inicializar los valores en 0 si no existen
+      clientStats.statistics.totalDebitAmount[date] =
+        (clientStats.statistics.totalDebitAmount[date] || 0) + stat.totalDebitAmount;
+      clientStats.statistics.totalRemainingDebt[date] =
+        (clientStats.statistics.totalRemainingDebt[date] || 0) + stat.totalRemainingDebt;
     });
 
     // Generar un rango de fechas
     const allDates = this.generateDateRange(startDate, endDate);
 
-    // Asegurar que cada cliente tenga un registro para cada fecha
+    // Asegurar que cada cliente tenga un registro para cada fecha con ambos campos inicializados en 0
     const result = Array.from(clientStatisticsMap.values()).map((clientStats) => {
-      const statisticsWithZeros = allDates.reduce((acc, date) => {
-        acc[date] = clientStats.statistics[date] || 0; // Asignar 0 si no hay datos
+      const totalDebitAmountWithZeros = allDates.reduce((acc, date) => {
+        acc[date] = clientStats.statistics.totalDebitAmount[date] || 0;
         return acc;
       }, {});
 
-      return { clientName: clientStats.clientName, statistics: statisticsWithZeros };
+      const totalRemainingDebtWithZeros = allDates.reduce((acc, date) => {
+        acc[date] = clientStats.statistics.totalRemainingDebt[date] || 0;
+        return acc;
+      }, {});
+
+      return {
+        clientName: clientStats.clientName,
+        statistics: {
+          totalDebitAmount: totalDebitAmountWithZeros,
+          totalRemainingDebt: totalRemainingDebtWithZeros,
+        },
+      };
     });
 
     return result;

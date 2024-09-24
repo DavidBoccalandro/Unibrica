@@ -16,4 +16,7 @@ export class StatisticsEntity extends BaseEntity {
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   totalDebitAmount: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  totalRemainingDebt: number;
 }

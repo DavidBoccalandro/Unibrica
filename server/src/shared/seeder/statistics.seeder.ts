@@ -29,9 +29,9 @@ async function seedDatabase() {
   // Crear hojas y estadísticas ficticias
   for (const client of clients) {
     //! Ajustar la cantidad de stadistics que se generarán por client
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 30; i++) {
       const date = faker.date
-        .between({ from: '2023-09-01', to: '2024-09-30' }) //! Ajustar la fecha de los sheets
+        .between({ from: '2024-08-01', to: '2024-09-30' }) //! Ajustar la fecha de los sheets
         .toISOString()
         .split('T')[0];
 
@@ -55,6 +55,7 @@ async function seedDatabase() {
         const statistic = new StatisticsEntity();
         statistic.date = new Date(date);
         statistic.totalDebitAmount = faker.number.float({ min: 0, max: 1000000 });
+        statistic.totalRemainingDebt = faker.number.float({ min: 0, max: 1000000 });
         statistic.client = client;
         statistic.sheet = sheet;
 
