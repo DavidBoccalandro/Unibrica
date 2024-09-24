@@ -89,7 +89,7 @@ export class LineChartPaymentsClientsComponent {
       if (data.length > 0) {
         const chartData = this.adaptStatisticsToChartData(data);
         if (this.chart) this.chart.destroy();
-        console.log('Antes de crear el Chart');
+        console.log('Antes de crear el Chart', chartData);
         this.chart = new Chart('MyChart', {
           type: 'line' as ChartType, //this denotes tha type of chart
           data: chartData, // Asegúrate de que tu variable esté definida correctamente
@@ -112,7 +112,7 @@ export class LineChartPaymentsClientsComponent {
     const totalLine = new Map<string, number>();
 
     response.forEach((stat) => {
-      Object.keys(stat.statistics).forEach((day) => {
+      Object.keys(stat.statistics.totalDebitAmount).forEach((day) => {
         const value = Number(stat.statistics.totalDebitAmount[day]);
         if (totalLine.has(day)) {
           totalLine.set(day, totalLine.get(day)! + value);
@@ -125,7 +125,7 @@ export class LineChartPaymentsClientsComponent {
     const totalStatistics = Object.fromEntries(totalLine);
     const finalStatistics = [...response, { clientName: 'Total', statistics: { totalDebitAmount: totalStatistics } }];
 
-    const labels = Object.keys(response[0].statistics);
+    const labels = Object.keys(response[0].statistics.totalDebitAmount);
     return {
       labels: labels,
       datasets: finalStatistics.map((stat, index) => {

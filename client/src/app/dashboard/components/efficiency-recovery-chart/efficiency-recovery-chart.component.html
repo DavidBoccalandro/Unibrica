@@ -1,15 +1,14 @@
 <div class="dashboard-container" [formGroup]="dashboardForm">
-  <h3>Eficiencia de cobro</h3>
+  <h3>Efectividad de cobro</h3>
   <ng-container class="charts-container" formGroupName="stackedBarsChartForm">
     <div class="chart-wrapper">
       <div class="left-side">
         <div class="subtitle">
-          <h4>
-            Período:
-          </h4>
+          <h4>Período:</h4>
           <div *ngIf="dashboardForm.get('stackedBarsChartForm.start')?.value; else noDate">
-            <h4 >
-              {{ dashboardForm.get('stackedBarsChartForm.start')?.value | date : 'dd/MM/yyyy' }} hasta
+            <h4>
+              {{ dashboardForm.get('stackedBarsChartForm.start')?.value | date : 'dd/MM/yyyy' }}
+              hasta
               {{ dashboardForm.get('stackedBarsChartForm.end')?.value | date : 'dd/MM/yyyy' }}
             </h4>
           </div>
@@ -62,6 +61,34 @@
           [barPadding]="60"
         >
         </ngx-charts-bar-vertical-stacked>
+      </div>
+      <div class="efficiency-cards">
+        <div *ngFor="let client of data" class="efficiency-card">
+          <h5>{{ client.name }}</h5>
+          <div>
+            <div class="card-content">
+              <!-- Columna de la eficiencia -->
+              <div class="efficiency-column">
+                <div class="efficiency-container">
+                  <p class="efficiency-label">Eficacia de cobro</p>
+                  <p class="efficiency-value">{{ client.collectionEfficiency }}%</p>
+                </div>
+              </div>
+
+              <!-- Columna de los detalles -->
+              <!-- <div class="details-column">
+                <p>
+                  <strong>Monto cobrado:</strong>
+                  <span class="value">{{ client.totalDebitAmountSum | currency }}</span>
+                </p>
+                <p>
+                  <strong>Monto de deuda restante:</strong>
+                  <span class="value">{{ client.totalRemainingDebtSum | currency }}</span>
+                </p>
+              </div> -->
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </ng-container>

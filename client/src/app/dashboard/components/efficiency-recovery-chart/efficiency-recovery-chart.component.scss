@@ -46,7 +46,7 @@
 
   h3 {
     text-align: center;
-    font-size: 1.8rem;
+    font-size: 2.4rem;
     margin: 20px;;
     color:rgb(92, 88, 88)
   }
@@ -106,3 +106,72 @@
   align-items: center !important;
 }
 
+.efficiency-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-around;
+
+  .efficiency-card {
+    width: 200px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid lightgray;
+    padding: 16px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+
+    h5 {
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 16px;
+      color: #1e4666
+    }
+  }
+}
+
+.card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 14px;
+}
+
+.efficiency-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-right: 20px;
+  // border-right: 1px solid #ccc;
+}
+
+.efficiency-container {
+  text-align: center;
+}
+
+.efficiency-label {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.efficiency-value {
+  font-size: 40px;
+  font-weight: bold;
+  color: #a20202; /* Color destacado */
+}
+
+.details-column {
+  flex: 2;
+  padding-left: 20px;
+}
+
+.value {
+  font-size: 18px;
+  color: #333;
+  font-weight: bold;
+}

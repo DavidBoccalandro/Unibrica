@@ -33,10 +33,7 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
 
   dashboardForm!: FormGroup;
 
-  constructor(
-    private statisticService: StadisticsService,
-    private fb: FormBuilder
-  ) {
+  constructor(private statisticService: StadisticsService, private fb: FormBuilder) {
     this.dashboardForm = this.fb.group({
       stackedBarsChartForm: this.fb.group({
         // selectedClientId: [null],
@@ -64,16 +61,15 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
       if (data.length > 0) {
         const chartData = this.adaptStatisticsToChartData(data);
         const maxValueY = this.calculateMaxValueY(chartData);
-        this.maxValue = Math.round(maxValueY + (maxValueY * 0.1));
+        this.maxValue = Math.round(maxValueY + maxValueY * 0.1);
         this.data = chartData;
-        console.log('maxValue: ', this.maxValue)
+        console.log('maxValue: ', this.maxValue);
       }
     });
   }
 
   adaptStatisticsToChartData(data: StatisticsResponse[]) {
     return data.map((clientStats) => {
-      // Sumar todos los valores de 'totalDebitAmount' y 'totalRemainingDebt' para cada cliente
       const totalDebitAmountSum = Object.values(clientStats.statistics.totalDebitAmount).reduce(
         (acc: number, value: number) => acc + value,
         0
@@ -84,18 +80,20 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
         0
       );
 
-      // Retornar en el formato necesario para ngx-charts
+      // Calcular el monto total de deuda (cobrado + deuda remanente)
+      const totalDebt = totalDebitAmountSum + totalRemainingDebtSum;
+
+      // Calcular la eficacia de cobro
+      const collectionEfficiency = totalDebt > 0 ? (totalDebitAmountSum / totalDebt) * 100 : 0;
+
       return {
-        name: clientStats.clientName, // El nombre del cliente
+        name: clientStats.clientName,
+        totalDebitAmountSum: totalDebitAmountSum,
+        totalRemainingDebtSum: totalRemainingDebtSum,
+        collectionEfficiency: collectionEfficiency.toFixed(2), // Dejar dos decimales
         series: [
-          {
-            name: 'Monto cobrado', // Nombre de la serie para el monto cobrado
-            value: Number(totalDebitAmountSum), // Suma total de monto cobrado
-          },
-          {
-            name: 'Monto deuda', // Nombre de la serie para la deuda remanente
-            value: Number(totalRemainingDebtSum), // Suma total de deuda remanente
-          },
+          { name: 'Monto cobrado', value: Number(totalDebitAmountSum) },
+          { name: 'Monto deuda', value: Number(totalRemainingDebtSum) },
         ],
       };
     });
