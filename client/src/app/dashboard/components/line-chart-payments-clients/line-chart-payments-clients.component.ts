@@ -123,7 +123,10 @@ export class LineChartPaymentsClientsComponent {
     });
 
     const totalStatistics = Object.fromEntries(totalLine);
-    const finalStatistics = [...response, { clientName: 'Total', statistics: { totalDebitAmount: totalStatistics } }];
+    const finalStatistics = [
+      ...response,
+      { clientName: 'Total', statistics: { totalDebitAmount: totalStatistics } },
+    ];
 
     const labels = Object.keys(response[0].statistics.totalDebitAmount);
     return {
@@ -154,7 +157,17 @@ export class LineChartPaymentsClientsComponent {
 
   // Función para generar un color para cada cliente (puedes definir tu lógica)
   getColorForClient(index: number): string {
-    const colors = ['#bb8fce', '#85c1e9', '#73c6b6', '#f5b7b1'];
+    const colors = [
+      '#bb8fce',
+      '#85c1e9',
+      '#73c6b6',
+      '#f5b7b1',
+      '#abebc6',
+      '#fad7a0',
+      '#edbb99',
+      '#2980b9',
+      '#1abc9c',
+    ];
     return colors[index];
   }
 

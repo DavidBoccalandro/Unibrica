@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Color, ScaleType } from '@swimlane/ngx-charts';
+import { Color, LegendPosition, ScaleType } from '@swimlane/ngx-charts';
+import { take } from 'rxjs';
+import { Client } from 'src/app/stadistics/components/clients/clients.interfaces';
 import { StadisticsService, StatisticsResponse } from 'src/app/stadistics/stadistics.service';
 
 @Component({
@@ -23,6 +25,7 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
   animations: boolean = true;
   data: any = [];
   maxValue = 16000000;
+  legendPosition = 'below' as LegendPosition;
 
   colorScheme: Color = {
     name: 'light',
@@ -32,11 +35,12 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
   };
 
   dashboardForm!: FormGroup;
+  clients: Client[] = []
 
   constructor(private statisticService: StadisticsService, private fb: FormBuilder) {
     this.dashboardForm = this.fb.group({
       stackedBarsChartForm: this.fb.group({
-        // selectedClientId: [null],
+        clientName: [null],
         start: [null],
         end: [null],
       }),
@@ -44,6 +48,9 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.statisticService.getAllClients().pipe(take(1)).subscribe((clients) => {
+      this.clients = clients;
+    });
     this.loadPaymentsForAllClients();
   }
 
@@ -63,12 +70,17 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
         const maxValueY = this.calculateMaxValueY(chartData);
         this.maxValue = Math.round(maxValueY + maxValueY * 0.1);
         this.data = chartData;
-        console.log('maxValue: ', this.maxValue);
+        this.view = [this.data.length * 300 < 1000 ? this.data.length * 300 : 1000, 600]
       }
     });
   }
 
   adaptStatisticsToChartData(data: StatisticsResponse[]) {
+    const selectedClients = this.dashboardForm.get('stackedBarsChartForm')!.value.clientName;
+    if (selectedClients) {
+      data = data.filter((client) => selectedClients.includes(client.clientName));
+    }
+
     return data.map((clientStats) => {
       const totalDebitAmountSum = Object.values(clientStats.statistics.totalDebitAmount).reduce(
         (acc: number, value: number) => acc + value,
@@ -93,7 +105,7 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
         collectionEfficiency: collectionEfficiency.toFixed(2), // Dejar dos decimales
         series: [
           { name: 'Monto cobrado', value: Number(totalDebitAmountSum) },
-          { name: 'Monto deuda', value: Number(totalRemainingDebtSum) },
+          { name: 'Monto no cobrado', value: Number(totalRemainingDebtSum) },
         ],
       };
     });

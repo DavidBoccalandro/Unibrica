@@ -17,14 +17,11 @@
           </ng-template>
         </div>
         <div class="controls">
-          <!-- <mat-form-field>
-            <mat-label>Cliente</mat-label>
-            <mat-select formControlName="selectedClientId">
-              <mat-option *ngFor="let client of clients" [value]="client.clientId">
-                {{ client.name }}
-              </mat-option>
+          <mat-form-field appearance="outline">
+            <mat-select placeholder="Clientes" formControlName="clientName" multiple>
+              <mat-option *ngFor="let client of clients" [value]="client.name">{{client.name}}</mat-option>
             </mat-select>
-          </mat-form-field> -->
+          </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Rango de búsqueda</mat-label>
@@ -59,11 +56,12 @@
           [animations]="animations"
           [yScaleMax]="maxValue"
           [barPadding]="60"
+          [legendPosition]="legendPosition"
         >
         </ngx-charts-bar-vertical-stacked>
       </div>
-      <div class="efficiency-cards">
-        <div *ngFor="let client of data" class="efficiency-card">
+      <div class="efficiency-cards" [ngClass]="{ 'small-cards': data.length > 3 }">
+        <div *ngFor="let client of data" class="efficiency-card" [ngClass]="{ 'small-card': data.length > 3 }">
           <h5>{{ client.name }}</h5>
           <div>
             <div class="card-content">
