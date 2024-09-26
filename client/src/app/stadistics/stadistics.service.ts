@@ -33,6 +33,9 @@ export interface StatisticsParams2 {
 export interface StatisticsResponse {
   clientName: string;
   statistics: {
+    totalDebtAmount: {
+      [key: string]: number;
+    };
     totalDebitAmount: {
       [key: string]: number;
     };
