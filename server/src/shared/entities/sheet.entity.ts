@@ -8,6 +8,7 @@ import { RepeatedDebtorEntity } from 'src/repeated-debtor/entities/repeated-debt
 import { DebtorEntity } from 'src/debts/entities/debtors.entity';
 import { StatisticsPaymentEntity } from 'src/statistics/entities/statisticsPayment.entity';
 import { StatisticsDebtEntity } from 'src/statistics/entities/statisticsDebt.entity';
+import { StatisticsReversalEntity } from 'src/statistics/entities/statisticsReversal.entity';
 
 @Entity({ name: 'sheets' })
 export class SheetEntity extends BaseEntity {
@@ -38,9 +39,12 @@ export class SheetEntity extends BaseEntity {
   @ManyToMany(() => RepeatedDebtorEntity, (debtor) => debtor.sheets, { nullable: true })
   repeatedDebtors: RepeatedDebtorEntity[];
 
-  @OneToMany(() => StatisticsPaymentEntity, (statistic) => statistic.client)
+  @OneToMany(() => StatisticsDebtEntity, (statistic) => statistic.client, { nullable: true })
+  debtStatistics: StatisticsDebtEntity[];
+
+  @OneToMany(() => StatisticsPaymentEntity, (statistic) => statistic.client, { nullable: true })
   paymentStatistics: StatisticsPaymentEntity[];
 
-  @OneToMany(() => StatisticsPaymentEntity, (statistic) => statistic.client)
-  debtStatistics: StatisticsDebtEntity[];
+  @OneToMany(() => StatisticsReversalEntity, (statistic) => statistic.client, { nullable: true })
+  reversalStatistics: StatisticsReversalEntity[];
 }

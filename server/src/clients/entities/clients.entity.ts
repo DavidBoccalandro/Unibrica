@@ -7,6 +7,7 @@ import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../config/base.entity';
 import { StatisticsPaymentEntity } from 'src/statistics/entities/statisticsPayment.entity';
 import { StatisticsDebtEntity } from 'src/statistics/entities/statisticsDebt.entity';
+import { StatisticsReversalEntity } from 'src/statistics/entities/statisticsReversal.entity';
 
 @Entity({ name: 'clients' })
 export class ClientEntity extends BaseEntity implements IClient {
@@ -28,9 +29,12 @@ export class ClientEntity extends BaseEntity implements IClient {
   @OneToMany(() => DebtEntity, (debt) => debt.client, { nullable: true })
   debts: DebtEntity[];
 
-  @OneToMany(() => StatisticsPaymentEntity, (statistic) => statistic.client)
+  @OneToMany(() => StatisticsPaymentEntity, (statistic) => statistic.client, { nullable: true })
   paymentStatistics: StatisticsPaymentEntity[];
 
-  @OneToMany(() => StatisticsPaymentEntity, (statistic) => statistic.client)
+  @OneToMany(() => StatisticsPaymentEntity, (statistic) => statistic.client, { nullable: true })
   debtStatistics: StatisticsDebtEntity[];
+
+  @OneToMany(() => StatisticsReversalEntity, (statistic) => statistic.client, { nullable: true })
+  reversalStatistics: StatisticsReversalEntity[];
 }

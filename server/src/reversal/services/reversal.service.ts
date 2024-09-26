@@ -14,6 +14,7 @@ import { UpdateReversalDto } from '../dto/updateReversalDto';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
 import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDto';
 import { SheetEntity } from 'src/shared/entities/sheet.entity';
+import { StatisticsReversalEntity } from 'src/statistics/entities/statisticsReversal.entity';
 
 @Injectable()
 export class ReversalService {
@@ -25,7 +26,9 @@ export class ReversalService {
     @InjectRepository(SheetEntity)
     private readonly sheetRepository: Repository<SheetEntity>,
     @InjectRepository(ClientEntity)
-    private clientRepository: Repository<ClientEntity>
+    private clientRepository: Repository<ClientEntity>,
+    @InjectRepository(StatisticsReversalEntity)
+    private readonly statisticsReversalRepository: Repository<StatisticsReversalEntity>
   ) {}
 
   async uploadReversalSheet(
@@ -65,18 +68,21 @@ export class ReversalService {
     client: ClientEntity
   ): Promise<ReversalRecord[]> {
     const processedData: ReversalRecord[] = [];
+    let totalReversalAmount = 0;
 
     for (const line of lines) {
       try {
         const reversalRecord = await this.parseLine(line, sheet, client);
         if (reversalRecord) {
           processedData.push(reversalRecord);
+          totalReversalAmount += reversalRecord.debitAmount;
         }
       } catch (error) {
         console.error(`Error processing line: ${line}. Error: ${error.message}`);
       }
     }
 
+    await this.updateStatisticsReversal(client, sheet, totalReversalAmount);
     return processedData;
   }
 
@@ -272,5 +278,30 @@ export class ReversalService {
 
   async findBySheet(id: string): Promise<ReversalRecord[]> {
     return this.reversalRecordRepository.find({ where: { sheet: { id } } });
+  }
+
+  private async updateStatisticsReversal(
+    client: ClientEntity,
+    sheet: SheetEntity,
+    totalReversalAmount: number
+  ): Promise<void> {
+    let statistics = await this.statisticsReversalRepository.findOne({
+      where: { client, sheet },
+    });
+
+    if (statistics) {
+      // Actualizar las estadísticas si ya existen
+      statistics.totalReversalAmount += totalReversalAmount;
+    } else {
+      // Crear un nuevo registro si no existe
+      statistics = this.statisticsReversalRepository.create({
+        client,
+        sheet,
+        totalReversalAmount,
+        date: new Date(), // Puedes ajustar la fecha según tu lógica
+      });
+    }
+
+    await this.statisticsReversalRepository.save(statistics);
   }
 }

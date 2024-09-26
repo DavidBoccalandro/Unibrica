@@ -87,20 +87,12 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
         0
       );
 
-      // const totalRemainingDebtSum = Object.values(clientStats.statistics.totalRemainingDebt).reduce(
-      //   (acc: number, value: number) => acc + value,
-      //   0
-      // );
-
       const totalDebtSum = Object.values(clientStats.statistics.totalDebtAmount).reduce(
         (acc: number, value: number) => acc + value,
         0
       );
 
       const totalRemainingDebtSum = totalDebtSum - totalDebitAmountSum > 0 ? totalDebtSum - totalDebitAmountSum : 0;
-
-      // Calcular el monto total de deuda (cobrado + deuda remanente)
-      // const totalDebt = totalDebitAmountSum + totalRemainingDebtSum;
 
       // Calcular la eficacia de cobro
       const collectionEfficiency = totalDebtSum > 0 ? (totalDebitAmountSum / totalDebtSum) * 100 : 0;

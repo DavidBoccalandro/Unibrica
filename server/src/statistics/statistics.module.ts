@@ -4,9 +4,16 @@ import { StatisticsService } from './services/statistics.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { StatisticsPaymentEntity } from './entities/statisticsPayment.entity';
 import { StatisticsDebtEntity } from './entities/statisticsDebt.entity';
+import { StatisticsReversalEntity } from './entities/statisticsReversal.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([StatisticsPaymentEntity, StatisticsDebtEntity])],
+  imports: [
+    TypeOrmModule.forFeature([
+      StatisticsPaymentEntity,
+      StatisticsDebtEntity,
+      StatisticsReversalEntity,
+    ]),
+  ],
   controllers: [StatisticsController],
   providers: [StatisticsService],
 })
