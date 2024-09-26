@@ -12,6 +12,7 @@ import { ClientsModule } from 'src/clients/clients.module';
 import { BanksModule } from 'src/banks/banks.module';
 import { SheetEntity } from 'src/shared/entities/sheet.entity';
 import { RepeatedDebtorEntity } from 'src/repeated-debtor/entities/repeated-debtor.entity';
+import { StatisticsDebtEntity } from 'src/statistics/entities/statisticsDebt.entity';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { RepeatedDebtorEntity } from 'src/repeated-debtor/entities/repeated-debt
       DebtEntity,
       SheetEntity,
       RepeatedDebtorEntity,
+      StatisticsDebtEntity,
     ]),
     UsersModule,
     ClientsModule,

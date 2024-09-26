@@ -12,7 +12,13 @@ import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDt
 import { RepeatedDebtorEntity } from 'src/repeated-debtor/entities/repeated-debtor.entity';
 import { generateDebtorStatistics } from '../utils/generateDebtorStatistics.utils';
 import { generateExcelWithStatistics } from '../utils/generateDebtExcel';
-import { processDebtExcelRow, handleDebtor, createDebt } from '../utils/processFileRowFunctions';
+import {
+  processDebtExcelRow,
+  handleDebtor,
+  createDebt,
+  createDebtStatistics,
+} from '../utils/processFileRowFunctions';
+import { StatisticsDebtEntity } from 'src/statistics/entities/statisticsDebt.entity';
 
 @Injectable()
 export class DebtsService {
@@ -22,6 +28,8 @@ export class DebtsService {
     @InjectRepository(DebtEntity) private readonly debtRepository: Repository<DebtEntity>,
     @InjectRepository(BankEntity) private readonly bankRepository: Repository<BankEntity>,
     @InjectRepository(ClientEntity) private readonly clientRepository: Repository<ClientEntity>,
+    @InjectRepository(StatisticsDebtEntity)
+    private readonly statisticsDebtRepository: Repository<StatisticsDebtEntity>,
     @InjectRepository(RepeatedDebtorEntity)
     private readonly repeatedDebtorRepository: Repository<RepeatedDebtorEntity>
   ) {}
@@ -78,6 +86,7 @@ export class DebtsService {
     const debtorsMap = new Map(allDebtors.map((debtor) => [debtor.dni, debtor]));
 
     const debtorIds: string[] = [];
+    let totalDebtAmount = 0;
 
     for (const row of excelData) {
       //% Procesa la fila del Excel
@@ -94,6 +103,7 @@ export class DebtsService {
       if (!debtorsMap.has(debtor.dni)) debtors.push(debtor);
 
       debtorIds.push(debtor.id);
+      totalDebtAmount += debt.amount;
     }
 
     // Save all entities in DB
@@ -103,6 +113,8 @@ export class DebtsService {
 
       //% Genera las estadísticas de los deudores
       const debtorStatistics = await generateDebtorStatistics(debtorIds, this.debtRepository);
+      //% Genera las estadísticas de la deuda
+      await createDebtStatistics(client, sheet, totalDebtAmount, this.statisticsDebtRepository);
       //% Generar el archivo Excel con estadísticas
       await generateExcelWithStatistics(debts, debtorStatistics, fileName);
       console.log('Se generó el Excel modificado');

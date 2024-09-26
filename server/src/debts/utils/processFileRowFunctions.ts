@@ -3,6 +3,8 @@ import { SheetEntity } from 'src/shared/entities/sheet.entity';
 import { DebtorEntity } from '../entities/debtors.entity';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
 import { DebtEntity } from '../entities/debts.entity';
+import { StatisticsDebtEntity } from 'src/statistics/entities/statisticsDebt.entity';
+import { Repository } from 'typeorm';
 
 interface ProcessedRowData {
   debtor: {
@@ -144,4 +146,18 @@ export async function handleDebtor(
 
   // Retornar el deudor (ya sea uno nuevo o uno existente)
   return debtor;
+}
+
+export async function createDebtStatistics(
+  client: ClientEntity,
+  sheet: SheetEntity,
+  totalDebtAmount: number,
+  statisticsRepository: Repository<StatisticsDebtEntity>
+) {
+  await statisticsRepository.save({
+    client,
+    sheet,
+    date: sheet.date,
+    totalDebtAmount,
+  });
 }
