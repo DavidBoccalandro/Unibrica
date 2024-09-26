@@ -84,7 +84,7 @@ export class DebtsService {
 
     const allDebtors = await this.debtorRepository.find({ relations: ['sheet'] });
     const debtorsMap = new Map(allDebtors.map((debtor) => [debtor.dni, debtor]));
-
+    console.log('debtorMap: ', debtorsMap);
     const debtorIds: string[] = [];
     let totalDebtAmount = 0;
 
@@ -93,7 +93,7 @@ export class DebtsService {
       const processedRow = processDebtExcelRow(row, bankMap);
 
       //% Maneja el deudor (crear o actualizar)
-      const debtor = await handleDebtor(processedRow, sheet, debtorsMap);
+      const debtor = await handleDebtor(processedRow, sheet, debtorsMap, this.debtorRepository);
 
       //% Crea una deuda a partir de la fila
       const debt = createDebt(processedRow, debtor, client, sheet);
@@ -106,11 +106,9 @@ export class DebtsService {
       totalDebtAmount += debt.amount;
     }
 
-    // Save all entities in DB
+    //% Guardar entidades
     try {
-      await this.debtorRepository.save(debtors);
       await this.debtRepository.save(debts);
-
       //% Genera las estadísticas de los deudores
       const debtorStatistics = await generateDebtorStatistics(debtorIds, this.debtRepository);
       //% Genera las estadísticas de la deuda
@@ -235,6 +233,7 @@ export class DebtsService {
 
     const debts = await queryBuilder.getMany();
 
+    console.log('Debts: ', debts);
     return { debts, totalItems };
   }
 }

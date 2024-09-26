@@ -98,12 +98,15 @@ export function createDebt(
 export async function handleDebtor(
   row: ProcessedRowData,
   sheet: SheetEntity,
-  debtorsMap: Map<string, DebtorEntity>
+  debtorsMap: Map<string, DebtorEntity>,
+  debtorRepository: Repository<DebtorEntity>
 ): Promise<DebtorEntity> {
   const { dni, firstNames, lastNames } = row.debtor;
 
   // Intentar obtener el deudor del mapa utilizando el DNI
+  console.log('Debtor DNI: ', dni, typeof dni);
   let debtor = debtorsMap.get(dni);
+  console.log('debtor', debtor);
 
   // Si el deudor no existe, se crea uno nuevo
   if (!debtor) {
@@ -115,6 +118,9 @@ export async function handleDebtor(
 
     // Guardar el nuevo deudor en el mapa para futuras referencias
     debtorsMap.set(dni, debtor);
+
+    // Guardar el nuevo deudor en la base de datos
+    debtor = await debtorRepository.save(debtor);
 
     return debtor;
   }
