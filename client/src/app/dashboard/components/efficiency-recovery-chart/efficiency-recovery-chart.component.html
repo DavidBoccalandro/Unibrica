@@ -13,7 +13,7 @@
             </h4>
           </div>
           <ng-template #noDate>
-            <h4>Último mes</h4>
+            <h4>Mes vigente</h4>
           </ng-template>
         </div>
         <div class="controls">
@@ -67,6 +67,10 @@
             <div class="card-content">
               <!-- Columna de la eficiencia -->
               <div class="efficiency-column">
+                <div class="efficiency-container">
+                  <p class="efficiency-label">Deuda total</p>
+                  <p class="debt-value">{{ client.totalDebtSum }}</p>
+                </div>
                 <div class="efficiency-container">
                   <p class="efficiency-label">Eficacia de cobro</p>
                   <p class="efficiency-value">{{ client.collectionEfficiency }}%</p>

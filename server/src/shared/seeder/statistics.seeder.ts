@@ -5,6 +5,7 @@ import { StatisticsPaymentEntity } from 'src/statistics/entities/statisticsPayme
 import { SheetEntity } from '../entities/sheet.entity';
 import { DataSourceConfig } from 'src/config/data.source';
 import { StatisticsDebtEntity } from 'src/statistics/entities/statisticsDebt.entity';
+import { StatisticsReversalEntity } from 'src/statistics/entities/statisticsReversal.entity';
 
 const dataSource = new DataSource(DataSourceConfig);
 
@@ -15,6 +16,7 @@ async function seedDatabase() {
   const sheetRepo = dataSource.getRepository(SheetEntity);
   const statisticsPaymentRepo = dataSource.getRepository(StatisticsPaymentEntity);
   const statisticsDebtRepo = dataSource.getRepository(StatisticsDebtEntity);
+  const statisticsReversalRepo = dataSource.getRepository(StatisticsReversalEntity);
 
   // Obtener todos los clientes existentes
   const clients = await clientRepo.find();
@@ -74,13 +76,24 @@ async function seedDatabase() {
         paymentStatistic.client = client;
         paymentStatistic.sheet = sheet;
 
+        // Crear la estadística de reversas
+        const reversalStatistic = new StatisticsReversalEntity();
+        reversalStatistic.date = new Date(date);
+        reversalStatistic.totalReversalAmount = faker.number.float({
+          min: 0,
+          max: paymentStatistic.totalDebitAmount / 2,
+        });
+        reversalStatistic.client = client;
+        reversalStatistic.sheet = sheet;
+
         await statisticsPaymentRepo.save(paymentStatistic);
         await statisticsDebtRepo.save(debtStatistic);
+        await statisticsReversalRepo.save(reversalStatistic);
 
         // Añadir la fecha al conjunto de fechas
         datesSet.add(date);
       }
-      console.log('Se repitió la fecha: ', date, datesSet);
+      // console.log('Se repitió la fecha: ', date, datesSet);
     }
   }
 

@@ -42,6 +42,9 @@ export interface StatisticsResponse {
     totalRemainingDebt: {
       [key: string]: number;
     };
+    totalReversalAmount: {
+      [key: string]: number;
+    };
   };
 }
 

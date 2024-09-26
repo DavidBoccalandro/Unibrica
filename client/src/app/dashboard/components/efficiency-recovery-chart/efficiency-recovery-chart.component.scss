@@ -154,6 +154,10 @@
       font-size: 12px;
     }
 
+    .debt-value {
+      font-size: 16px;
+    }
+
     .efficiency-value {
       font-size: 20px;
     }
@@ -187,18 +191,23 @@
 
 .efficiency-container {
   text-align: center;
+  padding: 8px 0;
 }
 
 .efficiency-label {
-  font-size: 16px;
+  font-size: 20px;
   color: #666;
   margin-bottom: 5px;
 }
 
-.efficiency-value {
+.efficiency-value, .debt-value {
   font-size: 40px;
   font-weight: bold;
-  color: #a20202; /* Color destacado */
+  color: #b93838; /* Color destacado */
+}
+
+.debt-value {
+  font-size: 30px;
 }
 
 .details-column {

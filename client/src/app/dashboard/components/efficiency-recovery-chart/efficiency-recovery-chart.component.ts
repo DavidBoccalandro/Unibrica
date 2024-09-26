@@ -31,11 +31,11 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
     name: 'light',
     selectable: true,
     group: 'linear' as ScaleType,
-    domain: ['#CC0000', '#1E4666', '#AAAAAA'],
+    domain: ['#CC0000', '#1E4666', '#3498db'],
   };
 
   dashboardForm!: FormGroup;
-  clients: Client[] = []
+  clients: Client[] = [];
 
   constructor(private statisticService: StadisticsService, private fb: FormBuilder) {
     this.dashboardForm = this.fb.group({
@@ -48,9 +48,12 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.statisticService.getAllClients().pipe(take(1)).subscribe((clients) => {
-      this.clients = clients;
-    });
+    this.statisticService
+      .getAllClients()
+      .pipe(take(1))
+      .subscribe((clients) => {
+        this.clients = clients;
+      });
     this.loadPaymentsForAllClients();
   }
 
@@ -58,7 +61,7 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
     const today = this.dashboardForm.get('stackedBarsChartForm')!.value.end ?? new Date();
     const start =
       this.dashboardForm.get('stackedBarsChartForm')!.value.start ??
-      new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+      new Date(today.getFullYear(), today.getMonth(), 1);
 
     // const today = new Date();
     // const start = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
@@ -67,10 +70,11 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
     this.statisticService.getStatisticsOfMonth(statisticsParam).subscribe((data) => {
       if (data.length > 0) {
         const chartData = this.adaptStatisticsToChartData(data);
+        console.log('chartData: ', chartData)
         const maxValueY = this.calculateMaxValueY(chartData);
         this.maxValue = Math.round(maxValueY + maxValueY * 0.1);
         this.data = chartData;
-        this.view = [this.data.length * 300 < 1000 ? this.data.length * 300 : 1000, 600]
+        this.view = [this.data.length * 300 < 1000 ? this.data.length * 300 : 1000, 600];
       }
     });
   }
@@ -82,29 +86,42 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
     }
 
     return data.map((clientStats) => {
-      const totalDebitAmountSum = Object.values(clientStats.statistics.totalDebitAmount).reduce(
+      let totalDebitAmountSum = Object.values(clientStats.statistics.totalDebitAmount).reduce(
         (acc: number, value: number) => acc + value,
         0
       );
-
+      console.log('totalDebitAmountSum: ', totalDebitAmountSum)
       const totalDebtSum = Object.values(clientStats.statistics.totalDebtAmount).reduce(
         (acc: number, value: number) => acc + value,
         0
       );
 
+      const totalReversalAmountSum = Object.values(
+        clientStats.statistics.totalReversalAmount
+      ).reduce((acc: number, value: number) => acc + value, 0);
+
+      //% A la sumatoria de lo cobrado, se le resta lo reversado
       const totalRemainingDebtSum = totalDebtSum - totalDebitAmountSum > 0 ? totalDebtSum - totalDebitAmountSum : 0;
+      totalDebitAmountSum = totalDebitAmountSum - totalReversalAmountSum;
+      // const totalRemainingDebtSum = totalDebtSum > 0 ? totalDebtSum - totalDebitAmountSum : 0;
+      console.log('totalDebitAmountSum++: ', totalDebitAmountSum, totalReversalAmountSum, totalDebtSum)
 
       // Calcular la eficacia de cobro
-      const collectionEfficiency = totalDebtSum > 0 ? (totalDebitAmountSum / totalDebtSum) * 100 : 0;
+      const collectionEfficiency =
+        totalDebtSum > 0
+          ? ((totalDebitAmountSum) / totalDebtSum) * 100
+          : 0;
 
       return {
         name: clientStats.clientName,
         totalDebitAmountSum: totalDebitAmountSum,
         totalRemainingDebtSum: totalRemainingDebtSum,
+        totalDebtSum: totalDebtSum.toFixed(2),
         collectionEfficiency: collectionEfficiency.toFixed(2), // Dejar dos decimales
         series: [
           { name: 'Monto cobrado', value: Number(totalDebitAmountSum) },
           { name: 'Monto no cobrado', value: Number(totalRemainingDebtSum) },
+          { name: 'Monto reversado', value: Number(totalReversalAmountSum ) },
         ],
       };
     });
