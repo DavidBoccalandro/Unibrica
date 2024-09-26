@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Color, LegendPosition, ScaleType } from '@swimlane/ngx-charts';
 import { take } from 'rxjs';
+import { shrinkOutAnimation } from 'src/app/shared/animations/shrinkOut';
 import { Client } from 'src/app/stadistics/components/clients/clients.interfaces';
 import { StadisticsService, StatisticsResponse } from 'src/app/stadistics/stadistics.service';
 
@@ -9,6 +10,7 @@ import { StadisticsService, StatisticsResponse } from 'src/app/stadistics/stadis
   selector: 'app-efficiency-recovery-chart',
   templateUrl: './efficiency-recovery-chart.component.html',
   styleUrls: ['./efficiency-recovery-chart.component.scss'],
+  animations: [shrinkOutAnimation]
 })
 export class EfficiencyRecoveryChartComponent implements OnInit {
   view: [number, number] = [1000, 600];
@@ -26,6 +28,7 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
   data: any = [];
   maxValue = 16000000;
   legendPosition = 'below' as LegendPosition;
+  isInfoVisible = false;
 
   colorScheme: Color = {
     name: 'light',

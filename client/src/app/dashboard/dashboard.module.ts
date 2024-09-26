@@ -17,6 +17,7 @@ import { ChartsSelectorComponent } from './components/charts-selector/charts-sel
 import { EfficiencyRecoveryChartComponent } from './components/efficiency-recovery-chart/efficiency-recovery-chart.component';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { MatCardModule } from '@angular/material/card';
     MatFormFieldModule,
     MatSelectModule,
     MatNativeDateModule,
+    MatIconModule,
     MatCardModule,
     NgxChartsModule
   ],

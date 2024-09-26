@@ -90,7 +90,6 @@ export class LineChartPaymentsClientsComponent {
       if (data.length > 0) {
         const chartData = this.adaptStatisticsToChartData(data);
         if (this.chart) this.chart.destroy();
-        console.log('Antes de crear el Chart', chartData);
         this.chart = new Chart('MyChart', {
           type: 'line' as ChartType, //this denotes tha type of chart
           data: chartData, // Asegúrate de que tu variable esté definida correctamente
@@ -112,12 +111,10 @@ export class LineChartPaymentsClientsComponent {
   adaptStatisticsToChartData(response: StatisticsResponse[]): ChartData {
     const totalLine = new Map<string, number>();
     const selectedClients = this.dashboardForm.get('lineChartForm')?.value.clientName;
-    console.log('Clientes selccionados', selectedClients)
 
     const responseFiltered = response.filter(client => selectedClients ? selectedClients.includes(client.clientName) : true)
 
     response.forEach((stat) => {
-        console.log('stat: ', stat)
         Object.keys(stat.statistics.totalDebitAmount).forEach((day) => {
           const value = Number(stat.statistics.totalDebitAmount[day]);
           if (totalLine.has(day)) {
