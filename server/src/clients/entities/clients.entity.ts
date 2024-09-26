@@ -6,6 +6,7 @@ import { SheetEntity } from 'src/shared/entities/sheet.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../config/base.entity';
 import { StatisticsPaymentEntity } from 'src/statistics/entities/statisticsPayment.entity';
+import { StatisticsDebtEntity } from 'src/statistics/entities/statisticsDebt.entity';
 
 @Entity({ name: 'clients' })
 export class ClientEntity extends BaseEntity implements IClient {
@@ -28,5 +29,8 @@ export class ClientEntity extends BaseEntity implements IClient {
   debts: DebtEntity[];
 
   @OneToMany(() => StatisticsPaymentEntity, (statistic) => statistic.client)
-  statistics: StatisticsPaymentEntity[];
+  paymentStatistics: StatisticsPaymentEntity[];
+
+  @OneToMany(() => StatisticsPaymentEntity, (statistic) => statistic.client)
+  debtStatistics: StatisticsDebtEntity[];
 }
