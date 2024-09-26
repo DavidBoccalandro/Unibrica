@@ -5,7 +5,7 @@ import { ReversalRecord } from 'src/reversal/entities/reversal.entity';
 import { SheetEntity } from 'src/shared/entities/sheet.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../config/base.entity';
-import { StatisticsEntity } from 'src/statistics/entities/statistic.entity';
+import { StatisticsPaymentEntity } from 'src/statistics/entities/statisticsPayment.entity';
 
 @Entity({ name: 'clients' })
 export class ClientEntity extends BaseEntity implements IClient {
@@ -27,6 +27,6 @@ export class ClientEntity extends BaseEntity implements IClient {
   @OneToMany(() => DebtEntity, (debt) => debt.client, { nullable: true })
   debts: DebtEntity[];
 
-  @OneToMany(() => StatisticsEntity, (statistic) => statistic.client)
-  statistics: StatisticsEntity[];
+  @OneToMany(() => StatisticsPaymentEntity, (statistic) => statistic.client)
+  statistics: StatisticsPaymentEntity[];
 }

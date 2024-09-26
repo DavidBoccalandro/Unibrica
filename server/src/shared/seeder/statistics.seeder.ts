@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import { faker } from '@faker-js/faker';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
-import { StatisticsEntity } from 'src/statistics/entities/statistic.entity';
+import { StatisticsPaymentEntity } from 'src/statistics/entities/statisticsPayment.entity';
 import { SheetEntity } from '../entities/sheet.entity';
 import { DataSourceConfig } from 'src/config/data.source';
 
@@ -12,7 +12,7 @@ async function seedDatabase() {
 
   const clientRepo = dataSource.getRepository(ClientEntity);
   const sheetRepo = dataSource.getRepository(SheetEntity);
-  const statisticsRepo = dataSource.getRepository(StatisticsEntity);
+  const statisticsRepo = dataSource.getRepository(StatisticsPaymentEntity);
 
   // Obtener todos los clientes existentes
   const clients = await clientRepo.find();
@@ -54,7 +54,7 @@ async function seedDatabase() {
         await sheetRepo.save(sheet);
 
         // Crear la estadística
-        const statistic = new StatisticsEntity();
+        const statistic = new StatisticsPaymentEntity();
         statistic.date = new Date(date);
         statistic.totalDebitAmount = faker.number.float({ min: 0, max: 1000000 });
         statistic.totalRemainingDebt = faker.number.float({ min: 0, max: 1000000 });

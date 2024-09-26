@@ -7,7 +7,7 @@ import { PaymentRecord } from './entities/payment.entity';
 import { DebtEntity } from 'src/debts/entities/debts.entity';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
 import { SheetEntity } from 'src/shared/entities/sheet.entity';
-import { StatisticsEntity } from 'src/statistics/entities/statistic.entity';
+import { StatisticsPaymentEntity } from 'src/statistics/entities/statisticsPayment.entity';
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import { StatisticsEntity } from 'src/statistics/entities/statistic.entity';
       DebtEntity,
       ClientEntity,
       SheetEntity,
-      StatisticsEntity,
+      StatisticsPaymentEntity,
     ]),
   ],
   providers: [PaymentService],

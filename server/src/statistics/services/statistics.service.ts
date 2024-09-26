@@ -1,20 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { StatisticsEntity } from '../entities/statistic.entity';
+import { StatisticsPaymentEntity } from '../entities/statisticsPayment.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class StatisticsService {
   constructor(
-    @InjectRepository(StatisticsEntity)
-    private readonly statisticsRepository: Repository<StatisticsEntity>
+    @InjectRepository(StatisticsPaymentEntity)
+    private readonly statisticsRepository: Repository<StatisticsPaymentEntity>
   ) {}
 
   async getStatistics(
     clientId: string,
     startDate: Date,
     endDate: Date
-  ): Promise<StatisticsEntity[]> {
+  ): Promise<StatisticsPaymentEntity[]> {
     const statistics = await this.statisticsRepository
       .createQueryBuilder('statistics')
       .leftJoinAndSelect('statistics.client', 'client')

@@ -14,7 +14,7 @@ import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDt
 import { rejectionCodes } from '../utils/rejectionCodes';
 import { processSdaLines } from '../utils/processSda';
 import { generatePaymentExcel } from '../utils/generatePaymentExcel.util';
-import { StatisticsEntity } from 'src/statistics/entities/statistic.entity';
+import { StatisticsPaymentEntity } from 'src/statistics/entities/statisticsPayment.entity';
 
 @Injectable()
 export class PaymentService {
@@ -34,8 +34,8 @@ export class PaymentService {
     @InjectRepository(SheetEntity)
     private sheetRepository: Repository<SheetEntity>,
 
-    @InjectRepository(StatisticsEntity)
-    private readonly statisticsRepository: Repository<StatisticsEntity>
+    @InjectRepository(StatisticsPaymentEntity)
+    private readonly statisticsRepository: Repository<StatisticsPaymentEntity>
   ) {}
 
   async uploadPaymentSheet(
