@@ -6,7 +6,7 @@ import { BankEntity } from 'src/banks/entities/banks.entity';
 import { PaymentRecord } from './entities/payment.entity';
 import { DebtEntity } from 'src/debts/entities/debts.entity';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
-import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
+import { SheetEntity } from 'src/shared/entities/sheet.entity';
 import { StatisticsEntity } from 'src/statistics/entities/statistic.entity';
 
 @Module({
@@ -16,7 +16,7 @@ import { StatisticsEntity } from 'src/statistics/entities/statistic.entity';
       PaymentRecord,
       DebtEntity,
       ClientEntity,
-      SheetsEntity,
+      SheetEntity,
       StatisticsEntity,
     ]),
   ],

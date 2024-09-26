@@ -9,7 +9,7 @@ import { DebtorEntity } from 'src/debts/entities/debtors.entity';
 import { StatisticsEntity } from 'src/statistics/entities/statistic.entity';
 
 @Entity({ name: 'sheets' })
-export class SheetsEntity extends BaseEntity {
+export class SheetEntity extends BaseEntity {
   @Column()
   date: Date;
 

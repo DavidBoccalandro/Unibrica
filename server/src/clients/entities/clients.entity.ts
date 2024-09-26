@@ -2,7 +2,7 @@ import { DebtEntity } from 'src/debts/entities/debts.entity';
 import { IClient } from 'src/interfaces/client.interfaces';
 import { PaymentRecord } from 'src/payment/entities/payment.entity';
 import { ReversalRecord } from 'src/reversal/entities/reversal.entity';
-import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
+import { SheetEntity } from 'src/shared/entities/sheet.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../config/base.entity';
 import { StatisticsEntity } from 'src/statistics/entities/statistic.entity';
@@ -15,8 +15,8 @@ export class ClientEntity extends BaseEntity implements IClient {
   @Column()
   name: string;
 
-  @OneToMany(() => SheetsEntity, (debtSheet) => debtSheet.client, { nullable: true })
-  sheets: SheetsEntity[];
+  @OneToMany(() => SheetEntity, (debtSheet) => debtSheet.client, { nullable: true })
+  sheets: SheetEntity[];
 
   @OneToMany(() => PaymentRecord, (payment) => payment.client, { nullable: true })
   payments: PaymentRecord[];

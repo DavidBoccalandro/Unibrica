@@ -8,7 +8,7 @@ import { BankEntity } from 'src/banks/entities/banks.entity';
 import * as XLSX from 'xlsx';
 import { DebtEntity } from 'src/debts/entities/debts.entity';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
-import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
+import { SheetEntity } from 'src/shared/entities/sheet.entity';
 import { findOrCreateSheet } from 'src/reversal/utils/reversal.util';
 import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDto';
 import { rejectionCodes } from '../utils/rejectionCodes';
@@ -31,8 +31,8 @@ export class PaymentService {
     @InjectRepository(ClientEntity)
     private clientRepository: Repository<ClientEntity>,
 
-    @InjectRepository(SheetsEntity)
-    private sheetRepository: Repository<SheetsEntity>,
+    @InjectRepository(SheetEntity)
+    private sheetRepository: Repository<SheetEntity>,
 
     @InjectRepository(StatisticsEntity)
     private readonly statisticsRepository: Repository<StatisticsEntity>

@@ -13,7 +13,7 @@ import {
 import { UpdateReversalDto } from '../dto/updateReversalDto';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
 import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDto';
-import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
+import { SheetEntity } from 'src/shared/entities/sheet.entity';
 
 @Injectable()
 export class ReversalService {
@@ -22,8 +22,8 @@ export class ReversalService {
     private readonly bankRepository: Repository<BankEntity>,
     @InjectRepository(ReversalRecord)
     private readonly reversalRecordRepository: Repository<ReversalRecord>,
-    @InjectRepository(SheetsEntity)
-    private readonly sheetRepository: Repository<SheetsEntity>,
+    @InjectRepository(SheetEntity)
+    private readonly sheetRepository: Repository<SheetEntity>,
     @InjectRepository(ClientEntity)
     private clientRepository: Repository<ClientEntity>
   ) {}
@@ -61,7 +61,7 @@ export class ReversalService {
 
   private async processLines(
     lines: string[],
-    sheet: SheetsEntity,
+    sheet: SheetEntity,
     client: ClientEntity
   ): Promise<ReversalRecord[]> {
     const processedData: ReversalRecord[] = [];
@@ -82,7 +82,7 @@ export class ReversalService {
 
   private async parseLine(
     line: string,
-    sheet: SheetsEntity,
+    sheet: SheetEntity,
     client: ClientEntity
   ): Promise<ReversalRecord | null> {
     // const recordType = parseInt(line.substring(0, 1).trim(), 10); // Filler

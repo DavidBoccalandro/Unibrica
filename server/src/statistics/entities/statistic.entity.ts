@@ -1,15 +1,15 @@
 import { ClientEntity } from 'src/clients/entities/clients.entity';
 import { BaseEntity } from 'src/config/base.entity';
-import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
+import { SheetEntity } from 'src/shared/entities/sheet.entity';
 import { Entity, ManyToOne, Column } from 'typeorm';
 
-@Entity()
+@Entity('statistics')
 export class StatisticsEntity extends BaseEntity {
   @ManyToOne(() => ClientEntity, (client) => client.statistics)
   client: ClientEntity;
 
-  @ManyToOne(() => SheetsEntity, (sheet) => sheet.statistics)
-  sheet: SheetsEntity;
+  @ManyToOne(() => SheetEntity, (sheet) => sheet.statistics)
+  sheet: SheetEntity;
 
   @Column()
   date: Date;

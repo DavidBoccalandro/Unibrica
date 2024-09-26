@@ -2,7 +2,7 @@ import { DataSource } from 'typeorm';
 import { faker } from '@faker-js/faker';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
 import { StatisticsEntity } from 'src/statistics/entities/statistic.entity';
-import { SheetsEntity } from '../entities/debtSheets.entity';
+import { SheetEntity } from '../entities/sheet.entity';
 import { DataSourceConfig } from 'src/config/data.source';
 
 const dataSource = new DataSource(DataSourceConfig);
@@ -11,7 +11,7 @@ async function seedDatabase() {
   await dataSource.initialize();
 
   const clientRepo = dataSource.getRepository(ClientEntity);
-  const sheetRepo = dataSource.getRepository(SheetsEntity);
+  const sheetRepo = dataSource.getRepository(SheetEntity);
   const statisticsRepo = dataSource.getRepository(StatisticsEntity);
 
   // Obtener todos los clientes existentes
@@ -46,7 +46,7 @@ async function seedDatabase() {
 
       if (!datesSet.has(date)) {
         // Crear la hoja
-        const sheet = new SheetsEntity();
+        const sheet = new SheetEntity();
         sheet.fileName = generateFileName();
         sheet.date = new Date(date);
         sheet.client = client;

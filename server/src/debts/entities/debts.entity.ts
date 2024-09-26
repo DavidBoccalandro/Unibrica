@@ -3,7 +3,7 @@ import { IDebt } from 'src/interfaces/debt.interface';
 import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { BankEntity } from 'src/banks/entities/banks.entity';
 import { PaymentRecord } from 'src/payment/entities/payment.entity';
-import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
+import { SheetEntity } from 'src/shared/entities/sheet.entity';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
 import { DebtorEntity } from './debtors.entity';
 
@@ -33,8 +33,8 @@ export class DebtEntity extends BaseEntity implements IDebt {
   @Column({ type: 'float' })
   amount: number;
 
-  @ManyToOne(() => SheetsEntity, (debtSheet) => debtSheet.debts)
-  sheet: SheetsEntity;
+  @ManyToOne(() => SheetEntity, (debtSheet) => debtSheet.debts)
+  sheet: SheetEntity;
 
   @OneToMany(() => PaymentRecord, (payment) => payment.debt, { nullable: true })
   payments: PaymentRecord[];

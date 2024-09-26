@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { BankEntity } from '../../banks/entities/banks.entity';
 import { DebtEntity } from '../entities/debts.entity';
-import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
+import { SheetEntity } from 'src/shared/entities/sheet.entity';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
 import { DebtorEntity } from '../entities/debtors.entity';
 import { findOrCreateSheet } from 'src/reversal/utils/reversal.util';
@@ -12,11 +12,12 @@ import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDt
 import { RepeatedDebtorEntity } from 'src/repeated-debtor/entities/repeated-debtor.entity';
 import { generateDebtorStatistics } from '../utils/generateDebtorStatistics.utils';
 import { generateExcelWithStatistics } from '../utils/generateDebtExcel';
+import { processDebtExcelRow, handleDebtor, createDebt } from '../utils/processFileRowFunctions';
 
 @Injectable()
 export class DebtsService {
   constructor(
-    @InjectRepository(SheetsEntity) private readonly sheetRepository: Repository<SheetsEntity>,
+    @InjectRepository(SheetEntity) private readonly sheetRepository: Repository<SheetEntity>,
     @InjectRepository(DebtorEntity) private readonly debtorRepository: Repository<DebtorEntity>,
     @InjectRepository(DebtEntity) private readonly debtRepository: Repository<DebtEntity>,
     @InjectRepository(BankEntity) private readonly bankRepository: Repository<BankEntity>,
@@ -64,7 +65,7 @@ export class DebtsService {
   public async processDebtSheet(
     excelData: any,
     client: ClientEntity,
-    sheet: SheetsEntity,
+    sheet: SheetEntity,
     fileName: string
   ) {
     const debts: DebtEntity[] = [];
@@ -79,75 +80,20 @@ export class DebtsService {
     const debtorIds: string[] = [];
 
     for (const row of excelData) {
-      //% Check if debt exists
-      let debtor = debtorsMap.get(row['DNI'].toString());
-      const bank = bankMap.get(row['bank']) ?? null;
+      //% Procesa la fila del Excel
+      const processedRow = processDebtExcelRow(row, bankMap);
 
-      //% Si no existe deudor, lo crea
-      if (!debtor && row['DNI']) {
-        debtor = new DebtorEntity();
-        debtor.dni = row['DNI'];
-        const splitName = row['NOMBRE Y APELLIDO'].split(' ');
-        debtor.firstNames = splitName.slice(1).join(' ');
-        debtor.lastNames = splitName[0];
-        debtor.sheet = sheet;
-        debtors.push(debtor);
-        debtorsMap.set(row['DNI'], debtor);
-      } else {
-        //% Si existe el deudor, revisa si ya está registrado como deudor en el repositorio de deudores repetidos
-        // console.log('Buscando deudor repetido para el DNI:', debtor.dni);
-        let repeatedDebtor = await this.repeatedDebtorRepository.findOne({
-          where: { debtor: { dni: debtor.dni } },
-          relations: ['debtor', 'sheets'],
-        });
-        // console.log('Resultado de la búsqueda:', repeatedDebtor);
+      //% Maneja el deudor (crear o actualizar)
+      const debtor = await handleDebtor(processedRow, sheet, debtorsMap);
 
-        //% Si no lo encuentra, crea el repeatedDebtor y le asigna la hoja (sheet) que se está procesando
-        if (!repeatedDebtor) {
-          repeatedDebtor = this.repeatedDebtorRepository.create({ debtor, sheets: [debtor.sheet] });
-          repeatedDebtor.sheets.push(sheet);
-          await this.repeatedDebtorRepository.save(repeatedDebtor);
-        } else {
-          //% Si lo encuentra, añade la relación con la hoja (sheet)
-          if (!repeatedDebtor.sheets.some((existingSheet) => existingSheet.id === sheet.id)) {
-            // console.log('Sheet ID:', sheet.id);
+      //% Crea una deuda a partir de la fila
+      const debt = createDebt(processedRow, debtor, client, sheet);
 
-            repeatedDebtor.sheets.push(sheet);
-            await this.repeatedDebtorRepository.save(repeatedDebtor);
-          } else {
-            console.log('La hoja ya está asociada al deudor repetido');
-          }
-        }
-
-        debtorIds.push(debtor.id);
-      }
-
-      // Create a new debt
-      const debt = new DebtEntity();
-      debt.amount = parseFloat(row['Importe']) / 100;
-      debt.idDebt = row['Id_adherente'];
-      debt.bank = bank;
-
-      // Format date
-      const dateString = row['Fecha_vto'].toString();
-      const year = parseInt(dateString.slice(0, 4), 10);
-      const month = parseInt(dateString.slice(4, 6), 10) - 1;
-      const day = parseInt(dateString.slice(6, 8), 10);
-      const dueDate = new Date(year, month, day);
-      debt.dueDate = dueDate;
-
-      // Set additional properties
-      debt.branchCode = row['Sucursal'];
-      debt.accountType = row['Tipo_Cuenta'];
-      debt.account = row['Cuenta'];
-      debt.currency = row['Moneda'].replace(/'/g, '');
-      debt.idDebt = row['Id_debito'];
-      debt.client = client;
-      debt.debtor = debtor;
-      debt.sheet = sheet;
-
-      // Add the debt to the list to be saved later
+      //% Agrega las deudas y deudores a sus respectivos arrays
       debts.push(debt);
+      if (!debtorsMap.has(debtor.dni)) debtors.push(debtor);
+
+      debtorIds.push(debtor.id);
     }
 
     // Save all entities in DB

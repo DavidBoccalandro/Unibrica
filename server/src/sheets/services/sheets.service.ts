@@ -1,16 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationFilterQueryDto } from 'src/shared/dto/PaginationFIlterQueryDto';
-import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
+import { SheetEntity } from 'src/shared/entities/sheet.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
 export class SheetsService {
-  constructor(@InjectRepository(SheetsEntity) private sheetRepository: Repository<SheetsEntity>) {}
+  constructor(@InjectRepository(SheetEntity) private sheetRepository: Repository<SheetEntity>) {}
 
   async getAllSheets(
     paginationQuery: PaginationFilterQueryDto
-  ): Promise<{ sheets: SheetsEntity[]; totalItems: number }> {
+  ): Promise<{ sheets: SheetEntity[]; totalItems: number }> {
     const { limit, offset, sortBy, sortOrder, stringFilters, numericFilters, dateFilters } =
       paginationQuery;
     let queryBuilder = this.sheetRepository

@@ -1,5 +1,5 @@
 import { BankEntity } from 'src/banks/entities/banks.entity';
-import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
+import { SheetEntity } from 'src/shared/entities/sheet.entity';
 import { Repository } from 'typeorm';
 import { ReversalRecord } from '../entities/reversal.entity';
 import * as XLSX from 'xlsx';
@@ -9,10 +9,10 @@ import { ClientEntity } from 'src/clients/entities/clients.entity';
 
 export async function findOrCreateSheet(
   originalFileName: string,
-  sheetRepository: Repository<SheetsEntity>,
+  sheetRepository: Repository<SheetEntity>,
   fileType: 'deudas' | 'pagos' | 'reversas',
   client: ClientEntity
-): Promise<SheetsEntity> {
+): Promise<SheetEntity> {
   let sheet = await sheetRepository.findOne({ where: { fileName: originalFileName } });
 
   if (!sheet) {

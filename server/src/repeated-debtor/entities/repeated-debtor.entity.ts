@@ -1,6 +1,6 @@
 import { BaseEntity } from 'src/config/base.entity';
 import { DebtorEntity } from 'src/debts/entities/debtors.entity';
-import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
+import { SheetEntity } from 'src/shared/entities/sheet.entity';
 import { Entity, JoinColumn, JoinTable, ManyToMany, OneToOne } from 'typeorm';
 
 @Entity({ name: 'repeated_debtors' })
@@ -9,7 +9,7 @@ export class RepeatedDebtorEntity extends BaseEntity {
   @JoinColumn()
   debtor: DebtorEntity;
 
-  @ManyToMany(() => SheetsEntity, (sheet) => sheet.repeatedDebtors)
+  @ManyToMany(() => SheetEntity, (sheet) => sheet.repeatedDebtors)
   @JoinTable()
-  sheets: SheetsEntity[];
+  sheets: SheetEntity[];
 }

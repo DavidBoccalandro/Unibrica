@@ -4,11 +4,11 @@ import { ReversalController } from './controllers/reversal.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ReversalRecord } from './entities/reversal.entity';
 import { BankEntity } from 'src/banks/entities/banks.entity';
-import { SheetsEntity } from 'src/shared/entities/debtSheets.entity';
+import { SheetEntity } from 'src/shared/entities/sheet.entity';
 import { ClientEntity } from 'src/clients/entities/clients.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ReversalRecord, BankEntity, SheetsEntity, ClientEntity])],
+  imports: [TypeOrmModule.forFeature([ReversalRecord, BankEntity, SheetEntity, ClientEntity])],
   providers: [ReversalService],
   controllers: [ReversalController],
 })
