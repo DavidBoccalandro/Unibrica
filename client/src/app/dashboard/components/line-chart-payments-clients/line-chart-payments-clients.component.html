@@ -4,12 +4,15 @@
       <div class="left-side">
         <h4>Pagos por cliente</h4>
         <div class="controls">
-          <mat-form-field>
-            <mat-label>Cliente</mat-label>
-            <mat-select formControlName="selectedClientId">
-              <mat-option *ngFor="let client of clients" [value]="client.clientId">
-                {{ client.name }}
-              </mat-option>
+          <mat-form-field appearance="outline">
+            <mat-select placeholder="Clientes" formControlName="clientName" multiple (selectionChange)="onSelectionChange($event)">
+              <mat-optgroup label="Acciones">
+                <mat-option (click)="selectAllClients()" value="selectAll">Seleccionar todos</mat-option>
+                <mat-option (click)="deselectAllClients()" value="deselectAll">Seleccionar ninguno</mat-option>
+              </mat-optgroup>
+              <mat-optgroup label="Clientes">
+                <mat-option *ngFor="let client of clients" [value]="client.name">{{client.name}}</mat-option>
+              </mat-optgroup>
             </mat-select>
           </mat-form-field>
 

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSelectChange } from '@angular/material/select';
 import { Chart, ChartType } from 'chart.js/auto';
 import { take } from 'rxjs';
 import { XYLabels } from 'src/app/charts/chart.interfaces';
@@ -52,7 +53,7 @@ export class LineChartPaymentsClientsComponent {
   ) {
     this.dashboardForm = this.fb.group({
       lineChartForm: this.fb.group({
-        selectedClientId: [null],
+        clientName: [null],
         start: [null],
         end: [null],
       }),
@@ -110,21 +111,26 @@ export class LineChartPaymentsClientsComponent {
 
   adaptStatisticsToChartData(response: StatisticsResponse[]): ChartData {
     const totalLine = new Map<string, number>();
+    const selectedClients = this.dashboardForm.get('lineChartForm')?.value.clientName;
+    console.log('Clientes selccionados', selectedClients)
+
+    const responseFiltered = response.filter(client => selectedClients ? selectedClients.includes(client.clientName) : true)
 
     response.forEach((stat) => {
-      Object.keys(stat.statistics.totalDebitAmount).forEach((day) => {
-        const value = Number(stat.statistics.totalDebitAmount[day]);
-        if (totalLine.has(day)) {
-          totalLine.set(day, totalLine.get(day)! + value);
-        } else {
-          totalLine.set(day, value);
-        }
+        console.log('stat: ', stat)
+        Object.keys(stat.statistics.totalDebitAmount).forEach((day) => {
+          const value = Number(stat.statistics.totalDebitAmount[day]);
+          if (totalLine.has(day)) {
+            totalLine.set(day, totalLine.get(day)! + value);
+          } else {
+            totalLine.set(day, value);
+          }
+        });
       });
-    });
 
     const totalStatistics = Object.fromEntries(totalLine);
     const finalStatistics = [
-      ...response,
+      ...responseFiltered,
       { clientName: 'Total', statistics: { totalDebitAmount: totalStatistics } },
     ];
 
@@ -141,6 +147,24 @@ export class LineChartPaymentsClientsComponent {
         };
       }),
     };
+  }
+
+  selectAllClients(): void {
+    const allClientNames = this.clients.map(client => client.name);
+    this.dashboardForm.get('lineChartForm')?.get('clientName')?.setValue(allClientNames);
+  }
+
+  // Deseleccionar todos los clientes
+  deselectAllClients(): void {
+    this.dashboardForm.get('lineChartForm')?.get('clientName')?.setValue([]);
+  }
+
+  onSelectionChange(event: MatSelectChange): void {
+    // if (event.value.includes('Total')) {
+    //   this.addTotalLine();
+    // } else {
+    //   this.removeTotalLine();
+    // }
   }
 
   getDaysInMonth(year: number, month: number): string[] {
