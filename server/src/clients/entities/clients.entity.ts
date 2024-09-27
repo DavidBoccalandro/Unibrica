@@ -3,7 +3,7 @@ import { IClient } from 'src/interfaces/client.interfaces';
 import { PaymentRecord } from 'src/payment/entities/payment.entity';
 import { ReversalRecord } from 'src/reversal/entities/reversal.entity';
 import { SheetEntity } from 'src/shared/entities/sheet.entity';
-import { Column, Entity, OneToMany } from 'typeorm';
+import { Column, Entity, ManyToMany, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../config/base.entity';
 import { StatisticsPaymentEntity } from 'src/statistics/entities/statisticsPayment.entity';
 import { StatisticsDebtEntity } from 'src/statistics/entities/statisticsDebt.entity';
@@ -20,7 +20,7 @@ export class ClientEntity extends BaseEntity implements IClient {
   @Column({ nullable: true })
   code: string;
 
-  @OneToMany(() => SheetEntity, (debtSheet) => debtSheet.client, { nullable: true })
+  @ManyToMany(() => SheetEntity, (sheet) => sheet.clients, { nullable: true })
   sheets: SheetEntity[];
 
   @OneToMany(() => PaymentRecord, (payment) => payment.client, { nullable: true })
@@ -35,7 +35,7 @@ export class ClientEntity extends BaseEntity implements IClient {
   @OneToMany(() => StatisticsPaymentEntity, (statistic) => statistic.client, { nullable: true })
   paymentStatistics: StatisticsPaymentEntity[];
 
-  @OneToMany(() => StatisticsPaymentEntity, (statistic) => statistic.client, { nullable: true })
+  @OneToMany(() => StatisticsDebtEntity, (statistic) => statistic.client, { nullable: true })
   debtStatistics: StatisticsDebtEntity[];
 
   @OneToMany(() => StatisticsReversalEntity, (statistic) => statistic.client, { nullable: true })

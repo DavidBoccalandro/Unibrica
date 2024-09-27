@@ -1,5 +1,5 @@
 import { BaseEntity } from 'src/config/base.entity';
-import { Column, Entity, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, OneToMany } from 'typeorm';
 import { DebtEntity } from '../../debts/entities/debts.entity';
 import { PaymentRecord } from 'src/payment/entities/payment.entity';
 import { ReversalRecord } from 'src/reversal/entities/reversal.entity';
@@ -24,14 +24,15 @@ export class SheetEntity extends BaseEntity {
   @OneToMany(() => DebtEntity, (debt) => debt.sheet, { nullable: true })
   debts: DebtEntity[];
 
-  @OneToMany(() => DebtEntity, (debt) => debt.sheet, { nullable: true })
+  @OneToMany(() => PaymentRecord, (payment) => payment.sheet, { nullable: true })
   payments: PaymentRecord[];
 
-  @OneToMany(() => ReversalRecord, (debt) => debt.sheet, { nullable: true })
+  @OneToMany(() => ReversalRecord, (reversal) => reversal.sheet, { nullable: true })
   reversals: ReversalRecord[];
 
-  @ManyToOne(() => ClientEntity, (client) => client.debts)
-  client: ClientEntity;
+  @ManyToMany(() => ClientEntity, (client) => client.sheets, { nullable: true })
+  @JoinTable()
+  clients: ClientEntity[];
 
   @OneToMany(() => DebtorEntity, (debtor) => debtor.sheet, { nullable: true })
   debtors: DebtorEntity[];

@@ -53,7 +53,7 @@ async function seedDatabase() {
         const sheet = new SheetEntity();
         sheet.fileName = generateFileName();
         sheet.date = new Date(date);
-        sheet.client = client;
+        sheet.clients = [client];
 
         await sheetRepo.save(sheet);
 

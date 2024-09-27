@@ -11,19 +11,24 @@ export async function findOrCreateSheet(
   originalFileName: string,
   sheetRepository: Repository<SheetEntity>,
   fileType: 'deudas' | 'pagos' | 'reversas',
-  client: ClientEntity
+  client: ClientEntity | ClientEntity[]
 ): Promise<SheetEntity> {
+  // Aseguramos que el nombre del archivo sea único
   let sheet = await sheetRepository.findOne({ where: { fileName: originalFileName } });
 
   if (!sheet) {
     const date = extractDateFromFileName(originalFileName, fileType);
 
+    // Verificamos si 'client' es un array o un solo objeto
+    const clients = Array.isArray(client) ? client : [client];
+
     sheet = sheetRepository.create({
       fileName: originalFileName,
       date,
-      client,
+      clients: clients, // Asignamos el array de clientes
       type: fileType,
     });
+
     await sheetRepository.save(sheet);
   }
 

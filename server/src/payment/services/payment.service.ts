@@ -77,7 +77,13 @@ export class PaymentService {
       where: { agreementNumber: +clientId },
     });
     const client = clientSearch[0];
-    const sheet = await findOrCreateSheet(file.originalname, this.sheetRepository, 'pagos', client);
+    const sheet = await findOrCreateSheet(
+      file.originalname,
+      this.sheetRepository,
+      'pagos',
+      clients
+    );
+    // console.log('sheet: ', sheet)
 
     // Busca todos los bancos UNA ÚNICA VEZ y crea un Map.
     const allBanks = await this.bankRepository.find();
