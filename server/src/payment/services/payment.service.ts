@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
 import { PaymentRecord } from '../entities/payment.entity';
@@ -54,11 +54,24 @@ export class PaymentService {
     const fileContent = file.buffer.toString('utf-8');
     const lines = fileContent.split('\n');
     const originalFileName = path.basename(file.originalname);
+    const originalFileNameOptional = path.basename(optionalFile.originalname);
+    console.log('files: ', originalFileNameOptional);
 
     const processedData: PaymentRecord[] = [];
 
-    const sdaDataMap = processSdaLines(optionalFile);
+    const [sdaDataMap, clientCodesSet] = processSdaLines(optionalFile);
+    console.log('clientCodes: ', clientCodesSet);
 
+    // const clientCodes = Array.from(Object.keys(sdaDataMap[0])); // Obtener todas las claves del Map como un array
+
+    const clients = await this.clientRepository.find({
+      where: {
+        agreementNumber: +clientId,
+        code: In([...clientCodesSet].map((code) => code)), // Usar In para buscar los códigos
+      },
+    });
+
+    console.log('clients', clients);
     // Busca el cliente en la DB
     const clientSearch = await this.clientRepository.find({
       where: { agreementNumber: +clientId },
@@ -95,7 +108,7 @@ export class PaymentService {
         const installmentNumber = parseInt(line.substring(85, 87).trim(), 10);
         const debitStatus = line.substring(87, 88).trim();
         let chargedAmount = parseFloat(line.substring(108, 119).trim()) / 100;
-        const rejectCode = sdaDataMap.get(bankAccountNumber) ?? '';
+        const rejectCode = sdaDataMap.get(bankAccountNumber)?.rejectionCode ?? '';
         const rejectText = rejectCode ? rejectionCodes[rejectCode] : '';
 
         //% debitStatus: E ==> Error; debitStatus: R ==> Rechazado
@@ -189,22 +202,22 @@ export class PaymentService {
     }
 
     //% Creamos las estadísticas
-    const newStat = this.statisticsRepository.create({
-      client,
-      sheet,
-      date: sheet.date,
-      totalDebitAmount,
-      totalRemainingDebt,
-    });
-    await this.statisticsRepository.save(newStat);
+    // const newStat = this.statisticsRepository.create({
+    //   client,
+    //   sheet,
+    //   date: sheet.date,
+    //   totalDebitAmount,
+    //   totalRemainingDebt,
+    // });
+    // await this.statisticsRepository.save(newStat);
 
-    //% Creamos archivo Excel
-    const filePath = await this.createExcelFile(processedData, originalFileName);
-    console.log(`Excel file created at: ${filePath}`);
+    // //% Creamos archivo Excel
+    // const filePath = await this.createExcelFile(processedData, originalFileName);
+    // console.log(`Excel file created at: ${filePath}`);
 
-    await this.paymentRecordRepository.save(processedData);
+    // await this.paymentRecordRepository.save(processedData);
 
-    generatePaymentExcel(processedData, originalFileName);
+    // generatePaymentExcel(processedData, originalFileName);
     return processedData;
   }
 
