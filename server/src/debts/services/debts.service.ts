@@ -43,7 +43,9 @@ export class DebtsService {
       const blockSize = 200; // Tamaño del bloque
 
       // Busca el cliente en la DB
-      const clientSearch = await this.clientRepository.find({ where: { clientId: +clientId } });
+      const clientSearch = await this.clientRepository.find({
+        where: { agreementNumber: +clientId },
+      });
       const client = clientSearch[0];
       if (!client) {
         throw new Error('Client not found');

@@ -12,10 +12,13 @@ import { StatisticsReversalEntity } from 'src/statistics/entities/statisticsReve
 @Entity({ name: 'clients' })
 export class ClientEntity extends BaseEntity implements IClient {
   @Column()
-  clientId: number;
+  agreementNumber: number;
 
   @Column()
   name: string;
+
+  @Column({ nullable: true })
+  code: string;
 
   @OneToMany(() => SheetEntity, (debtSheet) => debtSheet.client, { nullable: true })
   sheets: SheetEntity[];

@@ -57,16 +57,18 @@ export class PaymentService {
 
     const processedData: PaymentRecord[] = [];
 
+    const sdaDataMap = processSdaLines(optionalFile);
+
     // Busca el cliente en la DB
-    const clientSearch = await this.clientRepository.find({ where: { clientId: +clientId } });
+    const clientSearch = await this.clientRepository.find({
+      where: { agreementNumber: +clientId },
+    });
     const client = clientSearch[0];
     const sheet = await findOrCreateSheet(file.originalname, this.sheetRepository, 'pagos', client);
 
     // Busca todos los bancos UNA ÚNICA VEZ y crea un Map.
     const allBanks = await this.bankRepository.find();
     const bankMap = new Map(allBanks.map((bank) => [bank.bankId, bank]));
-
-    const sdaDataMap = processSdaLines(optionalFile);
 
     let totalDebitAmount = 0;
     let totalRemainingDebt = 0;
@@ -243,7 +245,7 @@ export class PaymentService {
         const value = Number(filterValue);
 
         if (filterBy === 'clientId') {
-          queryBuilder = queryBuilder.andWhere(`client.clientId = :value${index}`, {
+          queryBuilder = queryBuilder.andWhere(`client.agreementNumber = :value${index}`, {
             [`value${index}`]: value,
           });
         } else {

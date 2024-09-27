@@ -24,7 +24,7 @@ export class StatisticsService {
     const statistics = await this.statisticsPaymentRepository
       .createQueryBuilder('statistics')
       .leftJoinAndSelect('statistics.client', 'client')
-      .where('client.clientId = :clientId', { clientId: +clientId })
+      .where('client.agreementNumber = :clientId', { agreementNumber: +clientId })
       .andWhere('statistics.date BETWEEN :startDate AND :endDate', { startDate, endDate })
       .getMany();
 

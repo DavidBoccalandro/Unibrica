@@ -1,4 +1,4 @@
 export class UpdateClientDto {
-  clientId?: number;
+  agreementNumber?: number;
   name?: string;
 }

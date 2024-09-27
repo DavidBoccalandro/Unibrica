@@ -15,7 +15,7 @@ export class ClientsService {
   public async newClient(body: ClientDTO): Promise<ClientEntity> {
     try {
       const newClient = new ClientEntity();
-      newClient.clientId = body.clientId;
+      newClient.agreementNumber = body.clientId;
       newClient.name = body.name;
       const client: ClientEntity = await this.clientRepository.save(newClient);
 
@@ -48,7 +48,9 @@ export class ClientsService {
     updateClientDto: UpdateClientDto
   ): Promise<ClientEntity> {
     try {
-      const client = await this.clientRepository.findOne({ where: { clientId: oldClientId } });
+      const client = await this.clientRepository.findOne({
+        where: { agreementNumber: oldClientId },
+      });
 
       if (!client) {
         throw new ErrorManager({ type: 'BAD_REQUEST', message: 'Could Not Find Client' });

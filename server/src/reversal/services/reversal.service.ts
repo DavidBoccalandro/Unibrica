@@ -44,7 +44,9 @@ export class ReversalService {
     const originalFileName = path.basename(file.originalname, '.lis');
 
     // Busca el cliente en la DB
-    const clientSearch = await this.clientRepository.find({ where: { clientId: +clientId } });
+    const clientSearch = await this.clientRepository.find({
+      where: { agreementNumber: +clientId },
+    });
     const client = clientSearch[0];
     const sheet = await findOrCreateSheet(
       originalFileName,

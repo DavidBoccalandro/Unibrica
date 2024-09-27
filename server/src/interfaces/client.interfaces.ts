@@ -1,4 +1,4 @@
 export interface IClient {
-  clientId: number;
+  agreementNumber: number;
   name: string;
 }
