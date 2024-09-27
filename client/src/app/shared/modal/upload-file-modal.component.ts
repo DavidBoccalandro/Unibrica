@@ -1,9 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import {
-  AbstractControl,
   FormBuilder,
-  FormControl,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
@@ -56,7 +54,8 @@ export class UploadFileModalComponent implements OnInit {
   fileSelected: string = '';
   isPagbaSelected = false;
   isFileRepeated = false;
-  filesInDB: string[] = []
+  isClientMatches = false;
+  filesInDB: string[] = [];
 
   uploading$ = this.uploadFileService.uploading$;
   uploadSuccess$ = this.uploadFileService.uploadSuccess$;
@@ -79,7 +78,7 @@ export class UploadFileModalComponent implements OnInit {
     this.form = this.fb.group({
       client: ['', [Validators.required]],
       fileType: ['', [Validators.required]],
-      multipleFilesAccepted: [false]
+      multipleFilesAccepted: [false],
     });
   }
 
@@ -95,20 +94,35 @@ export class UploadFileModalComponent implements OnInit {
       }
     });
 
-    this.filesService.getAllSheets(this.params.value).pipe(take(1)).subscribe(data => {
-      this.filesInDB = data.sheets.map((file) => file.fileName)
-    })
+    this.filesService
+      .getAllSheets(this.params.value)
+      .pipe(take(1))
+      .subscribe((data) => {
+        this.filesInDB = data.sheets.map((file) => file.fileName);
+      });
+
+    this.form.valueChanges.subscribe(() => {
+      if(this.fileSelected) {
+        setTimeout(() => {
+          this.checkIfAgreementNumberMatches();
+        }, 0)
+      }
+    });
   }
 
+  changeSelectedClient(clientId: number) {
+    this.selectedClientId = clientId.toString()
+  }
   onCloseClick(): void {
     this.dialogRef.close();
   }
 
   onSelectedFiles(event: any, type: string): void {
-    if(type === 'main') {
+    if (type === 'main') {
       this.files = event.target.files ?? null;
       this.fileSelected = this.files![0].name.substring(0, this.files![0].name.length - 4);
-      this.checkIfFileIsRepeated()
+      this.checkIfFileIsRepeated();
+      this.checkIfAgreementNumberMatches();
     } else {
       this.optionalFiles = event.target.files ?? null;
     }
@@ -136,7 +150,7 @@ export class UploadFileModalComponent implements OnInit {
       client?.clientId ? client : null,
       this.selectedBankId,
       this.form.value['fileType'],
-      this.optionalFiles ?? undefined,
+      this.optionalFiles ?? undefined
     );
     this.files = null;
     this.form.reset();
@@ -144,11 +158,32 @@ export class UploadFileModalComponent implements OnInit {
   }
 
   checkIfFileIsRepeated(): void {
-    const aux = this.filesInDB.findIndex(file => file.match(this.fileSelected)) >= 0
+    const aux = this.filesInDB.findIndex((file) => file.match(this.fileSelected)) >= 0;
     if (aux) {
       this.isFileRepeated = true;
     } else {
       this.isFileRepeated = false;
+    }
+  }
+
+  checkIfAgreementNumberMatches(): void {
+    const pagba = this.fileSelected.match(/a(\d+)/);
+    const liquidaciones = this.fileSelected.match(/(\w+)$/);
+    let match;
+
+    if (pagba) {
+      match = Number(pagba[1]) === Number(this.selectedClientId);
+    } else if (liquidaciones) {
+      const client = this.clients.find((ele) => {
+        return ele.name.toLowerCase() === liquidaciones[0].toLowerCase();
+      });
+      match = client?.clientId === Number(this.selectedClientId);
+    }
+
+    if (!match) {
+      this.isClientMatches = true;
+    } else {
+      this.isClientMatches = false;
     }
   }
 
@@ -160,10 +195,10 @@ export class UploadFileModalComponent implements OnInit {
 
   fileTypeSelected(option: any) {
     // console.log('option.value:', option.value)
-    if(option.value === 'cobros') {
-      this.isPagbaSelected = true
+    if (option.value === 'cobros') {
+      this.isPagbaSelected = true;
     } else {
-      this.isPagbaSelected = false
+      this.isPagbaSelected = false;
     }
   }
 

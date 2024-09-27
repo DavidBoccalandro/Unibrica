@@ -11,7 +11,7 @@
       <mat-option
         *ngFor="let client of clients"
         [value]="client.name"
-        (onSelectionChange)="selectedClientId = client.clientId.toString()"
+        (click)="changeSelectedClient(client.clientId)"
       >
         {{ client.clientId }} - {{ client.name }}
       </mat-option>
@@ -32,7 +32,7 @@
     </mat-select>
   </mat-form-field>
 
-  <div class="file-form-field">
+  <div class="file-form-field" *ngIf="selectedClientId">
     <p *ngIf="filesLabel">{{ filesLabel }}</p>
     <button mat-button (click)="fileInput.click()">
       <mat-icon matIconPrefix matTooltip="Choose file(s)..."> attach_file</mat-icon>
@@ -48,6 +48,7 @@
     [multiple]="form.get('multipleFilesAccepted')?.value"
   />
   <p *ngIf="isFileRepeated" class="error-message">El archivo ya existe en la base de datos.</p>
+  <p *ngIf="isClientMatches" class="error-message">El archivo no corresponde al cliente seleccionado.</p>
   <div class="file-form-field" *ngIf="isPagbaSelected">
     <p *ngIf="filesLabel">{{ filesLabel }}</p>
     <button mat-button (click)="fileInputOptional.click()">
@@ -80,7 +81,7 @@
       type="button"
       form="inputForm"
       (click)="onUploadFiles()"
-      [disabled]="!form.valid || !files || isFileRepeated"
+      [disabled]="!form.valid || !files || isFileRepeated || isClientMatches"
     >
       Enviar
     </button>
