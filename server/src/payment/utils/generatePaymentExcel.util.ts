@@ -21,6 +21,12 @@ export async function generatePaymentExcel(payments: PaymentRecord[], fileName: 
       width: 12,
       style: { alignment: { wrapText: true, horizontal: 'center', vertical: 'middle' } },
     },
+    {
+      header: 'Cliente',
+      key: 'client',
+      width: 12,
+      style: { alignment: { wrapText: true, horizontal: 'center', vertical: 'middle' } },
+    },
     // {
     //   header: 'Empresa de crédito',
     //   key: 'creditCompany',
@@ -118,6 +124,7 @@ export async function generatePaymentExcel(payments: PaymentRecord[], fileName: 
     worksheet.addRow({
       recordType: payment.recordType,
       agreementNumber: payment.agreementNumber,
+      client: payment.client.name,
       creditCompany: payment.creditCompany,
       companyAccountNumber: payment.companyAccountNumber,
       debitDate: payment.debitDate.toISOString().split('T')[0], // Formato YYYY-MM-DD

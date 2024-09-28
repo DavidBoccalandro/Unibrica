@@ -55,6 +55,7 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
       .getAllClients()
       .pipe(take(1))
       .subscribe((clients) => {
+        console.log('clientes: ', clients)
         this.clients = clients;
       });
     this.loadPaymentsForAllClients();
@@ -72,6 +73,7 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
     const statisticsParam = { startDate: start, endDate: today };
     this.statisticService.getStatisticsOfMonth(statisticsParam).subscribe((data) => {
       if (data.length > 0) {
+        console.log('Data del back: ', data)
         const chartData = this.adaptStatisticsToChartData(data);
         console.log('chartData: ', chartData)
         const maxValueY = this.calculateMaxValueY(chartData);

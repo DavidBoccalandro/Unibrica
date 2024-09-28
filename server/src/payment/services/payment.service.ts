@@ -54,13 +54,11 @@ export class PaymentService {
     const fileContent = file.buffer.toString('utf-8');
     const lines = fileContent.split('\n');
     const originalFileName = path.basename(file.originalname);
-    const originalFileNameOptional = path.basename(optionalFile.originalname);
-    console.log('files: ', originalFileNameOptional);
+    // const originalFileNameOptional = path.basename(optionalFile.originalname);
 
     const processedData: PaymentRecord[] = [];
 
     const [sdaDataMap, clientCodesSet] = processSdaLines(optionalFile);
-    console.log('clientCodes: ', clientCodesSet);
 
     // const clientCodes = Array.from(Object.keys(sdaDataMap[0])); // Obtener todas las claves del Map como un array
 
@@ -71,26 +69,21 @@ export class PaymentService {
       },
     });
 
-    console.log('clients', clients);
-    // Busca el cliente en la DB
-    const clientSearch = await this.clientRepository.find({
-      where: { agreementNumber: +clientId },
-    });
-    const client = clientSearch[0];
     const sheet = await findOrCreateSheet(
       file.originalname,
       this.sheetRepository,
       'pagos',
       clients
     );
-    // console.log('sheet: ', sheet)
 
     // Busca todos los bancos UNA ÚNICA VEZ y crea un Map.
     const allBanks = await this.bankRepository.find();
     const bankMap = new Map(allBanks.map((bank) => [bank.bankId, bank]));
 
-    let totalDebitAmount = 0;
-    let totalRemainingDebt = 0;
+    // Inicializa un objeto para almacenar los totales por cliente
+    const clientTotals: {
+      [key: string]: { totalDebitAmount: number; totalRemainingDebt: number };
+    } = {};
 
     for (const line of lines) {
       try {
@@ -117,18 +110,24 @@ export class PaymentService {
         const rejectCode = sdaDataMap.get(bankAccountNumber)?.rejectionCode ?? '';
         const rejectText = rejectCode ? rejectionCodes[rejectCode] : '';
 
+        //% Tomamos el cliente de clients según el código obtenido en el SDA
+        const client = clients.find((ele) => {
+          return ele.code === sdaDataMap.get(bankAccountNumber)?.clientCode;
+        });
+
         //% debitStatus: E ==> Error; debitStatus: R ==> Rechazado
         if (debitStatus !== 'P') {
           chargedAmount = 0;
         }
         const remainingDebt = +(debtAmount - chargedAmount).toFixed(2);
-        if (!isNaN(remainingDebt)) {
-          totalRemainingDebt += remainingDebt;
+        // Actualiza los totales del cliente correspondiente
+        if (client) {
+          if (!clientTotals[client.id]) {
+            clientTotals[client.id] = { totalDebitAmount: 0, totalRemainingDebt: 0 };
+          }
+          clientTotals[client.id].totalRemainingDebt += remainingDebt;
+          clientTotals[client.id].totalDebitAmount += chargedAmount;
         }
-        if (!isNaN(debtAmount)) {
-          totalDebitAmount += chargedAmount;
-        }
-        // console.log('Total debit amount: ', totalDebitAmount, debtAmount);
 
         let bank = bankMap.get(bankCode);
 
@@ -208,22 +207,24 @@ export class PaymentService {
     }
 
     //% Creamos las estadísticas
-    // const newStat = this.statisticsRepository.create({
-    //   client,
-    //   sheet,
-    //   date: sheet.date,
-    //   totalDebitAmount,
-    //   totalRemainingDebt,
-    // });
-    // await this.statisticsRepository.save(newStat);
+    for (const client of clients) {
+      const newStat = this.statisticsRepository.create({
+        client,
+        sheet,
+        date: sheet.date,
+        totalDebitAmount: clientTotals[client.id].totalDebitAmount,
+        totalRemainingDebt: clientTotals[client.id].totalRemainingDebt,
+      });
+      await this.statisticsRepository.save(newStat);
+    }
 
-    // //% Creamos archivo Excel
-    // const filePath = await this.createExcelFile(processedData, originalFileName);
-    // console.log(`Excel file created at: ${filePath}`);
+    //% Creamos archivo Excel
+    const filePath = await this.createExcelFile(processedData, originalFileName);
+    console.log(`Excel file created at: ${filePath}`);
 
-    // await this.paymentRecordRepository.save(processedData);
+    await this.paymentRecordRepository.save(processedData);
 
-    // generatePaymentExcel(processedData, originalFileName);
+    generatePaymentExcel(processedData, originalFileName);
     return processedData;
   }
 

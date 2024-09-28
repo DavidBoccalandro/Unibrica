@@ -46,6 +46,7 @@ export class PaymentsComponent {
     // 'id',
     // 'recordType',
     'agreementNumber',
+    'client.name',
     // 'creditCompany',
     'companyAccountNumber',
     'bankAccountNumber',

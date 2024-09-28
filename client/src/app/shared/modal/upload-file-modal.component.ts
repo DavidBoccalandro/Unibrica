@@ -110,9 +110,10 @@ export class UploadFileModalComponent implements OnInit {
     });
   }
 
-  changeSelectedClient(clientId: number) {
-    this.selectedClientId = clientId.toString()
+  changeSelectedClient(agreementNumber: number) {
+    this.selectedClientId = agreementNumber.toString()
   }
+
   onCloseClick(): void {
     this.dialogRef.close();
   }
@@ -147,7 +148,7 @@ export class UploadFileModalComponent implements OnInit {
     const response = this.uploadFileService.postUploadDebtSheet(
       this.files!,
       'e1cac08c-145b-469b-ae9d-c1c76d3ff001',
-      client?.clientId ? client : null,
+      client?.agreementNumber ? client : null,
       this.selectedBankId,
       this.form.value['fileType'],
       this.optionalFiles ?? undefined
@@ -177,7 +178,7 @@ export class UploadFileModalComponent implements OnInit {
       const client = this.clients.find((ele) => {
         return ele.name.toLowerCase() === liquidaciones[0].toLowerCase();
       });
-      match = client?.clientId === Number(this.selectedClientId);
+      match = client?.agreementNumber === Number(this.selectedClientId);
     }
 
     if (!match) {
@@ -189,8 +190,16 @@ export class UploadFileModalComponent implements OnInit {
 
   getClients() {
     this.clientService.getClients().subscribe((clients) => {
-      this.clients = clients;
+      const agreementNumbers = new Set<string>();
+      // this.clients = clients;
+      clients.forEach(client => {
+        if(!agreementNumbers.has(client.agreementNumber.toString())) {
+          this.clients.push(client);
+          agreementNumbers.add(client.agreementNumber.toString());
+        }
+      })
     });
+    console.log('Clientes: ', this.clients)
   }
 
   fileTypeSelected(option: any) {

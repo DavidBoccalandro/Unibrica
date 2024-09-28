@@ -15,7 +15,7 @@ export class SheetsService {
       paginationQuery;
     let queryBuilder = this.sheetRepository
       .createQueryBuilder('sheets')
-      .leftJoinAndSelect('sheets.client', 'client');
+      .leftJoinAndSelect('sheets.clients', 'client');
     // .leftJoinAndSelect('sheets.bank', 'bank')
     // .leftJoinAndSelect('sheets.sheet', 'sheet')
 

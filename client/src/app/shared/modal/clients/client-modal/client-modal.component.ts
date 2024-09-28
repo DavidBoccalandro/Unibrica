@@ -65,7 +65,7 @@ export class ClientModalComponent implements OnInit {
     this.selectedClient = this.clients.find((client) => client.clientId === this.selectedClientId);
     if (this.selectedClient) {
       this.clientForm.patchValue({
-        clientId: this.selectedClient.clientId,
+        clientId: this.selectedClient.agreementNumber,
         name: this.selectedClient.name,
       });
     }

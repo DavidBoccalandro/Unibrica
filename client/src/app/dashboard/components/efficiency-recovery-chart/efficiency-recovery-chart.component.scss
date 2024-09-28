@@ -152,7 +152,7 @@
 
   .efficiency-card {
     width: 200px;
-    max-height: 200px;
+    max-height: 250px;
     margin-bottom: 20px;
     display: flex;
     flex-direction: column;
@@ -167,6 +167,7 @@
       font-size: 18px;
       margin-bottom: 16px;
       color: #1e4666;
+      text-align: center;
     }
   }
 
@@ -221,19 +222,19 @@
 }
 
 .efficiency-label {
-  font-size: 20px;
+  font-size: 16px;
   color: #666;
   margin-bottom: 5px;
 }
 
 .efficiency-value, .debt-value {
-  font-size: 40px;
+  font-size: 30px;
   font-weight: bold;
   color: #b93838; /* Color destacado */
 }
 
 .debt-value {
-  font-size: 30px;
+  font-size: 26px;
 }
 
 .details-column {

@@ -10,10 +10,10 @@
     <mat-select formControlName="client">
       <mat-option
         *ngFor="let client of clients"
-        [value]="client.name"
-        (click)="changeSelectedClient(client.clientId)"
+        [value]="client.agreementNumber"
+        (click)="changeSelectedClient(client.agreementNumber)"
       >
-        {{ client.clientId }} - {{ client.name }}
+        {{ client.agreementNumber }}
       </mat-option>
     </mat-select>
   </mat-form-field>

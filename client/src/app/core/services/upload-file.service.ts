@@ -35,7 +35,7 @@ export class UploadFileService {
       formData.append('files', files[i], files[i].name);
     }
     formData.append('userId', userId);
-    formData.append('clientId', client ? client.clientId.toString() : '');
+    formData.append('clientId', client ? client.agreementNumber.toString() : '');
     formData.append('clientName', client ? client.name : '');
     formData.append('bankId', bankId);
 

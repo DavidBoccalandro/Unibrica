@@ -1,4 +1,4 @@
 export interface Client {
-  clientId: number,
+  agreementNumber: number,
   name: string,
 }

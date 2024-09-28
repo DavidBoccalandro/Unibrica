@@ -2,6 +2,7 @@ import * as ExcelJS from 'exceljs';
 import { Payment } from '../payments/payments.component';
 import { saveAs } from 'file-saver';
 import { FilterInExcel } from 'src/app/shared/interfaces/filterInExcel.interface';
+import { Client } from '../../clients/clients.interfaces';
 
 // Método para generar el archivo Excel
 export async function generatePaymentExcel(payments: Payment[], filters: FilterInExcel[]) {
@@ -46,6 +47,11 @@ export async function generatePaymentExcel(payments: Payment[], filters: FilterI
     {
       header: 'Número de convenio',
       key: 'agreementNumber',
+      width: 20,
+    },
+    {
+      header: 'Cliente',
+      key: 'client',
       width: 20,
     },
     {
@@ -125,6 +131,7 @@ export async function generatePaymentExcel(payments: Payment[], filters: FilterI
   payments.forEach((payment) => {
     worksheet.addRow({
       agreementNumber: payment.agreementNumber,
+      client: payment.client?.name,
       companyAccountNumber: payment.companyAccountNumber,
       debitDate: payment.debitDate,
       bankCode: payment.bank?.bankId || '',
@@ -149,6 +156,7 @@ export async function generatePaymentExcel(payments: Payment[], filters: FilterI
     columns: columns.map((col) => ({ name: col.header as string })),
     rows: payments.map((payment) => [
       payment.agreementNumber,
+      payment.client?.name,
       payment.companyAccountNumber,
       payment.debitDate,
       payment.bank?.bankId || '',

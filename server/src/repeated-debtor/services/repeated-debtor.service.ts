@@ -20,7 +20,7 @@ export class RepeatedDebtorService {
       .createQueryBuilder('repeated_debtors')
       .leftJoinAndSelect('repeated_debtors.debtor', 'debtor')
       .leftJoinAndSelect('repeated_debtors.sheets', 'sheets')
-      .leftJoinAndSelect('sheets.client', 'client');
+      .leftJoinAndSelect('sheets.clients', 'client');
     // .leftJoinAndSelect('sheets.bank', 'bank')
     // .leftJoinAndSelect('sheets.sheet', 'sheet')
 
