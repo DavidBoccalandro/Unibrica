@@ -22,10 +22,10 @@ export class PaymentController {
   @UseInterceptors(FilesInterceptor('files'))
   async uploadReversal(
     @UploadedFiles() files: Express.Multer.File[],
-    @Body('clientId') clientId: string
+    @Body('clientId') agreementNumber: string
   ): Promise<any> {
     const [file, optionalFile] = files;
-    await this.paymentService.uploadPaymentSheet(file, clientId, optionalFile);
+    await this.paymentService.uploadPaymentSheet(file, agreementNumber, optionalFile);
 
     return { message: 'Files processed and Excel file created.' };
   }

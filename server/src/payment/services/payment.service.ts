@@ -40,7 +40,7 @@ export class PaymentService {
 
   async uploadPaymentSheet(
     file: Express.Multer.File,
-    clientId: string,
+    agreementNumber: string,
     optionalFile?: Express.Multer.File
   ): Promise<PaymentRecord[]> {
     if (!file) {
@@ -59,12 +59,11 @@ export class PaymentService {
     const processedData: PaymentRecord[] = [];
 
     const [sdaDataMap, clientCodesSet] = processSdaLines(optionalFile);
-
     // const clientCodes = Array.from(Object.keys(sdaDataMap[0])); // Obtener todas las claves del Map como un array
 
     const clients = await this.clientRepository.find({
       where: {
-        agreementNumber: +clientId,
+        agreementNumber: +agreementNumber,
         code: In([...clientCodesSet].map((code) => code)), // Usar In para buscar los códigos
       },
     });
@@ -115,6 +114,7 @@ export class PaymentService {
           return ele.code === sdaDataMap.get(bankAccountNumber)?.clientCode;
         });
 
+        // console.log('client: ', client);
         //% debitStatus: E ==> Error; debitStatus: R ==> Rechazado
         if (debitStatus !== 'P') {
           chargedAmount = 0;
@@ -243,8 +243,6 @@ export class PaymentService {
     if (stringFilters && stringFilters.length > 0) {
       stringFilters.forEach((filter) => {
         const { filterBy, filterValue } = filter;
-        // console.log('filterBy: ', filterBy);
-        // console.log('filterValue type: ', typeof filterValue);
         if (filterBy === 'clientName') {
           queryBuilder = queryBuilder.andWhere(`LOWER(client.name) LIKE :filterValue`, {
             filterValue: `%${filterValue.toLowerCase()}%`,

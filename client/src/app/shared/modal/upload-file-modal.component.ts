@@ -143,7 +143,7 @@ export class UploadFileModalComponent implements OnInit {
   }
 
   onUploadFiles(): void {
-    const client = this.clients.find((client) => client.name === this.form.value['client']!);
+    const client = this.clients.find((client) => client.agreementNumber === this.form.value['client']!);
 
     const response = this.uploadFileService.postUploadDebtSheet(
       this.files!,
@@ -190,6 +190,7 @@ export class UploadFileModalComponent implements OnInit {
 
   getClients() {
     this.clientService.getClients().subscribe((clients) => {
+      // console.log('Clientes: ', clients)
       const agreementNumbers = new Set<string>();
       // this.clients = clients;
       clients.forEach(client => {
@@ -199,7 +200,6 @@ export class UploadFileModalComponent implements OnInit {
         }
       })
     });
-    console.log('Clientes: ', this.clients)
   }
 
   fileTypeSelected(option: any) {
