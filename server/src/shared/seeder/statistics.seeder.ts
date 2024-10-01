@@ -37,7 +37,7 @@ async function seedDatabase() {
       const date = faker.date
         //! Ajustar la fecha de los sheets
         // .between({ from: '2024-08-01', to: '2024-09-30' }) // último mes
-        .between({ from: '2023-08-01', to: '2024-09-30' }) // último año
+        .between('2023-08-01', '2024-09-30') // último año
         .toISOString()
         .split('T')[0];
 
@@ -61,25 +61,25 @@ async function seedDatabase() {
         const debtStatistic = new StatisticsDebtEntity();
         // This should be a date a week before paymentStatistic.date
         debtStatistic.date = new Date(new Date(date).setDate(new Date(date).getDate() - 7));
-        debtStatistic.totalDebtAmount = faker.number.float({ min: 0, max: 1000000 });
+        debtStatistic.totalDebtAmount = faker.datatype.float({ min: 0, max: 1000000 });
         debtStatistic.client = client;
         debtStatistic.sheet = sheet;
 
         // Crear la estadística de pagos
         const paymentStatistic = new StatisticsPaymentEntity();
         paymentStatistic.date = new Date(date);
-        paymentStatistic.totalDebitAmount = faker.number.float({
+        paymentStatistic.totalDebitAmount = faker.datatype.float({
           min: 0,
           max: debtStatistic.totalDebtAmount,
         });
-        paymentStatistic.totalRemainingDebt = faker.number.float({ min: 0, max: 1000000 });
+        paymentStatistic.totalRemainingDebt = faker.datatype.float({ min: 0, max: 1000000 });
         paymentStatistic.client = client;
         paymentStatistic.sheet = sheet;
 
         // Crear la estadística de reversas
         const reversalStatistic = new StatisticsReversalEntity();
         reversalStatistic.date = new Date(date);
-        reversalStatistic.totalReversalAmount = faker.number.float({
+        reversalStatistic.totalReversalAmount = faker.datatype.float({
           min: 0,
           max: paymentStatistic.totalDebitAmount / 2,
         });
@@ -107,10 +107,10 @@ seedDatabase()
 // Función para generar nombres de archivo ficticios con un patrón específico
 function generateFileName(): string {
   const prefix = 'pagpa';
-  const randomNumber = faker.number.int({ min: 10000, max: 99999 });
-  const date = faker.date.between({ from: '2024-08-01', to: '2024-09-30' });
+  const randomNumber = faker.datatype.number({ min: 10000, max: 99999 });
+  const date = faker.date.between('2024-08-01', '2024-09-30');
   const formattedDate = date.toISOString().split('T')[0].replace(/-/g, '');
-  const suffix = `of${faker.number.int({ min: 100, max: 999 })}.lis`;
+  const suffix = `of${faker.datatype.number({ min: 100, max: 999 })}.lis`;
 
   return `${prefix}${randomNumber}_${formattedDate}_${suffix}`;
 }

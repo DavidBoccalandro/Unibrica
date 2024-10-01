@@ -3,7 +3,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { NavigationExtras, Router, ActivatedRoute, Params } from '@angular/router';
 import { Observable } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { environment } from 'src/enviroments/enviroment';
+import { environment } from 'src/environments/environment';
 import { Sheet } from 'src/app/shared/interfaces/sheet.interface';
 import { File } from '../components/files/files.component';
 import { RepeatedDebtor } from '../components/file-log/file-log.component';

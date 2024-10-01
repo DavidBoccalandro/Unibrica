@@ -4,7 +4,7 @@
   "description": "Unibirica Platform",
   "main": "index.js",
   "scripts": {
-    "start:client": "cd client && ng serve",
+    "start:client": "cd client && ng serve --host 0.0.0.0 --port 4200",
     "start:server": "cd server && npm run start:dev",
     "test": "cd client && npm run test:headless && cd.. && cd server && npm test",
     "test:client": "cd client && npm run test:headless",

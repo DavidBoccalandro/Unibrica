@@ -1,0 +1,62 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydatabase
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile-server
+    container_name: nest-server
+    environment:
+      - NODE_ENV=docker
+    env_file:
+      - .docker.env
+    depends_on:
+      - postgres
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./server:/usr/src/app  # Monta la carpeta del servidor en el contenedor
+      - /usr/src/app/node_modules  # Evita conflictos de node_modules
+
+  # Frontend Angular
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile-client
+    container_name: angular-client-dev
+    ports:
+      - "4200:4200"  # Puerto para el servidor de desarrollo de Angular
+    environment:
+      - NODE_ENV=development
+    command: npm run start
+    volumes:
+      - ./client:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - server
+
+  # pgAdmin service
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: aerocmc@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: 3Tristestigres
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:

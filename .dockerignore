@@ -1,0 +1,7 @@
+# Ignorar carpetas node_modules
+server/node_modules
+client/node_modules
+
+# Ignorar archivos de compilación
+server/dist
+client/dist

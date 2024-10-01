@@ -1,0 +1,18 @@
+# Usa una imagen oficial de Node.js como base para construir el proyecto Angular
+FROM node:20.17.0 AS builder
+
+# Establece el directorio de trabajo
+WORKDIR /usr/src/app
+
+# Copia los archivos del proyecto Angular
+COPY client/package*.json ./
+RUN npm install
+
+# Copia el resto del código fuente
+COPY client/ .
+
+# Expone el puerto donde se ejecutará la aplicación Angular
+EXPOSE 4200
+
+# Inicia el servidor de desarrollo de Angular
+CMD ["npm", "run", "start"]

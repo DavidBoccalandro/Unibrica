@@ -65,8 +65,16 @@
               "namedChunks": true,
               "fileReplacements": [
                 {
-                  "replace": "src/enviroments/enviroment.ts",
-                  "with": "src/enviroments/development.enviroment.ts"
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.development.ts"
+                }
+              ]
+            },
+            "docker": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.docker.ts"
                 }
               ]
             }
