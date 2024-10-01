@@ -104,9 +104,7 @@ export async function handleDebtor(
   const { dni, firstNames, lastNames } = row.debtor;
 
   // Intentar obtener el deudor del mapa utilizando el DNI
-  console.log('Debtor DNI: ', dni, typeof dni);
   let debtor = debtorsMap.get(dni);
-  console.log('debtor', debtor);
 
   // Si el deudor no existe, se crea uno nuevo
   if (!debtor) {

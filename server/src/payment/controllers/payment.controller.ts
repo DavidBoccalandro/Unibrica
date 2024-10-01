@@ -38,13 +38,6 @@ export class PaymentController {
     @Query('numericFilters') numericFilters: string,
     @Query('dateFilters') dateFilters: string
   ) {
-    console.log(
-      'filters',
-      stringFilters,
-      typeof stringFilters,
-      numericFilters,
-      typeof numericFilters
-    );
     let parsedStringFilters, parsedNumericFilters, parsedDateFilters;
     if (stringFilters && stringFilters !== 'undefined') {
       parsedStringFilters = JSON.parse(stringFilters);

@@ -42,7 +42,6 @@ export class AuthService extends HttpBaseService {
   isTokenExpired(token: string): boolean {
     const decoded: any = jwtDecode(token);
     const currentTime = Math.floor(new Date().getTime() / 1000);
-    console.log('Comparacion: ', decoded.exp, currentTime)
     return decoded.exp < currentTime;
   }
 

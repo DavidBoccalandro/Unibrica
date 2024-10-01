@@ -124,7 +124,6 @@ export class FilesComponent implements OnDestroy {
   }
 
   download(element: any, option?: string) {
-    console.log('Element', element);
     let name = element.fileName;
     if (name.match(/\.[^/.]+$/)) {
       name = name.replace(/\.[^/.]+$/, '');
@@ -153,7 +152,7 @@ export class FilesComponent implements OnDestroy {
   }
 
   elementClick(event: any): void {
-    console.log('dataSource: ', this.dataSource.data);
+    // console.log('dataSource: ', this.dataSource.data);
     // if (!this.clickableColumns) return;
     // if(this.clickableColumns.has(event.column)) {
     //   this.elementClickEmitter.emit(event)

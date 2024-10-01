@@ -55,7 +55,6 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
       .getAllClients()
       .pipe(take(1))
       .subscribe((clients) => {
-        console.log('clientes: ', clients)
         this.clients = clients;
       });
     this.loadPaymentsForAllClients();
@@ -73,9 +72,7 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
     const statisticsParam = { startDate: start, endDate: today };
     this.statisticService.getStatisticsOfMonth(statisticsParam).subscribe((data) => {
       if (data.length > 0) {
-        console.log('Data del back: ', data)
         const chartData = this.adaptStatisticsToChartData(data);
-        console.log('chartData: ', chartData)
         const maxValueY = this.calculateMaxValueY(chartData);
         this.maxValue = Math.round(maxValueY + maxValueY * 0.1);
         this.data = chartData;
@@ -95,7 +92,6 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
         (acc: number, value: number) => acc + value,
         0
       );
-      console.log('totalDebitAmountSum: ', totalDebitAmountSum)
       const totalDebtSum = Object.values(clientStats.statistics.totalDebtAmount).reduce(
         (acc: number, value: number) => acc + value,
         0
@@ -109,7 +105,6 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
       const totalRemainingDebtSum = totalDebtSum - totalDebitAmountSum > 0 ? totalDebtSum - totalDebitAmountSum : 0;
       totalDebitAmountSum = totalDebitAmountSum - totalReversalAmountSum;
       // const totalRemainingDebtSum = totalDebtSum > 0 ? totalDebtSum - totalDebitAmountSum : 0;
-      console.log('totalDebitAmountSum++: ', totalDebitAmountSum, totalReversalAmountSum, totalDebtSum)
 
       // Calcular la eficacia de cobro
       const collectionEfficiency =

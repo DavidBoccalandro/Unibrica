@@ -20,13 +20,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
   userSub$!: Subscription;
 
   constructor(
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private store: Store<AuthState>
   ) {}
 
   ngOnInit() {
     this.userSub$ = this.store.select(selectUser).subscribe(
-      (user) => {this.user = user} 
+      (user) => {this.user = user}
     )
     this.profileForm = this.fb.group({
       username: [this.user?.name, Validators.required],
@@ -34,7 +34,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       name: ['Julian', Validators.required],
       lastName: ['Marc', Validators.required],
     });
-    this.profileForm.disable(); 
+    this.profileForm.disable();
   }
 
   ngOnDestroy(): void {
@@ -53,7 +53,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   onSubmit() {
     if (this.profileForm.valid) {
-      console.log('Form submitted:', this.profileForm.value);
       this.profileForm.disable();
       this.isEditing = false;
     }

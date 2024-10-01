@@ -86,7 +86,7 @@ export class DebtsService {
 
     const allDebtors = await this.debtorRepository.find({ relations: ['sheet'] });
     const debtorsMap = new Map(allDebtors.map((debtor) => [debtor.dni, debtor]));
-    console.log('debtorMap: ', debtorsMap);
+
     const debtorIds: string[] = [];
     let totalDebtAmount = 0;
 
@@ -235,7 +235,6 @@ export class DebtsService {
 
     const debts = await queryBuilder.getMany();
 
-    console.log('Debts: ', debts);
     return { debts, totalItems };
   }
 }

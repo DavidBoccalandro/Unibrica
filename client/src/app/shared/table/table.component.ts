@@ -95,7 +95,6 @@ export class TableComponent {
   ngOnInit() {}
 
   elementClick (event: TableClickEvent):void {
-    console.log('dataSource: ', this.dataSource.data)
     if (!this.clickableColumns) return;
     if(this.clickableColumns.has(event.column)) {
       this.elementClickEmitter.emit(event)

@@ -58,7 +58,6 @@ export class ClientsService {
 
       // Actualiza los campos del cliente con los nuevos datos
       Object.assign(client, updateClientDto);
-      console.log('Cliente modificado: ', client);
 
       // Guarda los cambios
       return await this.clientRepository.save(client);
