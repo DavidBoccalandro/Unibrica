@@ -18,7 +18,7 @@ services:
       dockerfile: Dockerfile-server
     container_name: nest-server
     environment:
-      - NODE_ENV=docker
+      - NODE_ENV=develop
     env_file:
       - .docker.env
     depends_on:

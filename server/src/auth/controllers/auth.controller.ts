@@ -25,7 +25,7 @@ export class AuthController {
       httpOnly: false,
       secure: false,
       sameSite: false,
-      expires: addHoursToDate('1h'),
+      expires: addHoursToDate('24h'),
     });
     return jwt.user;
   }

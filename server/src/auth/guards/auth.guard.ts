@@ -17,11 +17,20 @@ export class AuthGuard implements CanActivate {
     const req = context.switchToHttp().getRequest<Request>();
     const httpOnlyCookie = req.headers['cookie'];
 
-    if (!httpOnlyCookie) {
-      throw new UnauthorizedException('Ha expirado la sesión');
+    const cookies = httpOnlyCookie.split(';');
+    let token: string | undefined;
+
+    for (const cookie of cookies) {
+      const [key, value] = cookie.trim().split('=');
+      if (key === 'access_token') {
+        token = value;
+        break;
+      }
     }
 
-    const token = httpOnlyCookie.replace('access_token=', '');
+    if (!token) {
+      throw new UnauthorizedException('Token not found in cookies');
+    }
 
     const manageToken: IUseToken | string = useToken(token);
 
