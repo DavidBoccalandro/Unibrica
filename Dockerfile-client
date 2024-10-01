@@ -1,5 +1,5 @@
 # Usa una imagen oficial de Node.js como base para construir el proyecto Angular
-FROM node:20.17.0 AS builder
+FROM node:20.17.0-alpine AS builder
 
 # Establece el directorio de trabajo
 WORKDIR /usr/src/app

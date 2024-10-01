@@ -1,0 +1,21 @@
+  services:
+    server:
+      build: .
+      ports:
+        - "3000:3000"  # Cambiar el puerto si es necesario
+      # volumes:
+      #   - ./server:/usr/src/app  # Montar el directorio de tu aplicación NestJS
+      # command: npm run start:dev  # Asumiendo que este es el comando para iniciar en modo de desarrollo
+      develop:
+        watch:
+          - action: sync
+            path: .
+            target: /usr/src/app
+            ignore:
+              - node_modules/
+          - action: rebuild
+            path: ./client/package.json
+          - action: rebuild  # Reconstruir cuando haya cambios en el Dockerfile
+            path: ./client/Dockerfile  # Ruta al Dockerfile de Angular
+          - action: rebuild  # Reconstruir cuando haya cambios en el docker-compose.yml
+            path: ./docker-compose.yml  # Ruta al archivo docker-compose.yml

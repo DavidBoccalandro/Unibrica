@@ -13,7 +13,7 @@ export class ChartsSelectorComponent {
       title: 'Pagos por cliente',
       imageUrl: '../../../../assets/media/line-chart.png',
       description: 'Representación de los pagos realizados por los clientes cada día en un determinado período de tiempo',
-      route: '/dashboard/line-chart'
+      route: '/dashboard/payments-line-chart'
     },
     {
       title: 'Efectividad de cobro',
@@ -22,17 +22,17 @@ export class ChartsSelectorComponent {
       route: '/dashboard/stacked-chart'
     },
     {
-      title: 'Gráfico 3',
-      imageUrl: '../../../../assets/media/SITIO-EN-CONSTRUCCION.jpg',
-      description: 'Descripción del gráfico 3',
-      route: '/grafico3'
+      title: 'Reversas por cliente',
+      imageUrl: '../../../../assets/media/line-chart.png',
+      description: 'Representación de las reversas realizados por los clientes cada día en un determinado período de tiempo',
+      route: '/dashboard/reversals-line-chart'
     },
-    {
-      title: 'Gráfico 4',
-      imageUrl: '../../../../assets/media/SITIO-EN-CONSTRUCCION.jpg',
-      description: 'Descripción del gráfico 4',
-      route: '/grafico4'
-    }
+    // {
+    //   title: 'Gráfico 4',
+    //   imageUrl: '../../../../assets/media/SITIO-EN-CONSTRUCCION.jpg',
+    //   description: 'Descripción del gráfico 4',
+    //   route: '/grafico4'
+    // }
   ];
 
   constructor(private router: Router) {}

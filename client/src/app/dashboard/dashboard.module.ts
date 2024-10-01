@@ -18,6 +18,7 @@ import { EfficiencyRecoveryChartComponent } from './components/efficiency-recove
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { LineChartReversalsClientsComponent } from './components/line-chart-reversals-clients/line-chart-reversals-clients.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +26,7 @@ import { MatIconModule } from '@angular/material/icon';
     LineChartPaymentsClientsComponent,
     ChartsSelectorComponent,
     EfficiencyRecoveryChartComponent,
+    LineChartReversalsClientsComponent,
   ],
   imports: [
     CommonModule,

@@ -25,9 +25,19 @@ services:
       - postgres
     ports:
       - "4000:4000"
-    volumes:
-      - ./server:/usr/src/app  # Monta la carpeta del servidor en el contenedor
-      - /usr/src/app/node_modules  # Evita conflictos de node_modules
+    develop:
+      watch:
+        - action: sync
+          path: ./server
+          target: /usr/src/app
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: .server/package.json
+        - action: rebuild
+          path: ./Dockerfile-server
+        - action: rebuild
+          path: ./docker-compose.yml
 
   # Frontend Angular
   client:
@@ -39,10 +49,16 @@ services:
       - "4200:4200"  # Puerto para el servidor de desarrollo de Angular
     environment:
       - NODE_ENV=development
-    command: npm run start
-    volumes:
-      - ./client:/usr/src/app
-      - /usr/src/app/node_modules
+    #command: npm run start
+    develop:
+      watch:
+        - action: sync
+          path: ./client
+          target: /usr/src/app
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: client/package.json
     depends_on:
       - server
 
