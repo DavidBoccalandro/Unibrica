@@ -17,6 +17,7 @@ export class ClientsService {
       const newClient = new ClientEntity();
       newClient.agreementNumber = body.clientId;
       newClient.name = body.name;
+      newClient.code = body.code ?? '';
       const client: ClientEntity = await this.clientRepository.save(newClient);
 
       if (!client) {

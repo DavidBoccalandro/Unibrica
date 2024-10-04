@@ -1,52 +1,68 @@
-<h2 mat-dialog-title [class.editing]="selectedClient">
-  {{ selectedClient ? 'Editar Cliente' : 'Crear Cliente' }}
-</h2>
+<div class="left-side">
+  <h2 mat-dialog-title [class.editing]="selectedClient">{{selectedClient ? 'Editar datos del cliente' : 'Crear Cliente'}}</h2>
 
-<mat-dialog-content>
-  <form [formGroup]="clientForm" color="primary">
-    <!-- Campo para el ID del cliente -->
-    <mat-form-field appearance="outline" class="file-type-form-field">
-      <mat-label>N° de convenio</mat-label>
-      <input matInput formControlName="clientId" type="number" />
-      <mat-error *ngIf="clientForm.get('clientId')?.hasError('required')"
-        >El ID es requerido</mat-error
-      >
-    </mat-form-field>
+  <mat-dialog-content>
+    <form [formGroup]="clientForm" color="primary">
+      <!-- Campo para el ID del cliente -->
+      <mat-form-field appearance="outline" class="file-type-form-field">
+        <mat-label>N° de convenio</mat-label>
+        <input matInput formControlName="clientId" type="number" />
+        <mat-error *ngIf="clientForm.get('clientId')?.hasError('required')"
+          >El ID es requerido</mat-error
+        >
+      </mat-form-field>
 
-    <!-- Campo para el Nombre -->
-    <mat-form-field appearance="outline" class="file-type-form-field">
-      <mat-label>Nombre</mat-label>
-      <input matInput formControlName="name" />
-      <mat-error *ngIf="clientForm.get('name')?.hasError('required')"
-        >El nombre es requerido</mat-error
-      >
-    </mat-form-field>
+      <!-- Campo para el Nombre -->
+      <mat-form-field appearance="outline" class="file-type-form-field">
+        <mat-label>Nombre</mat-label>
+        <input matInput formControlName="name" />
+        <mat-error *ngIf="clientForm.get('name')?.hasError('required')"
+          >El nombre es requerido</mat-error
+        >
+      </mat-form-field>
 
+      <!-- Campo para el Código -->
+      <mat-form-field appearance="outline" class="file-type-form-field">
+        <mat-label>Código</mat-label>
+        <input matInput formControlName="code" />
+        <mat-error *ngIf="clientForm.get('name')?.hasError('required')"
+          >El nombre es requerido</mat-error
+        >
+      </mat-form-field>
+
+      <mat-dialog-actions>
+        <button mat-stroked-button color="warn" (click)="onCancel()">Cancelar</button>
+        <button mat-flat-button color="primary" (click)="onSave()" [disabled]="clientForm.invalid">
+          {{ selectedClient ? 'Guardar Cambios' : 'Crear Cliente' }}
+        </button>
+      </mat-dialog-actions>
+    </form>
+  </mat-dialog-content>
+</div>
+
+<div class="right-side">
+  <h2 mat-dialog-title [class.editing]="selectedClient">Editar Cliente</h2>
+  <mat-dialog-content>
     <!-- Lista de clientes seleccionables -->
     <mat-form-field appearance="outline" class="file-type-form-field select-client">
       <mat-label>Selecciona cliente para editar</mat-label>
-      <mat-select [(value)]="selectedClientId">
-        <mat-option *ngFor="let client of clients" [value]="client.clientId">
+      <mat-select [(value)]="selectedClientToEdit">
+        <mat-option *ngFor="let client of clients" [value]="client">
           {{ client.name }}
         </mat-option>
       </mat-select>
     </mat-form-field>
-    <button
-      mat-flat-button
-      color="primary"
-      type="button"
-      (click)="onClientSelect()"
-      [disabled]="!selectedClientId"
-      class="edit-button"
-    >
-      Editar
-    </button>
-  </form>
-</mat-dialog-content>
-
-<mat-dialog-actions>
-  <button mat-stroked-button color="warn" (click)="onCancel()">Cancelar</button>
-  <button mat-flat-button color="primary" (click)="onSave()" [disabled]="clientForm.invalid">
-    {{ selectedClient ? 'Guardar Cambios' : 'Crear Cliente' }}
-  </button>
-</mat-dialog-actions>
+    <mat-dialog-actions>
+      <button
+        mat-flat-button
+        color="primary"
+        type="button"
+        (click)="onClientSelect()"
+        [disabled]="!selectedClientToEdit"
+        class="edit-button"
+      >
+        Editar
+      </button>
+    </mat-dialog-actions>
+  </mat-dialog-content>
+</div>

@@ -18,7 +18,7 @@ const MaterialModules = [
   MatSelectModule,
   MatInputModule,
   MatIconModule,
-  MatDialogModule
+  MatDialogModule,
 ];
 
 @Component({
@@ -30,9 +30,9 @@ const MaterialModules = [
 })
 export class ClientModalComponent implements OnInit {
   clientForm: FormGroup;
-  clients: any[] = []; // Lista de clientes
-  selectedClientId: number | null = null;
-  selectedClient: Client | null = null;
+  clients: Client[] = [];
+  selectedClientToEdit: Client | undefined = undefined;
+  selectedClient: Client | undefined = undefined;
 
   constructor(
     private fb: FormBuilder,
@@ -43,6 +43,7 @@ export class ClientModalComponent implements OnInit {
     this.clientForm = this.fb.group({
       clientId: [data.client ? data.client.clientId : '', Validators.required],
       name: [data.client ? data.client.name : '', Validators.required],
+      code: [''],
     });
   }
 
@@ -62,19 +63,26 @@ export class ClientModalComponent implements OnInit {
   }
 
   onClientSelect(): void {
-    this.selectedClient = this.clients.find((client) => client.clientId === this.selectedClientId);
+    const clientsFiltered = this.clients.filter(
+      (client) => client.agreementNumber === this.selectedClientToEdit?.agreementNumber
+    );
+    this.selectedClient =
+      clientsFiltered.length > 1
+        ? clientsFiltered.find((client) => client.code === this.selectedClientToEdit!.code)
+        : clientsFiltered[0];
     if (this.selectedClient) {
       this.clientForm.patchValue({
         clientId: this.selectedClient.agreementNumber,
         name: this.selectedClient.name,
+        code: this.selectedClient.code,
       });
     }
   }
 
   onEditClient(): void {
-    // if (this.selectedClientId) {
-    //   this.onClientSelect(this.selectedClientId); // Cargar datos del cliente en el formulario
-    // }
+    if (this.selectedClientToEdit) {
+      this.onClientSelect();
+    }
   }
 
   onCancel(): void {

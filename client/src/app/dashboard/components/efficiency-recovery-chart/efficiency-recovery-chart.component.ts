@@ -71,6 +71,7 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
 
     const statisticsParam = { startDate: start, endDate: today };
     this.statisticService.getStatisticsOfMonth(statisticsParam).subscribe((data) => {
+      console.log('getStatisticsOfMonth: ', data)
       if (data.length > 0) {
         const chartData = this.adaptStatisticsToChartData(data);
         const maxValueY = this.calculateMaxValueY(chartData);
@@ -144,5 +145,10 @@ export class EfficiencyRecoveryChartComponent implements OnInit {
     });
 
     return maxValue;
+  }
+
+  getCurrentMonth(): string {
+    const today = new Date();
+    return today.toLocaleString('default', { month: 'long' }).toUpperCase();
   }
 }

@@ -23,7 +23,7 @@ export class ChartsSelectorComponent {
     },
     {
       title: 'Reversas por cliente',
-      imageUrl: '../../../../assets/media/line-chart.png',
+      imageUrl: '../../../../assets/media/line-chart 2.png',
       description: 'Representación de las reversas realizados por los clientes cada día en un determinado período de tiempo',
       route: '/dashboard/reversals-line-chart'
     },

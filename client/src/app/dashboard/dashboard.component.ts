@@ -57,7 +57,7 @@ export class DashboardComponent implements OnInit {
 
   openClientModal(client = null): void {
     const dialogRef = this.dialog.open(ClientModalComponent, {
-      width: '400px',
+      width: '800px',
       data: { client },
     });
 

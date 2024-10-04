@@ -1,14 +1,17 @@
 :host {
-  width: 400px;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-direction: row;
+  // align-items: flex-end;
+  justify-content: space-around;
   padding-bottom: 15px;
+  margin: 24px;
+  gap: 24px;
 }
 
 h2 {
-  padding-bottom: 24px;
-  font-weight: 500;
+  padding-bottom: 12px;
+  font-weight: 500 !important;
+  font-size: 1.1rem !important;
   align-self: flex-start;
 }
 
@@ -46,9 +49,9 @@ mat-dialog-actions {
   justify-content: space-between;
 }
 
-.select-client {
-  margin-top: 15px;
-}
+// .select-client {
+  // margin-top: 15px;
+// }
 
 .editing {
   color: orange;
@@ -57,4 +60,10 @@ mat-dialog-actions {
 .edit-button:not(:disabled) {
   margin-bottom: 15px;
   background-color: orange;
+}
+
+.right-side, .left-side {
+  width: 50%;
+  border: 1px solid lightgray;
+  border-radius: 10px;
 }
